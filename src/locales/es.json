@@ -1,3 +1,9 @@
 {
-
+  "option": {
+    "home": "Inicio",
+    "map": "Mapa",
+    "alert": "Alerta",
+    "business": "Negocio",
+    "subscription": "Suscripción"
+  }
 }

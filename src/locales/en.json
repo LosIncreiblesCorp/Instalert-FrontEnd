@@ -1,3 +1,9 @@
 {
-
+  "option": {
+    "home": "Home",
+    "map": "Map",
+    "alert": "Alert",
+    "business": "Business",
+    "subscription": "Subscription"
+  }
 }
