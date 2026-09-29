@@ -1,9 +1,10 @@
 import {createRouter, createWebHistory} from "vue-router";
+import home from "./shared/presentation/views/home.vue";
 
 const routes = [
-    //{ path: '/home',            name: 'home',       component: Home,        meta: { title: 'Home' } },
+    { path: '/home',            name: 'home',       component: home,        meta: { title: 'Home' } },
 
-    //{ path: '/',                redirect: '/home' },
+    { path: '/',                redirect: '/home' },
     //{ path: '/:pathMatch(.*)*', name: 'not-found', component: pageNotFound, meta: { title: 'Page Not Found' } }
 ];
 const router = createRouter({
