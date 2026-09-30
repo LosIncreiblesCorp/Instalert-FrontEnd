@@ -1,3 +1,32 @@
 {
-
+  "common": {
+    "appName": "InstAlert",
+    "skipToContent": "Saltar al contenido",
+    "openNavigation": "Abrir menú de navegación",
+    "closeNavigation": "Cerrar menú de navegación",
+    "language": "Idioma",
+    "demoView": "Vista de demostración",
+    "demoAccount": "Cuenta de demostración",
+    "profile": "Perfil",
+    "notFoundCode": "ERROR 404",
+    "notFoundTitle": "Página no encontrada",
+    "notFoundDescription": "La página solicitada no existe o pudo haber cambiado de dirección.",
+    "goBack": "Volver"
+  },
+  "roles": {
+    "administrator": "Administrador",
+    "employee": "Personal operativo"
+  },
+  "navigation": {
+    "mainLabel": "Navegación principal",
+    "sectionTitle": "Navegación táctica",
+    "adminDashboard": "Inicio",
+    "employeeDashboard": "Inicio",
+    "riskMap": "Mapa de riesgo",
+    "alerts": "Alertas",
+    "activeAlerts": "Alertas activas",
+    "alertHistory": "Historial de alertas",
+    "personnel": "Personal",
+    "subscription": "Suscripción"
+  }
 }

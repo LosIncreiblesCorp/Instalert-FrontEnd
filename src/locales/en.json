@@ -1,3 +1,32 @@
 {
-
+  "common": {
+    "appName": "InstAlert",
+    "skipToContent": "Skip to content",
+    "openNavigation": "Open navigation menu",
+    "closeNavigation": "Close navigation menu",
+    "language": "Language",
+    "demoView": "Demo view",
+    "demoAccount": "Demo account",
+    "profile": "Profile",
+    "notFoundCode": "ERROR 404",
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The page you requested does not exist or may have moved.",
+    "goBack": "Go back"
+  },
+  "roles": {
+    "administrator": "Administrator",
+    "employee": "Operational staff"
+  },
+  "navigation": {
+    "mainLabel": "Main navigation",
+    "sectionTitle": "Tactical navigation",
+    "adminDashboard": "Dashboard",
+    "employeeDashboard": "Dashboard",
+    "riskMap": "Risk map",
+    "alerts": "Alerts",
+    "activeAlerts": "Active alerts",
+    "alertHistory": "Alert history",
+    "personnel": "Staff",
+    "subscription": "Subscription"
+  }
 }
