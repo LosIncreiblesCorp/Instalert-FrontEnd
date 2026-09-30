@@ -16,7 +16,7 @@ const routes = [
   {
     path: "/admin/risk-map",
     name: "admin-risk-map",
-    component: EmptyRouteView,
+    component: () => import('./mapping/presentation/views/risk-map-page.vue'),
     meta: { role: "administrator", menuKey: "risk-map", title: "navigation.riskMap" },
   },
   { path: "/admin/alerts", redirect: { name: "admin-alerts-active" } },
@@ -66,7 +66,7 @@ const routes = [
   {
     path: "/employee/risk-map",
     name: "employee-risk-map",
-    component: EmptyRouteView,
+    component: () => import('./mapping/presentation/views/risk-map-page.vue'),
     meta: { role: "employee", menuKey: "risk-map", title: "navigation.riskMap" },
   },
   {

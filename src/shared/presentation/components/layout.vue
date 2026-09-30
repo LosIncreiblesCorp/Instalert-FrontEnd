@@ -136,6 +136,7 @@ function closeMobileNavigation() {
 
     <main id="main-content" class="workspace-main" tabindex="-1">
       <h1 class="visually-hidden">{{ currentTitle }}</h1>
+      <RouterView />
     </main>
   </div>
 </template>
