@@ -13,6 +13,28 @@
     "notFoundDescription": "The page you requested does not exist or may have moved.",
     "goBack": "Go back"
   },
+  "business": {
+    "personnel": {
+      "title": "Business staff",
+      "description": "Staff associated with your business.",
+      "name": "Name",
+      "status": "Status",
+      "unavailableTitle": "Your staff information is not available yet",
+      "unavailableDescription": "Your business's staff information has not been connected yet. In the meantime, you can validate an email address in New invitation."
+    },
+    "invitation": {
+      "title": "New invitation",
+      "description": "Invite operational staff to your business.",
+      "email": "Email address",
+      "emailHelp": "Required. Enter the employee's email address.",
+      "unavailable": "This form only checks the email format. Creating invitations and sending emails are not available yet.",
+      "required": "Enter an email address.",
+      "invalid": "Enter an email address with a valid format.",
+      "checkEmail": "Validate email",
+      "validFormat": "This email address has a valid format. Creating the invitation will be available once integration is complete.",
+      "back": "Back to staff"
+    }
+  },
   "roles": {
     "administrator": "Administrator",
     "employee": "Operational staff"
