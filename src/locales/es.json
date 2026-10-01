@@ -13,6 +13,28 @@
     "notFoundDescription": "La página solicitada no existe o pudo haber cambiado de dirección.",
     "goBack": "Volver"
   },
+  "business": {
+    "personnel": {
+      "title": "Personal del Comercio",
+      "description": "Personal asociado a tu negocio.",
+      "name": "Nombre",
+      "status": "Estado",
+      "unavailableTitle": "La información de tu personal aún no está disponible",
+      "unavailableDescription": "La información del personal de tu negocio aún está pendiente de conexión. Mientras tanto, puedes validar un correo electrónico desde Nueva invitación."
+    },
+    "invitation": {
+      "title": "Nueva invitación",
+      "description": "Invita al personal operativo de tu negocio.",
+      "email": "Correo electrónico",
+      "emailHelp": "Obligatorio. Ingresa el correo electrónico del empleado.",
+      "unavailable": "Este formulario solo valida el formato del correo. La creación de invitaciones y el envío de correos aún no están disponibles.",
+      "required": "Ingresa un correo electrónico.",
+      "invalid": "Ingresa un correo electrónico con formato válido.",
+      "checkEmail": "Validar correo",
+      "validFormat": "El correo tiene un formato válido. La creación de la invitación estará disponible cuando se complete la integración.",
+      "back": "Volver a Personal"
+    }
+  },
   "roles": {
     "administrator": "Administrador",
     "employee": "Personal operativo"
