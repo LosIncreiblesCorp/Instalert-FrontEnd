@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref, watch } from "vue";
-import { RouterLink, useRoute } from "vue-router";
+import { RouterLink, RouterView, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import LanguageSwitcher from "./language-switcher.vue";
 import instalertLogo from "../../../assets/instalert-logo.svg";
@@ -136,6 +136,7 @@ function closeMobileNavigation() {
 
     <main id="main-content" class="workspace-main" tabindex="-1">
       <h1 class="visually-hidden">{{ currentTitle }}</h1>
+      <RouterView />
     </main>
   </div>
 </template>
