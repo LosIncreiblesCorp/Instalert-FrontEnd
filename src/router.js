@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { i18n } from "./i18n.js";
 import PageNotFound from "./shared/presentation/views/page-not-found.vue";
+import businessRoutes from "./business/presentation/business-routes.js";
 
 const EmptyRouteView = { render: () => null };
 
@@ -32,12 +33,7 @@ const routes = [
     component: EmptyRouteView,
     meta: { role: "administrator", menuKey: "alerts", alertView: "history", title: "navigation.alertHistory" },
   },
-  {
-    path: "/admin/personnel",
-    name: "admin-personnel",
-    component: EmptyRouteView,
-    meta: { role: "administrator", menuKey: "personnel", title: "navigation.personnel" },
-  },
+  ...businessRoutes,
   {
     path: "/admin/subscription",
     name: "admin-subscription",
