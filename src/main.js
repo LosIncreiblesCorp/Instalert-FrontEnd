@@ -1,6 +1,6 @@
 import { createApp, watch } from 'vue'
 import PrimeVue from 'primevue/config'
-import { Button, ConfirmationService, ConfirmDialog, SelectButton } from 'primevue'
+import { Button, Column, ConfirmationService, ConfirmDialog, DataTable, InputText, SelectButton } from 'primevue'
 import Material from '@primeuix/themes/material'
 import 'primeicons/primeicons.css'
 import './style.css'
@@ -16,12 +16,15 @@ const app = createApp(App)
 app
     .use(i18n)
     .use(PrimeVue, {
-        theme: { preset: Material },
+        theme: { preset: Material, options: { darkModeSelector: false } },
         ripple: true,
         license: primeUiLicenseKey
     })
     .use(ConfirmationService)
     .component('pv-button', Button)
+    .component('pv-column', Column)
+    .component('pv-data-table', DataTable)
+    .component('pv-input-text', InputText)
     .component('pv-confirm-dialog', ConfirmDialog)
     .component('pv-select-button', SelectButton)
     .use(router)
