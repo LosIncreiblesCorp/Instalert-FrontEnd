@@ -1,6 +1,6 @@
 import { createApp, watch } from 'vue'
 import PrimeVue from 'primevue/config'
-import { Button, ConfirmationService, ConfirmDialog, SelectButton } from 'primevue'
+import { Button, Card, Column, ConfirmationService, ConfirmDialog, DataTable, Message, ProgressBar, SelectButton, Tag } from 'primevue'
 import Material from '@primeuix/themes/material'
 import 'primeicons/primeicons.css'
 import './style.css'
@@ -22,6 +22,12 @@ app
     })
     .use(ConfirmationService)
     .component('pv-button', Button)
+    .component('pv-card', Card)
+    .component('pv-tag', Tag)
+    .component('pv-progress-bar', ProgressBar)
+    .component('pv-message', Message)
+    .component('pv-data-table', DataTable)
+    .component('pv-column', Column)
     .component('pv-confirm-dialog', ConfirmDialog)
     .component('pv-select-button', SelectButton)
     .use(router)

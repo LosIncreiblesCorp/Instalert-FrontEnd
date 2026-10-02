@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { i18n } from "./i18n.js";
 import PageNotFound from "./shared/presentation/views/page-not-found.vue";
+import { paymentsRoutes } from "./payments/presentation/payments-routes.js";
 
 const EmptyRouteView = { render: () => null };
 
@@ -38,12 +39,7 @@ const routes = [
     component: EmptyRouteView,
     meta: { role: "administrator", menuKey: "personnel", title: "navigation.personnel" },
   },
-  {
-    path: "/admin/subscription",
-    name: "admin-subscription",
-    component: EmptyRouteView,
-    meta: { role: "administrator", menuKey: "subscription", title: "navigation.subscription" },
-  },
+  ...paymentsRoutes,
   {
     path: "/admin/profile",
     name: "admin-profile",
