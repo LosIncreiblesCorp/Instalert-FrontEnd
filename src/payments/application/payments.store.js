@@ -1,0 +1,198 @@
+import { defineStore } from "pinia";
+import { PaymentsApi } from "../infrastructure/payments-api.js";
+import { PlanAssembler } from "../infrastructure/plan.assembler.js";
+import { SubscriptionAssembler } from "../infrastructure/subscription.assembler.js";
+
+const SIMULATED_BUSINESS_ID = "demo-business";
+
+// Simulated catalog: demo prices in PEN (S/ 120 / 220 / 480 per month), no real charge.
+// The quota counts only active employees (admin and pending invites excluded).
+const SIMULATED_PLANS = [
+    {
+        id: "basic",
+        name: "Sentinel Esencial",
+        price: 120,
+        currency: "PEN",
+        billingCycle: "monthly",
+        maxEmployees: 5,
+        features: ["activeAlerts", "riskMap"]
+    },
+    {
+        id: "professional",
+        name: "Sentinel Pro",
+        price: 220,
+        currency: "PEN",
+        billingCycle: "monthly",
+        maxEmployees: 15,
+        features: ["activeAlerts", "riskMap", "alertHistory", "personnel"]
+    },
+    {
+        id: "enterprise",
+        name: "Sentinel Red Enterprise",
+        price: 480,
+        currency: "PEN",
+        billingCycle: "monthly",
+        maxEmployees: 50,
+        features: ["activeAlerts", "riskMap", "alertHistory", "personnel", "prioritySupport"]
+    }
+];
+
+const SIMULATED_SUBSCRIPTION = {
+    id: "sub-demo-01",
+    businessId: SIMULATED_BUSINESS_ID,
+    planId: "professional",
+    status: "active",
+    currentPeriodEnd: "2026-11-01",
+    cancelAtPeriodEnd: false,
+    maxEmployees: 15
+};
+
+// Simulated active-employee count. The real roster belongs to Business, not Payments.
+// TODO: replace with the Business contract once it reports active employees
+// (excluding the administrator and pending invites). No HTTP call here on purpose.
+const SIMULATED_ACTIVE_EMPLOYEES = 8;
+
+export const usePaymentsStore = defineStore("payments", {
+    state: () => ({
+        plans: [],
+        currentSubscription: null,
+        activeEmployees: 0,
+        isLoading: false,
+        simulated: {
+            plans: true,
+            subscription: true,
+            billing: true
+        }
+    }),
+    getters: {
+        currentPlan(state) {
+            return state.plans.find((plan) => plan.id === state.currentSubscription?.planId) ?? null;
+        },
+        memberLimit(state) {
+            return state.currentSubscription?.maxEmployees ?? 0;
+        },
+        assignedOperators(state) {
+            return state.activeEmployees;
+        },
+        isSimulated(state) {
+            return state.simulated.plans || state.simulated.subscription || state.simulated.billing;
+        }
+    },
+    actions: {
+        async fetchPlans() {
+            this.isLoading = true;
+            const api = new PaymentsApi();
+            try {
+                const response = await api.getPlans();
+                const dtos = Array.isArray(response.data) ? response.data : response.data?.plans ?? [];
+                if (dtos.length === 0) throw new Error("Empty plans collection");
+                this.plans = PlanAssembler.toDomainList(dtos);
+                this.simulated.plans = false;
+            } catch (err) {
+                this.plans = PlanAssembler.toDomainList(SIMULATED_PLANS);
+                this.simulated.plans = true;
+                console.warn("Payments plans fallback to simulated catalog.", err?.message ?? err);
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        async fetchSubscription(businessId = SIMULATED_BUSINESS_ID) {
+            this.isLoading = true;
+            const api = new PaymentsApi();
+            try {
+                const response = await api.getSubscriptionById(`${businessId}-subscription`);
+                this.currentSubscription = SubscriptionAssembler.toDomain(response.data);
+                this.simulated.subscription = false;
+            } catch (err) {
+                this.currentSubscription = SubscriptionAssembler.toDomain({
+                    ...SIMULATED_SUBSCRIPTION,
+                    businessId
+                });
+                this.simulated.subscription = true;
+                console.warn("Payments subscription fallback to simulated data.", err?.message ?? err);
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        async fetchPaymentsData(businessId = SIMULATED_BUSINESS_ID) {
+            await this.fetchPlans();
+            await this.fetchSubscription(businessId);
+            await this.fetchBilling();
+            await this.fetchActiveEmployeeCount();
+        },
+        async fetchBilling() {
+            this.isLoading = true;
+            const api = new PaymentsApi();
+            try {
+                const [methodsResponse, invoicesResponse] = await Promise.all([
+                    api.getPaymentMethods(),
+                    api.getInvoices()
+                ]);
+                const methodDtos = Array.isArray(methodsResponse.data)
+                    ? methodsResponse.data
+                    : (methodsResponse.data?.paymentMethods ?? []);
+                const invoiceDtos = Array.isArray(invoicesResponse.data)
+                    ? invoicesResponse.data
+                    : (invoicesResponse.data?.invoices ?? []);
+                if (methodDtos.length === 0 || invoiceDtos.length === 0) throw new Error("Empty billing collections");
+                this.paymentMethod = PaymentMethodAssembler.toDomain(methodDtos[0]);
+                this.invoices = InvoiceAssembler.toDomainList(invoiceDtos);
+                this.simulated.billing = false;
+            } catch (err) {
+                this.paymentMethod = PaymentMethodAssembler.toDomain(SIMULATED_PAYMENT_METHOD);
+                this.invoices = InvoiceAssembler.toDomainList(SIMULATED_INVOICES);
+                this.simulated.billing = true;
+                console.warn("Payments billing fallback to simulated data.", err?.message ?? err);
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        async fetchActiveEmployeeCount() {
+            // No HTTP call: the contract with Business does not exist yet.
+            // Business must report the active-employee count (excluding the
+            // administrator and pending invites); Payments only owns the limit.
+            this.activeEmployees = SIMULATED_ACTIVE_EMPLOYEES;
+        },
+        async selectPlan(planId) {
+            const plan = this.plans.find((p) => p.id === planId);
+            if (!plan || !this.currentSubscription) return false;
+            // UI-level guard only: the quota counts active employees and the
+            // definitive validation belongs to the backend (Business enforces
+            // the limit reported by Payments).
+            if (plan.maxEmployees < this.assignedOperators) return false;
+            const next = {
+                ...SubscriptionAssembler.toResource(this.currentSubscription),
+                planId: plan.id,
+                status: "active",
+                cancelAtPeriodEnd: false,
+                maxEmployees: plan.maxEmployees
+            };
+            try {
+                const api = new PaymentsApi();
+                const response = await api.updateSubscription(next.id, next);
+                this.currentSubscription = SubscriptionAssembler.toDomain(response.data);
+                this.simulated.subscription = false;
+            } catch {
+                this.currentSubscription = SubscriptionAssembler.toDomain(next);
+                this.simulated.subscription = true;
+            }
+            return true;
+        },
+        async cancelSubscription() {
+            if (!this.currentSubscription) return;
+            const next = {
+                ...SubscriptionAssembler.toResource(this.currentSubscription),
+                cancelAtPeriodEnd: true
+            };
+            try {
+                const api = new PaymentsApi();
+                const response = await api.updateSubscription(next.id, next);
+                this.currentSubscription = SubscriptionAssembler.toDomain(response.data);
+                this.simulated.subscription = false;
+            } catch {
+                this.currentSubscription = SubscriptionAssembler.toDomain(next);
+                this.simulated.subscription = true;
+            }
+        }
+    }
+});
