@@ -2,6 +2,8 @@ import { defineStore } from "pinia";
 import { PaymentsApi } from "../infrastructure/payments-api.js";
 import { PlanAssembler } from "../infrastructure/plan.assembler.js";
 import { SubscriptionAssembler } from "../infrastructure/subscription.assembler.js";
+import { PaymentMethodAssembler } from "../infrastructure/payment-method.assembler.js";
+import { InvoiceAssembler } from "../infrastructure/invoice.assembler.js";
 
 const SIMULATED_BUSINESS_ID = "demo-business";
 
@@ -47,6 +49,23 @@ const SIMULATED_SUBSCRIPTION = {
     maxEmployees: 15
 };
 
+// Simulated payment method: only the last 4 digits are shown.
+// Card numbers are never requested or stored.
+const SIMULATED_PAYMENT_METHOD = {
+    brand: "VISA",
+    last4: "4128",
+    holderName: "TITULAR DEMO",
+    expiry: "08/28"
+};
+
+// Simulated invoices: fictitious folios with no tax validity, no real download.
+// Amounts in PEN, no real charge.
+const SIMULATED_INVOICES = [
+    { id: "inv-2026-09", folio: "FAC-2026-0003", issuedAt: "2026-09-15", amount: 220, currency: "PEN", status: "paid" },
+    { id: "inv-2026-08", folio: "FAC-2026-0002", issuedAt: "2026-08-15", amount: 220, currency: "PEN", status: "paid" },
+    { id: "inv-2026-07", folio: "FAC-2026-0001", issuedAt: "2026-07-15", amount: 220, currency: "PEN", status: "paid" }
+];
+
 // Simulated active-employee count. The real roster belongs to Business, not Payments.
 // TODO: replace with the Business contract once it reports active employees
 // (excluding the administrator and pending invites). No HTTP call here on purpose.
@@ -56,6 +75,8 @@ export const usePaymentsStore = defineStore("payments", {
     state: () => ({
         plans: [],
         currentSubscription: null,
+        paymentMethod: null,
+        invoices: [],
         activeEmployees: 0,
         isLoading: false,
         simulated: {
