@@ -1,3 +1,284 @@
 {
-
+  "alerts": {
+    "title": "Alertas",
+    "skip": "Ir al contenido",
+    "preview": "Vista previa",
+    "language": "Idioma",
+    "employee": "Personal operativo",
+    "employeeView": "Vista de personal operativo",
+    "navigation": "Navegación táctica",
+    "home": "Inicio",
+    "riskMap": "Mapa de riesgo",
+    "commandCenter": "Centro operativo de mando",
+    "subtitle": "Centro de activación inmediata de protocolos de seguridad y respuesta comunitaria.",
+    "history": "Ver historial",
+    "networkStatus": "Estado de la red",
+    "unavailable": "No disponible",
+    "indicators": {
+      "community": "Baliza comunitaria",
+      "location": "Ubicación",
+      "police": "Enlace policial",
+      "latency": "Latencia del nodo"
+    },
+    "protocol": "Protocolo de emergencia",
+    "panicTitle": "Botón de pánico",
+    "panicDescription": "Acción de emergencia para notificar a usuarios cercanos a través de la aplicación.",
+    "previewNote": "Vista previa. La emisión de alertas aún no está habilitada.",
+    "reportsTitle": "Otros reportes",
+    "reportsSubtitle": "Opciones preventivas y registro posterior sin emisión de alarma sonora en cuadras.",
+    "reports": {
+      "preventive": {
+        "badge": "Preventivo",
+        "title": "Vi algo sospechoso",
+        "description": "Reporta personas, vehículos o comportamientos inusuales antes de que ocurra un incidente crítico.",
+        "action": "Iniciar reporte silencioso"
+      },
+      "community": {
+        "badge": "Comunidad",
+        "title": "Otro tipo de alerta",
+        "description": "Reporta fallas de luminarias, cortes de suministro u otra situación perimetral que afecte a los comercios.",
+        "action": "Difundir aviso barrial"
+      },
+      "historical": {
+        "badge": "Bitácora",
+        "title": "Historial de Alertas y Eventos",
+        "description": "Consulta el historial de activaciones del botón de pánico, alertas y eventos registrados.",
+        "action": "Ver historial"
+      }
+    },
+    "countdown": {
+      "sequence": "Secuencia de confirmación",
+      "title": "Confirmación de alerta de pánico",
+      "completedTitle": "Cuenta regresiva finalizada",
+      "description": "Puedes cancelar la acción antes de que termine la cuenta regresiva de 5 segundos.",
+      "remaining": "Tiempo restante",
+      "seconds": "seg",
+      "pending": "Transmisión pendiente",
+      "cancelTitle": "Cancelación antes del envío",
+      "cancelDescription": "Si activaste la acción por error, cancélala antes de que termine el contador.",
+      "cancel": "CANCELAR ALERTA SOS",
+      "back": "VOLVER A ALERTAS",
+      "notSent": "No se ha enviado ninguna alerta.",
+      "completedDescription": "El contador terminó. La emisión no está conectada: no se registró ni se notificó una alerta.",
+      "details": "Información de la confirmación",
+      "sender": "Información del emisor",
+      "business": "Comercio asociado",
+      "location": "Ubicación del incidente",
+      "locationUnavailable": "Ubicación no disponible. No se están transmitiendo coordenadas.",
+      "protocolTitle": "Al finalizar la cuenta regresiva",
+      "stepOne": "Confirmación de la acción",
+      "stepOneDescription": "El contador finaliza si no cancelas la acción.",
+      "stepTwo": "Registro de la alerta",
+      "stepTwoDescription": "Pendiente de integración con el servicio de alertas.",
+      "stepThree": "Notificación en la aplicación",
+      "stepThreeDescription": "Pendiente de integración para los usuarios elegibles cercanos."
+    },
+    "activePreview": {
+      "location": "Ubicación registrada",
+      "coordinates": "Coordenadas",
+      "minutes": "min",
+      "gps": "GPS no disponible",
+      "description": "La emisión de alertas todavía no está conectada.",
+      "noRecord": "No existe una alerta registrada.",
+      "status": "Cuenta regresiva finalizada · Vista previa",
+      "finish": "FINALIZAR SITUACIÓN DE PÁNICO",
+      "activeTime": "Tiempo activo",
+      "notified": "No se han notificado comercios",
+      "pending": "Continúa para completar la información de lo ocurrido. Vista previa sin resolución registrada.",
+      "warning": "Esta acción corresponde al momento en que la situación de peligro haya terminado.",
+      "record": "Registro de la alerta",
+      "activationTime": "Hora de activación",
+      "title": "ALERTA DE PÁNICO · VISTA PREVIA",
+      "transmission": "Sin transmisión activa",
+      "operationalStatus": "Estado operativo"
+    },
+    "reportForm": {
+      "placeholder": "Ingresar descripción",
+      "complete": "Completar reporte de vista previa",
+      "feedback": {
+        "ready": "Información completa. Aún no se ha guardado ningún reporte.",
+        "deferred": "Puedes completar el formulario después mientras esta vista permanezca abierta. No se ha guardado un reporte pendiente.",
+        "required": "Selecciona un tipo e ingresa una descripción."
+      },
+      "typeTitle": "1. Tipo de incidente",
+      "typeHelp": "Selecciona una sola categoría que describa el incidente.",
+      "descriptionHelp": "Describe los hechos y los detalles relevantes que recuerdes.",
+      "required": "Obligatorio",
+      "previewInfo": "Los datos permanecen solo en esta sesión. Guardar y dejar un reporte pendiente requieren integración con el servicio.",
+      "later": "Completar más tarde",
+      "title": "Completa el reporte de la emergencia",
+      "types": {
+        "assault": {
+          "description": "Con violencia directa",
+          "title": "Asalto"
+        },
+        "other": {
+          "description": "Describe el incidente ocurrido",
+          "title": "Otro"
+        },
+        "robbery": {
+          "description": "Sustracción consumada",
+          "title": "Robo"
+        },
+        "attemptedRobbery": {
+          "description": "Frustrado o disuadido",
+          "title": "Intento de robo"
+        }
+      },
+      "descriptionTitle": "2. Descripción de lo ocurrido",
+      "subtitle": "Describe lo ocurrido. Este formulario es una vista previa y no registra una resolución real."
+    },
+    "preventive": {
+      "locationTitle": "2. Ubicación del evento",
+      "badge": "Reporte preventivo · Vista previa",
+      "moments": {
+        "now": "En este momento",
+        "earlier": "Hace más de una hora",
+        "recent": "Hace 15–30 minutos"
+      },
+      "subtitle": "Describe patrones inusuales o presencias dudosas. Esta vista previa no activa alarmas ni notifica a comercios.",
+      "momentTitle": "3. ¿Cuándo ocurrió?",
+      "descriptionHelp": "Incluye características observadas y detalles relevantes.",
+      "recommended": "Para describir actividad sospechosa o patrones inusuales sin una emergencia inmediata.",
+      "locationPlaceholder": "Ingresar ubicación",
+      "descriptionTitle": "4. Descripción",
+      "emergency": "Si existe un peligro inmediato, vuelve a Alertas y utiliza la acción de pánico.",
+      "locationHelp": "Describe dónde observaste la actividad. No se está obteniendo ubicación GPS.",
+      "feedback": {
+        "required": "Selecciona una actividad y un momento, e ingresa ubicación y descripción.",
+        "ready": "Información completa. No se ha enviado ni guardado un aviso preventivo."
+      },
+      "activities": {
+        "behavior": {
+          "description": "Señales o actitudes",
+          "title": "Comportamiento inusual"
+        },
+        "other": {
+          "description": "Especificar abajo",
+          "title": "Otro patrón"
+        },
+        "person": {
+          "description": "Rondines o acecho",
+          "title": "Persona sospechosa"
+        },
+        "vehicle": {
+          "description": "Actividad inusual",
+          "title": "Vehículo sospechoso"
+        },
+        "surveillance": {
+          "description": "Observación de accesos",
+          "title": "Marcaje / vigilancia"
+        }
+      },
+      "mapUnavailable": "Mapa no conectado",
+      "reachTitle": "Alcance del aviso",
+      "guidanceTitle": "¿Cuándo usar este reporte?",
+      "send": "Revisar aviso preventivo",
+      "reachUnavailable": "Radio y comercios notificados: no disponibles.",
+      "activityTitle": "1. Tipo de actividad observada",
+      "discard": "Descartar y volver a Alertas",
+      "title": "Reportar actividad sospechosa"
+    },
+    "communityReport": {
+      "locationTitle": "2. Localización",
+      "badge": "Canal de comunicación comunitaria · Vista previa",
+      "moments": {
+        "now": "En este momento",
+        "earlier": "Hace más de una hora",
+        "recent": "Hace 15–30 minutos"
+      },
+      "subtitle": "Describe riesgos, anomalías o sucesos que requieren atención de la comunidad sin una situación de pánico en curso.",
+      "momentTitle": "¿Cuándo ocurrió el suceso?",
+      "descriptionHelp": "Incluye los detalles relevantes del riesgo o conducta observada.",
+      "recommended": "Para describir actividad sospechosa o patrones inusuales sin una emergencia inmediata.",
+      "locationPlaceholder": "Ingresar ubicación",
+      "descriptionTitle": "3. Descripción de lo ocurrido",
+      "emergency": "Si existe un peligro inmediato, vuelve a Alertas y utiliza la acción de pánico.",
+      "locationHelp": "Describe dónde observaste la actividad. No se está obteniendo ubicación GPS.",
+      "feedback": {
+        "required": "Selecciona una actividad y un momento, e ingresa ubicación y descripción.",
+        "ready": "Información completa. No se ha enviado ni guardado una alerta."
+      },
+      "activities": {
+        "attempt": {
+          "title": "Intento de robo",
+          "description": "Tentativa o forzamiento"
+        },
+        "extortion": {
+          "title": "Extorsión",
+          "description": "Notas o amenazas"
+        },
+        "vandalism": {
+          "title": "Vandalismo",
+          "description": "Daño a fachadas o vitrinas"
+        },
+        "disturbance": {
+          "title": "Disturbio",
+          "description": "Peleas o alteración"
+        },
+        "vehicle": {
+          "title": "Vehículo",
+          "description": "Actividad inusual"
+        },
+        "suspicious": {
+          "title": "Sospechoso",
+          "description": "Observación o vigilancia"
+        },
+        "intrusion": {
+          "title": "Intrusión",
+          "description": "Acceso a área restringida"
+        },
+        "other": {
+          "title": "Otro",
+          "description": "Situación particular"
+        }
+      },
+      "mapUnavailable": "Mapa no conectado",
+      "reachTitle": "Alcance de la alerta",
+      "guidanceTitle": "Guía de protocolo operativo",
+      "send": "Revisar alerta",
+      "reachUnavailable": "Radio y comercios notificados: no disponibles.",
+      "activityTitle": "1. Tipo de alerta",
+      "discard": "Descartar y volver a Alertas",
+      "title": "Otro tipo de alerta"
+    },
+    "historyView": {
+      "title": "Historial de Alertas y Eventos",
+      "emptyDescription": "Todavía no se han consultado registros. Aquí se mostrarán los eventos disponibles del servicio de alertas.",
+      "search": "Buscar por referencia o descripción",
+      "detailDescription": "El detalle estará disponible al consultar y seleccionar un registro.",
+      "subtitle": "Consulta de incidentes, alertas preventivas y situaciones de pánico del comercio.",
+      "type": "Tipo de alerta",
+      "detailTitle": "Detalle del evento",
+      "period": "Periodo",
+      "statusLabel": "Filtrar por estado",
+      "total": "Total de registros",
+      "types": {
+        "panic": "Pánico",
+        "preventive": "Preventivo",
+        "community": "Comunidad",
+        "all": "Todos los tipos"
+      },
+      "statuses": {
+        "all": "Todos",
+        "resolved": "Resuelta",
+        "active": "Activa",
+        "cancelled": "Cancelada",
+        "completed": "Completada",
+        "pending": "Reporte pendiente"
+      },
+      "periods": {
+        "month": "Este mes",
+        "week": "Últimos 7 días",
+        "today": "Hoy"
+      },
+      "panic": "Alertas SOS de pánico",
+      "filtersNote": "Controles de vista previa. Los filtros se aplicarán cuando exista una consulta integrada.",
+      "download": "Descargar PDF / CSV",
+      "unavailable": "Consulta no conectada",
+      "emptyTitle": "Historial pendiente de integración",
+      "filters": "Filtros del historial",
+      "badge": "Historial · Vista previa"
+    }
+  }
 }
