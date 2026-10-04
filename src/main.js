@@ -1,8 +1,9 @@
 import { createApp, watch } from 'vue'
 import PrimeVue from 'primevue/config'
-import { Button, ConfirmationService, ConfirmDialog, DatePicker, InputNumber, InputText, Select, SelectButton, Textarea } from 'primevue'
+import { Button, Card, ConfirmationService, ConfirmDialog, DatePicker, InputNumber, InputText, Select, SelectButton, Textarea } from 'primevue'
 import Material from '@primeuix/themes/material'
 import 'primeicons/primeicons.css'
+import 'primeflex/primeflex.css'
 import './style.css'
 import App from './App.vue'
 import i18n, { localeStorageKey, supportedLocales } from './i18n'
@@ -23,6 +24,7 @@ app
     .use(ConfirmationService)
     .component('pv-button', Button)
     .component('pv-confirm-dialog', ConfirmDialog)
+    .component('pv-card', Card)
     .component('pv-date-picker', DatePicker)
     .component('pv-input-number', InputNumber)
     .component('pv-input-text', InputText)

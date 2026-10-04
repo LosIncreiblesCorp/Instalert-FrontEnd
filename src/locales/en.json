@@ -45,6 +45,27 @@
     "administrator": "Administrator",
     "employee": "Operational staff"
   },
+  "mapping": {
+    "filters": {
+      "allIncidents": "All incidents",
+      "incidentCategory": "Incident category"
+    },
+    "incidentCategories": {
+      "robbery": "Robbery",
+      "attemptedRobbery": "Attempted robbery",
+      "assault": "Assault",
+      "extortion": "Extortion",
+      "vandalism": "Vandalism",
+      "person": "Suspicious person",
+      "vehicle": "Suspicious vehicle",
+      "unusualBehavior": "Unusual behavior",
+      "surveillance": "Surveillance or following",
+      "lowLighting": "Low lighting",
+      "policePresence": "Police presence",
+      "roadBlockage": "Blocked road or area",
+      "other": "Other"
+    }
+  },
   "navigation": {
     "mainLabel": "Main navigation",
     "sectionTitle": "Tactical navigation",
