@@ -31,7 +31,7 @@
         <button class="p-link text-gray-500 mb-3 bg-transparent border-none cursor-pointer p-0 font-medium" @click="$emit('close')"><i class="pi pi-arrow-left"></i> Volver al mapa</button>
         
         <div class="bg-red-50 border-round p-4 mb-3 border-left-3 border-red-500">
-          <p class="text-xs font-bold text-red-500 mb-1 flex align-items-center"><i class="pi pi-exclamation-triangle mr-2"></i> {{ item.type.toUpperCase() }}</p>
+          <p class="text-xs font-bold text-red-500 mb-1 flex align-items-center"><i class="pi pi-exclamation-triangle mr-2"></i> {{ incidentCategoryLabel.toLocaleUpperCase() }}</p>
           <h2 class="text-xl font-bold m-0 mb-2 text-gray-900">{{ item.title }}</h2>
           <p class="text-sm text-gray-600 m-0 mb-3"><i class="pi pi-clock mr-1"></i> {{ new Date(item.reportedAt).toLocaleString() }}</p>
           <span class="bg-red-100 text-red-700 text-xs px-2 py-1 border-round font-medium" v-if="item.status === 'active'"><i class="pi pi-spin pi-spinner text-xs mr-1"></i> En progreso</span>
@@ -146,6 +146,9 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t, te } = useI18n();
 
 const props = defineProps({
   item: {
@@ -169,6 +172,10 @@ const props = defineProps({
 defineEmits(['close']);
 
 const activeTab = ref('comercio');
+const incidentCategoryLabel = computed(() => {
+  const key = `mapping.incidentCategories.${props.item.type}`;
+  return te(key) ? t(key) : props.item.type ?? t('mapping.incidentCategories.other');
+});
 
 watch(() => props.type, (newType) => {
   if (newType === 'business') activeTab.value = 'comercio';
