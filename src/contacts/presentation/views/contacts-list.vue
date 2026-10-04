@@ -1,4 +1,5 @@
 <script setup>
+/** Searchable list of employee emergency contacts. */
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -19,6 +20,9 @@ const visibleContacts = computed(() => {
 
 onMounted(() => store.loadContacts());
 
+/** Asks for confirmation before deleting a contact.
+* @param {import('../../domain/model/emergency-contact.entity.js').EmergencyContact} contact - Contact to delete.
+* @returns {void} No return value. */
 function confirmDeletion(contact) {
     confirm.require({
         header: t('contacts.actions.deleteTitle'),

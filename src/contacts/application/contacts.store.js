@@ -10,17 +10,29 @@ const demoEmployeeId = 'demo-employee';
 const editableFields = values => ({ fullName: values.fullName, relationship: values.relationship,
     phone: values.phone, email: values.email, notes: values.notes });
 
+/** Application service store for employee emergency contacts.
+* @returns {Object} Contacts store state and actions. */
 const useContactsStore = defineStore('contacts', () => {
+/** @type {import('vue').Ref<Array<import('../domain/model/emergency-contact.entity.js').EmergencyContact>>} Contact list. */
     const contacts = ref([]);
+/** @type {import('vue').Ref<import('../domain/model/emergency-contact.entity.js').EmergencyContact|null>} Selected contact. */
     const selectedContact = ref(null);
+/** @type {import('vue').Ref<boolean>} List/detail loading flag. */
     const isLoading = ref(false);
+/** @type {import('vue').Ref<boolean>} Create/update/delete saving flag. */
     const isSaving = ref(false);
+/** @type {import('vue').Ref<string|null>} Localized error key. */
     const errorMessage = ref(null);
+/** @type {import('vue').Ref<string|null>} Localized notice key. */
     const noticeMessage = ref(null);
 
+/** Clears store feedback messages. */
     function clearMessages() { errorMessage.value = null; noticeMessage.value = null; }
     const errorKey = (error, fallback) => error.message?.startsWith('contacts.errors.') ? error.message : fallback;
 
+/** Fetches one owned contact or rejects foreign records.
+* @param {string|number} id - Contact identifier.
+* @returns {Promise<import('../domain/model/emergency-contact.entity.js').EmergencyContact>} Owned contact. */
     async function getOwnContact(id) {
         const response = await contactsApi.getContact(id);
         const contact = EmergencyContactAssembler.toEntityFromResource(response.data);
@@ -28,6 +40,8 @@ const useContactsStore = defineStore('contacts', () => {
         return contact;
     }
 
+/** Loads demo employee contacts into the store.
+* @returns {Promise<boolean>} True when loading succeeds. */
     async function loadContacts() {
         isLoading.value = true;
         errorMessage.value = null;
@@ -42,6 +56,9 @@ const useContactsStore = defineStore('contacts', () => {
         } finally { isLoading.value = false; }
     }
 
+/** Loads one owned contact into the selection.
+* @param {string|number} id - Contact identifier.
+* @returns {Promise<boolean>} True when loading succeeds. */
     async function loadContact(id) {
         isLoading.value = true;
         selectedContact.value = null;
@@ -55,6 +72,10 @@ const useContactsStore = defineStore('contacts', () => {
         } finally { isLoading.value = false; }
     }
 
+/** Runs a write command with shared saving and feedback state.
+* @param {Function} command - Async mutation to execute.
+* @param {string} successKey - Localized success message key.
+* @returns {Promise<boolean>} True when the command succeeds. */
     async function runCommand(command, successKey) {
         if (isLoading.value || isSaving.value) return false;
         clearMessages();
@@ -69,6 +90,9 @@ const useContactsStore = defineStore('contacts', () => {
         } finally { isSaving.value = false; }
     }
 
+/** Creates one contact for the demo employee.
+* @param {Object} values - Editable contact fields.
+* @returns {Promise<boolean>} True when creation succeeds. */
     function createContact(values) {
         return runCommand(async () => {
             const now = new Date().toISOString();
@@ -79,6 +103,10 @@ const useContactsStore = defineStore('contacts', () => {
         }, 'contacts.messages.created');
     }
 
+/** Updates one owned contact with editable fields.
+* @param {string|number} id - Contact identifier.
+* @param {Object} values - Editable contact fields.
+* @returns {Promise<boolean>} True when update succeeds. */
     function updateContact(id, values) {
         return runCommand(async () => {
             const current = await getOwnContact(id);
@@ -89,6 +117,9 @@ const useContactsStore = defineStore('contacts', () => {
         }, 'contacts.messages.updated');
     }
 
+/** Deletes one owned contact and clears its selection.
+* @param {string|number} id - Contact identifier.
+* @returns {Promise<boolean>} True when deletion succeeds. */
     function deleteContact(id) {
         return runCommand(async () => {
             await getOwnContact(id);

@@ -1,4 +1,5 @@
 <script setup>
+/** Create/edit form for one emergency contact. */
 import { computed, nextTick, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -34,6 +35,8 @@ watch(() => route.fullPath, async (_, __, onCleanup) => {
     if (!stale) ready.value = true;
 }, { immediate: true });
 
+/** Validates the draft and creates or updates the contact.
+* @returns {Promise<void>} Resolves after save and navigation. */
 async function saveContact() {
     touched.value = true;
     const invalidField = fields.find(field => errors.value[field]);

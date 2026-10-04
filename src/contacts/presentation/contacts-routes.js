@@ -1,3 +1,4 @@
+// Lazy-loaded components
 const contactForm = () => import('./views/contact-form.vue');
 const contactMeta = { role: 'employee', menuKey: 'contacts' };
 
