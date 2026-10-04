@@ -3903,18 +3903,33 @@
   "plans": [
     {
       "id": "demo-basic",
-      "name": "Plan 3",
-      "maxEmployees": 3
+      "name": "Essential",
+      "price": 50,
+      "priceUsd": 15,
+      "currency": "PEN",
+      "billingCycle": "monthly",
+      "maxEmployees": 4,
+      "features": ["bracelets2", "incidentAlerts24h", "monthlyMaintenance"]
     },
     {
       "id": "demo-standard",
-      "name": "Plan 5",
-      "maxEmployees": 5
+      "name": "Professional",
+      "price": 100,
+      "priceUsd": 30,
+      "currency": "PEN",
+      "billingCycle": "monthly",
+      "maxEmployees": 8,
+      "features": ["bracelets5", "priorityAlerts24h", "monthlyMaintenance", "localRiskReports"]
     },
     {
       "id": "demo-extended",
-      "name": "Plan 8",
-      "maxEmployees": 8
+      "name": "Business",
+      "price": 150,
+      "priceUsd": 45,
+      "currency": "PEN",
+      "billingCycle": "monthly",
+      "maxEmployees": 15,
+      "features": ["bracelets8", "organizationPriority24h", "monthlyMaintenance", "advancedAlertsImplementation"]
     }
   ],
   "subscriptions": [

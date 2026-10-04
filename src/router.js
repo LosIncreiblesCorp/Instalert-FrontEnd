@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { i18n } from "./i18n.js";
 import PageNotFound from "./shared/presentation/views/page-not-found.vue";
+import { paymentsRoutes } from "./payments/presentation/payments-routes.js";
 import businessRoutes from "./business/presentation/business-routes.js";
 import alertRoutes from "./alert/presentation/alert-routes.js";
 
@@ -44,13 +45,8 @@ const routes = [
     component: () => import("./alert/presentation/views/employee-alerts.vue"),
     meta: { role: "administrator", menuKey: "alerts", alertView: "history", historyOnly: true, title: "navigation.alertHistory" },
   },
+  ...paymentsRoutes,
   ...businessRoutes,
-  {
-    path: "/admin/subscription",
-    name: "admin-subscription",
-    component: EmptyRouteView,
-    meta: { role: "administrator", menuKey: "subscription", title: "navigation.subscription" },
-  },
   {
     path: "/admin/profile",
     name: "admin-profile",
