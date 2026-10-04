@@ -4,6 +4,8 @@ import { RiskZoneAssembler } from '../infrastructure/risk-zone.assembler.js';
 import { IncidentMarkerAssembler } from '../infrastructure/incident-marker.assembler.js';
 import { BusinessLocationAssembler } from '../infrastructure/business-location.assembler.js';
 
+/** Application service store for risk map data and selection.
+* @returns {Object} Mapping store state and actions. */
 export const useMappingStore = defineStore('mapping', {
     state: () => ({
         riskZones: [],
@@ -14,6 +16,8 @@ export const useMappingStore = defineStore('mapping', {
         selectedZone: null
     }),
     actions: {
+/** Loads risk zones, incidents and verified businesses.
+* @returns {Promise<void>} Resolves after map data is refreshed. */
         async fetchMapData() {
             this.isLoading = true;
             this.error = null;
@@ -37,6 +41,9 @@ export const useMappingStore = defineStore('mapping', {
                 this.isLoading = false;
             }
         },
+/** Selects one risk zone by id.
+* @param {string|number} zoneId - Risk zone identifier.
+* @returns {void} No return value. */
         selectRiskZone(zoneId) {
             this.selectedZone = this.riskZones.find(z => z.id === zoneId) || null;
         }

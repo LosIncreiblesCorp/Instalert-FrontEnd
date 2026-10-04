@@ -60,6 +60,7 @@
 </template>
 
 <script setup>
+/** Full-page risk map with filters and tactical inspector. */
 import { ref, onMounted, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMappingStore } from '../../application/mapping.store.js';
@@ -117,6 +118,9 @@ onMounted(() => {
   mappingStore.fetchMapData();
 });
 
+/** Shows the selected risk zone in the inspector.
+* @param {string|number} zoneId - Risk zone identifier.
+* @returns {void} No return value. */
 const handleZoneSelected = (zoneId) => {
   const zone = mappingStore.riskZones.find(z => z.id === zoneId);
   if (zone) {
@@ -125,6 +129,9 @@ const handleZoneSelected = (zoneId) => {
   }
 };
 
+/** Shows the selected incident in the inspector.
+* @param {string|number} incidentId - Incident identifier.
+* @returns {void} No return value. */
 const handleIncidentSelected = (incidentId) => {
   const incident = mappingStore.incidents.find(i => i.id === incidentId);
   if (incident) {
@@ -133,6 +140,9 @@ const handleIncidentSelected = (incidentId) => {
   }
 };
 
+/** Shows the selected business in the inspector.
+* @param {string|number} businessId - Business identifier.
+* @returns {void} No return value. */
 const handleBusinessSelected = (businessId) => {
   const business = mappingStore.businesses.find(b => b.id === businessId);
   if (business) {

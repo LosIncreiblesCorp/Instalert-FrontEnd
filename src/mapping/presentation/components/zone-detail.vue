@@ -24,11 +24,15 @@
 </template>
 
 <script setup>
+/** Card with zone summary and its nearby incidents. */
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t, te } = useI18n();
 
+/** Translates an incident category into its localized label.
+* @param {string} category - Incident category code.
+* @returns {string} Localized category label. */
 function incidentCategoryLabel(category) {
   const key = `mapping.incidentCategories.${category}`;
   return te(key) ? t(key) : category ?? t('mapping.incidentCategories.other');

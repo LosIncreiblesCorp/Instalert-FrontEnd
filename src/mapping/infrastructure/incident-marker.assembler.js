@@ -7,7 +7,12 @@ const legacyIncidentTypes = Object.freeze({
     'Vandalismo': IncidentCategory.VANDALISM,
 });
 
+/** Maps incident resources to domain entities, normalizing legacy categories.
+* @class IncidentMarkerAssembler */
 export class IncidentMarkerAssembler {
+/** Converts one resource into a domain entity.
+* @param {Object} dto - Incident resource.
+* @returns {IncidentMarker} Mapped entity. */
     static toDomain(dto) {
         const category = dto.category ?? dto.type;
         return new IncidentMarker({
@@ -22,6 +27,9 @@ export class IncidentMarkerAssembler {
         });
     }
 
+/** Converts a resource list into domain entities.
+* @param {Array<Object>} dtos - Incident resources.
+* @returns {IncidentMarker[]} Mapped entities. */
     static toDomainList(dtos) {
         return dtos.map(dto => this.toDomain(dto));
     }

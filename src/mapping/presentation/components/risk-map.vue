@@ -3,6 +3,7 @@
 </template>
 
 <script setup>
+/** Mapbox map rendering risk zones, incidents and businesses. */
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -31,6 +32,8 @@ const mapElement = ref(null);
 let map = null;
 let markers = [];
 
+/** Initializes the Mapbox map centered on Lima.
+* @returns {void} No return value. */
 const initMap = () => {
   mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY;
   map = new mapboxgl.Map({
@@ -45,6 +48,8 @@ const initMap = () => {
   });
 };
 
+/** Removes markers, zone sources and layers from the map.
+* @returns {void} No return value. */
 const clearMapData = () => {
   markers.forEach(m => m.marker.remove());
   markers = [];
@@ -61,6 +66,8 @@ const clearMapData = () => {
   });
 };
 
+/** Draws zones, incident and business markers on the map.
+* @returns {void} No return value. */
 const drawMapData = () => {
   if (!map || !map.isStyleLoaded()) return;
   
@@ -166,6 +173,8 @@ const drawMapData = () => {
   updateSelection();
 };
 
+/** Highlights the currently selected zone or marker.
+* @returns {void} No return value. */
 const updateSelection = () => {
   if (!map || !map.isStyleLoaded()) return;
 

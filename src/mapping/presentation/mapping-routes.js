@@ -1,3 +1,5 @@
+/** Risk map routes for admin and employee roles. */
+// Lazy-loaded components
 export const mappingRoutes = [
     {
         path: 'risk-map',

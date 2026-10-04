@@ -16,7 +16,11 @@ export const IncidentCategory = Object.freeze({
     OTHER: 'other',
 });
 
+/** Reported incident marker plotted on the risk map.
+* @class IncidentMarker */
 export class IncidentMarker {
+/** Creates an incident marker entity.
+* @param {Object} params - Incident marker fields. */
     constructor({ id, title, description, type, status, latitude, longitude, reportedAt }) {
         this.id = id;
         this.title = title;
