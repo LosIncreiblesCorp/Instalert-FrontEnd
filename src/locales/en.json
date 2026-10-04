@@ -164,7 +164,66 @@
     "activeAlerts": "Active alerts",
     "alertHistory": "Alert history",
     "personnel": "Staff",
+    "emergencyContacts": "Emergency contacts",
     "subscription": "Subscription"
+  },
+  "contacts": {
+    "eyebrow": "Your trusted circle",
+    "title": "My emergency contacts",
+    "description": "Keep the details of family and trusted people in one place.",
+    "search": "Search by name, phone, relationship or email",
+    "total": "Contacts: {count}",
+    "loading": "Loading contacts…",
+    "emptyTitle": "Your emergency contacts, close at hand",
+    "emptyHelp": "Add your first contact to keep their information available when you need it.",
+    "noResults": "No matching contacts",
+    "noResultsHelp": "Try another name, phone number or relationship.",
+    "fields": {
+      "fullName": "Full name",
+      "relationship": "Relationship",
+      "phone": "Phone number",
+      "email": "Email address",
+      "notes": "Notes"
+    },
+    "form": {
+      "createTitle": "New emergency contact",
+      "editTitle": "Edit emergency contact",
+      "description": "Enter the details of someone you trust. You can update them whenever needed.",
+      "relationshipPlaceholder": "Family member, friend, neighbor…",
+      "phoneHelp": "Enter 7–15 digits. You can include the country code, for example +51.",
+      "optional": "Optional",
+      "characters": "{count}/{max} characters",
+      "requiredHelp": "Fields marked with * are required."
+    },
+    "actions": {
+      "add": "Add contact",
+      "save": "Save contact",
+      "saveChanges": "Save changes",
+      "back": "Back to contacts",
+      "cancel": "Cancel",
+      "refresh": "Refresh",
+      "editContact": "Edit contact {name}",
+      "deleteContact": "Delete contact {name}",
+      "delete": "Delete",
+      "deleteTitle": "Delete emergency contact",
+      "deleteMessage": "Delete {name} from your emergency contacts?"
+    },
+    "messages": {
+      "created": "Emergency contact added.",
+      "updated": "Contact details updated.",
+      "deleted": "Emergency contact deleted."
+    },
+    "errors": {
+      "ownerRequired": "The employee could not be identified.",
+      "nameInvalid": "Enter a name between 1 and 100 characters.",
+      "relationshipInvalid": "Enter a relationship between 1 and 60 characters.",
+      "phoneInvalid": "Enter a valid phone number with 7–15 digits and an optional + country code.",
+      "emailInvalid": "Enter a valid email address or leave this field empty.",
+      "notesInvalid": "Notes can contain up to 140 characters.",
+      "notFound": "This contact is no longer available. Return to your contacts list.",
+      "load": "Unable to load your contacts. Please refresh and try again.",
+      "save": "Unable to save the change. Please try again."
+    }
   },
   "payments": {
     "title": "Subscription and billing",
