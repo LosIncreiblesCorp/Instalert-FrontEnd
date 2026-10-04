@@ -38,7 +38,7 @@ const topPlanId = computed(() => {
 });
 
 function isBlocked(plan) {
-  return plan.maxEmployees < assignedOperators.value;
+  return !paymentsStore.seatUsageAvailable || plan.maxEmployees < assignedOperators.value;
 }
 
 function formatPlanPrice(plan, cycle) {
@@ -81,8 +81,8 @@ function handleCancelClick() {
     rejectLabel: t("payments.confirmReject"),
     accept: async () => {
       cancelling.value = true;
-      await paymentsStore.cancelSubscription();
-      notice.value = t("payments.cancelScheduled");
+      const applied = await paymentsStore.cancelSubscription();
+      notice.value = applied ? t("payments.cancelScheduled") : "";
       cancelling.value = false;
     }
   });
@@ -93,10 +93,14 @@ function handleCancelClick() {
   <div class="subscription-page">
     <header class="subscription-page__header">
       <div class="subscription-page__titles">
-        <h2 class="subscription-page__title">{{ $t("payments.title") }}</h2>
+        <h1 class="subscription-page__title">{{ $t("payments.title") }}</h1>
         <p class="subscription-page__subtitle">{{ $t("payments.subtitle") }}</p>
       </div>
     </header>
+
+    <pv-message v-if="paymentsStore.errorMessage" severity="error" :closable="false" role="alert">
+      {{ $t(paymentsStore.errorMessage) }}
+    </pv-message>
 
     <p v-if="paymentsStore.isLoading" class="subscription-page__state" role="status">
       {{ $t("payments.loading") }}

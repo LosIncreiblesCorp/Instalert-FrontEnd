@@ -18,6 +18,28 @@ export class PaymentsApi {
         return this.subscriptionsEndpoint.getById(id);
     }
 
+    getSubscriptions(businessId) {
+        return this.subscriptionsEndpoint.http.get(this.subscriptionsEndpoint.endpointPath, { params: { businessId } });
+    }
+
+    /** Mock projection of the Business seat-usage contract; no private domain imports. */
+    async getSeatUsage(businessId) {
+        const http = this.subscriptionsEndpoint.http;
+        const [membersResponse, invitationsResponse] = await Promise.all([
+            http.get('business-members', { params: { businessId } }),
+            http.get('staff-invitations', { params: { businessId } })
+        ]);
+        const members = Array.isArray(membersResponse.data) ? membersResponse.data : membersResponse.data?.members;
+        const invitations = Array.isArray(invitationsResponse.data) ? invitationsResponse.data : invitationsResponse.data?.invitations;
+        if (!Array.isArray(members) || !Array.isArray(invitations)) throw new Error('Invalid seat usage response');
+        const belongsToBusiness = record => String(record.businessId) === String(businessId);
+        return {
+            activeEmployees: members.filter(member => belongsToBusiness(member)
+                && member.role === 'Operative' && member.status === 'active').length,
+            reservedSeats: invitations.filter(invitation => belongsToBusiness(invitation) && invitation.status === 'pending').length
+        };
+    }
+
     updateSubscription(id, resource) {
         return this.subscriptionsEndpoint.update(id, resource);
     }

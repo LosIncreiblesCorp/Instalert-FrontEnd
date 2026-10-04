@@ -30,10 +30,12 @@ const detailsOpen = ref(false);
 const detailsId = computed(() => `plan-details-${props.plan.id}`);
 const blockedHintId = computed(() => `plan-blocked-${props.plan.id}`);
 
-const tierKey = computed(() => `payments.tiers.${props.plan.id}`);
+const tierAliases = { 'demo-basic': 'basic', 'demo-standard': 'professional', 'demo-extended': 'enterprise' };
+const tierId = computed(() => tierAliases[props.plan.id] ?? props.plan.id);
+const tierKey = computed(() => `payments.tiers.${tierId.value}`);
 const eyebrow = computed(() => (te(`${tierKey.value}.eyebrow`) ? t(`${tierKey.value}.eyebrow`) : ""));
 const description = computed(() => (te(`${tierKey.value}.description`) ? t(`${tierKey.value}.description`) : ""));
-const tierIcon = computed(() => tierIcons[props.plan.id] ?? "pi pi-shield");
+const tierIcon = computed(() => tierIcons[tierId.value] ?? "pi pi-shield");
 
 const rawPrice = computed(() => planPrice(props.plan, props.currency, props.billingCycle));
 

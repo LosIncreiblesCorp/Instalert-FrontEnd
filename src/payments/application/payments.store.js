@@ -5,13 +5,13 @@ import { SubscriptionAssembler } from "../infrastructure/subscription.assembler.
 import { PaymentMethodAssembler } from "../infrastructure/payment-method.assembler.js";
 import { InvoiceAssembler } from "../infrastructure/invoice.assembler.js";
 
-const SIMULATED_BUSINESS_ID = "demo-business";
+const SIMULATED_BUSINESS_ID = "bus-1";
 
 // Monthly catalog prices in PEN and USD; no real charge.
-// The quota counts only active employees (admin and pending invites excluded).
+// Active employees and pending invitations occupy seats; administrators are excluded.
 const SIMULATED_PLANS = [
     {
-        id: "basic",
+        id: "demo-basic",
         name: "Essential",
         price: 50,
         priceUsd: 15,
@@ -21,7 +21,7 @@ const SIMULATED_PLANS = [
         features: ["bracelets2", "incidentAlerts24h", "monthlyMaintenance"]
     },
     {
-        id: "professional",
+        id: "demo-standard",
         name: "Professional",
         price: 100,
         priceUsd: 30,
@@ -31,7 +31,7 @@ const SIMULATED_PLANS = [
         features: ["bracelets5", "priorityAlerts24h", "monthlyMaintenance", "localRiskReports"]
     },
     {
-        id: "enterprise",
+        id: "demo-extended",
         name: "Business",
         price: 150,
         priceUsd: 45,
@@ -41,16 +41,6 @@ const SIMULATED_PLANS = [
         features: ["bracelets8", "organizationPriority24h", "monthlyMaintenance", "advancedAlertsImplementation"]
     }
 ];
-
-const SIMULATED_SUBSCRIPTION = {
-    id: "sub-demo-01",
-    businessId: SIMULATED_BUSINESS_ID,
-    planId: "professional",
-    status: "active",
-    currentPeriodEnd: "2026-11-01",
-    cancelAtPeriodEnd: false,
-    maxEmployees: 8
-};
 
 // Simulated payment method: only the last 4 digits are shown.
 // Card numbers are never requested or stored.
@@ -69,11 +59,6 @@ const SIMULATED_INVOICES = [
     { id: "inv-2026-07", folio: "FAC-2026-0001", issuedAt: "2026-07-15", amount: 220, currency: "PEN", status: "paid" }
 ];
 
-// Simulated active-employee count. The real roster belongs to Business, not Payments.
-// TODO: replace with the Business contract once it reports active employees
-// (excluding the administrator and pending invites). No HTTP call here on purpose.
-const SIMULATED_ACTIVE_EMPLOYEES = 8;
-
 export const usePaymentsStore = defineStore("payments", {
     state: () => ({
         plans: [],
@@ -81,6 +66,9 @@ export const usePaymentsStore = defineStore("payments", {
         paymentMethod: null,
         invoices: [],
         activeEmployees: 0,
+        reservedSeats: 0,
+        seatUsageAvailable: false,
+        errorMessage: null,
         isLoading: false,
         simulated: {
             plans: true,
@@ -93,10 +81,10 @@ export const usePaymentsStore = defineStore("payments", {
             return state.plans.find((plan) => plan.id === state.currentSubscription?.planId) ?? null;
         },
         memberLimit(state) {
-            return state.currentSubscription?.maxEmployees ?? 0;
+            return this.currentPlan?.maxEmployees ?? 0;
         },
         assignedOperators(state) {
-            return state.activeEmployees;
+            return state.activeEmployees + state.reservedSeats;
         },
         isSimulated(state) {
             return state.simulated.plans || state.simulated.subscription || state.simulated.billing;
@@ -122,27 +110,29 @@ export const usePaymentsStore = defineStore("payments", {
         },
         async fetchSubscription(businessId = SIMULATED_BUSINESS_ID) {
             this.isLoading = true;
+            this.currentSubscription = null;
             const api = new PaymentsApi();
             try {
-                const response = await api.getSubscriptionById(`${businessId}-subscription`);
-                this.currentSubscription = SubscriptionAssembler.toDomain(response.data);
+                const response = await api.getSubscriptions(businessId);
+                const subscriptions = Array.isArray(response.data) ? response.data : response.data?.subscriptions;
+                if (!Array.isArray(subscriptions)) throw new Error('Invalid subscription response');
+                const active = subscriptions.filter(subscription => String(subscription.businessId) === String(businessId)
+                    && subscription.status === 'active');
+                if (active.length > 1) throw new Error('Multiple active subscriptions');
+                this.currentSubscription = active.length ? SubscriptionAssembler.toDomain(active[0]) : null;
                 this.simulated.subscription = false;
-            } catch (err) {
-                this.currentSubscription = SubscriptionAssembler.toDomain({
-                    ...SIMULATED_SUBSCRIPTION,
-                    businessId
-                });
-                this.simulated.subscription = true;
-                console.warn("Payments subscription fallback to simulated data.", err?.message ?? err);
+            } catch {
+                this.errorMessage = 'payments.errors.subscriptionLoad';
             } finally {
                 this.isLoading = false;
             }
         },
         async fetchPaymentsData(businessId = SIMULATED_BUSINESS_ID) {
+            this.errorMessage = null;
             await this.fetchPlans();
             await this.fetchSubscription(businessId);
             await this.fetchBilling();
-            await this.fetchActiveEmployeeCount();
+            await this.fetchActiveEmployeeCount(businessId);
         },
         async fetchBilling() {
             this.isLoading = true;
@@ -171,18 +161,24 @@ export const usePaymentsStore = defineStore("payments", {
                 this.isLoading = false;
             }
         },
-        async fetchActiveEmployeeCount() {
-            // No HTTP call: the contract with Business does not exist yet.
-            // Business must report the active-employee count (excluding the
-            // administrator and pending invites); Payments only owns the limit.
-            this.activeEmployees = SIMULATED_ACTIVE_EMPLOYEES;
+        async fetchActiveEmployeeCount(businessId = SIMULATED_BUSINESS_ID) {
+            this.seatUsageAvailable = false;
+            try {
+                const usage = await new PaymentsApi().getSeatUsage(businessId);
+                this.activeEmployees = usage.activeEmployees;
+                this.reservedSeats = usage.reservedSeats;
+                this.seatUsageAvailable = true;
+            } catch {
+                this.errorMessage = 'payments.errors.seatUsageLoad';
+            }
         },
         async selectPlan(planId) {
             const plan = this.plans.find((p) => p.id === planId);
             if (!plan || !this.currentSubscription) return false;
-            // UI-level guard only: the quota counts active employees and the
-            // definitive validation belongs to the backend (Business enforces
-            // the limit reported by Payments).
+            this.errorMessage = null;
+            await this.fetchActiveEmployeeCount(this.currentSubscription.businessId);
+            if (!this.seatUsageAvailable) return false;
+            // Backend must enforce the limit against Business seat usage again.
             if (plan.maxEmployees < this.assignedOperators) return false;
             const next = {
                 ...SubscriptionAssembler.toResource(this.currentSubscription),
@@ -197,13 +193,14 @@ export const usePaymentsStore = defineStore("payments", {
                 this.currentSubscription = SubscriptionAssembler.toDomain(response.data);
                 this.simulated.subscription = false;
             } catch {
-                this.currentSubscription = SubscriptionAssembler.toDomain(next);
-                this.simulated.subscription = true;
+                this.errorMessage = 'payments.errors.save';
+                return false;
             }
             return true;
         },
         async cancelSubscription() {
-            if (!this.currentSubscription) return;
+            if (!this.currentSubscription) return false;
+            this.errorMessage = null;
             const next = {
                 ...SubscriptionAssembler.toResource(this.currentSubscription),
                 cancelAtPeriodEnd: true
@@ -214,9 +211,10 @@ export const usePaymentsStore = defineStore("payments", {
                 this.currentSubscription = SubscriptionAssembler.toDomain(response.data);
                 this.simulated.subscription = false;
             } catch {
-                this.currentSubscription = SubscriptionAssembler.toDomain(next);
-                this.simulated.subscription = true;
+                this.errorMessage = 'payments.errors.save';
+                return false;
             }
+            return true;
         }
     }
 });

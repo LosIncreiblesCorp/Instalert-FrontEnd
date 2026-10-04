@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref, watch } from "vue";
-import { RouterLink, useRoute } from "vue-router";
+import { RouterLink, RouterView, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import LanguageSwitcher from "./language-switcher.vue";
 import instalertLogo from "../../../assets/instalert-logo.svg";
@@ -19,12 +19,11 @@ const homeRouteName = computed(() =>
 const profileRouteName = computed(() =>
   isAdministrator.value ? "admin-profile" : "employee-profile",
 );
-const currentTitle = computed(() => t(route.meta.title ?? "common.appName"));
 
 const administratorItems = [
   { key: "dashboard", label: "navigation.adminDashboard", icon: "pi pi-home", routeName: "admin-dashboard" },
   { key: "risk-map", label: "navigation.riskMap", icon: "pi pi-map", routeName: "admin-risk-map" },
-  { key: "alerts", label: "navigation.alerts", icon: "pi pi-bell", routeName: "admin-alerts-active" },
+  { key: "alerts", label: "navigation.alerts", icon: "pi pi-bell", routeName: "admin-alerts-history" },
   { key: "personnel", label: "navigation.personnel", icon: "pi pi-users", routeName: "admin-personnel" },
   { key: "subscription", label: "navigation.subscription", icon: "pi pi-credit-card", routeName: "admin-subscription" },
 ];
@@ -89,7 +88,6 @@ function closeMobileNavigation() {
           <span class="role-mark" aria-hidden="true"><i class="pi pi-user"></i></span>
           <span class="role-copy">
             <span class="role-name">{{ currentRoleLabel }}</span>
-            <span class="role-caption">{{ t("common.demoView") }}</span>
           </span>
           <span class="profile-label">{{ t("common.profile") }}</span>
         </RouterLink>
@@ -135,7 +133,6 @@ function closeMobileNavigation() {
     </aside>
 
     <main id="main-content" class="workspace-main" tabindex="-1">
-      <h1 class="visually-hidden">{{ currentTitle }}</h1>
       <RouterView />
     </main>
   </div>
@@ -263,12 +260,6 @@ function closeMobileNavigation() {
 .role-name {
   font-size: 12px;
   font-weight: 700;
-  line-height: 1.2;
-}
-
-.role-caption {
-  color: var(--muted);
-  font-size: 10px;
   line-height: 1.2;
 }
 
@@ -467,10 +458,6 @@ select:focus-visible {
 
   .role-copy {
     min-width: auto;
-  }
-
-  .role-caption {
-    display: none;
   }
 
   .app-sidebar {

@@ -12,7 +12,7 @@ const props = defineProps({
 
 const { locale } = useI18n();
 
-const limit = computed(() => props.subscription.maxEmployees ?? 0);
+const limit = computed(() => props.plan?.maxEmployees ?? props.subscription.maxEmployees ?? 0);
 const percent = computed(() =>
     limit.value > 0 ? Math.min(100, Math.round((props.assignedOperators / limit.value) * 100)) : 0
 );

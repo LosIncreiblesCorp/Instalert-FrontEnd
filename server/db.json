@@ -1,3 +1,3945 @@
 {
-
+  "risk_zones": [
+    {
+      "id": "rz-1",
+      "name": "Cuadrante San Isidro 1",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -77.03145069772144,
+          -12.101939771879728
+        ],
+        [
+          -77.02209864067866,
+          -12.101939771879728
+        ],
+        [
+          -77.02209864067866,
+          -12.092587714836938
+        ],
+        [
+          -77.03145069772144,
+          -12.092587714836938
+        ],
+        [
+          -77.03145069772144,
+          -12.101939771879728
+        ]
+      ]
+    },
+    {
+      "id": "rz-2",
+      "name": "Cuadrante San Isidro 2",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -77.04498096337221,
+          -12.095610482219989
+        ],
+        [
+          -77.03542283100526,
+          -12.095610482219989
+        ],
+        [
+          -77.03542283100526,
+          -12.086052349853045
+        ],
+        [
+          -77.04498096337221,
+          -12.086052349853045
+        ],
+        [
+          -77.04498096337221,
+          -12.095610482219989
+        ]
+      ]
+    },
+    {
+      "id": "rz-3",
+      "name": "Cuadrante San Isidro 3",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -77.03884657842553,
+          -12.105453562346339
+        ],
+        [
+          -77.03230395863022,
+          -12.105453562346339
+        ],
+        [
+          -77.03230395863022,
+          -12.098910942551028
+        ],
+        [
+          -77.03884657842553,
+          -12.098910942551028
+        ],
+        [
+          -77.03884657842553,
+          -12.105453562346339
+        ]
+      ]
+    },
+    {
+      "id": "rz-4",
+      "name": "Cuadrante San Isidro 4",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -77.03506930451904,
+          -12.089898533541984
+        ],
+        [
+          -77.02538641255155,
+          -12.089898533541984
+        ],
+        [
+          -77.02538641255155,
+          -12.080215641574494
+        ],
+        [
+          -77.03506930451904,
+          -12.080215641574494
+        ],
+        [
+          -77.03506930451904,
+          -12.089898533541984
+        ]
+      ]
+    },
+    {
+      "id": "rz-5",
+      "name": "Cuadrante San Isidro 5",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -77.02044858130591,
+          -12.08980649170523
+        ],
+        [
+          -77.0127227329566,
+          -12.08980649170523
+        ],
+        [
+          -77.0127227329566,
+          -12.082080643355921
+        ],
+        [
+          -77.02044858130591,
+          -12.082080643355921
+        ],
+        [
+          -77.02044858130591,
+          -12.08980649170523
+        ]
+      ]
+    },
+    {
+      "id": "rz-6",
+      "name": "Cuadrante San Isidro 6",
+      "riskLevel": "medium",
+      "bounds": [
+        [
+          -77.01910035750235,
+          -12.101229615035846
+        ],
+        [
+          -77.01222210706295,
+          -12.101229615035846
+        ],
+        [
+          -77.01222210706295,
+          -12.094351364596436
+        ],
+        [
+          -77.01910035750235,
+          -12.094351364596436
+        ],
+        [
+          -77.01910035750235,
+          -12.101229615035846
+        ]
+      ]
+    },
+    {
+      "id": "rz-7",
+      "name": "Cuadrante San Isidro 7",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -77.02672317268618,
+          -12.110518478913118
+        ],
+        [
+          -77.01896530686771,
+          -12.110518478913118
+        ],
+        [
+          -77.01896530686771,
+          -12.102760613094649
+        ],
+        [
+          -77.02672317268618,
+          -12.102760613094649
+        ],
+        [
+          -77.02672317268618,
+          -12.110518478913118
+        ]
+      ]
+    },
+    {
+      "id": "rz-8",
+      "name": "Cuadrante San Borja 1",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -77.0046092520734,
+          -12.115271977525188
+        ],
+        [
+          -76.99504859843894,
+          -12.115271977525188
+        ],
+        [
+          -76.99504859843894,
+          -12.105711323890747
+        ],
+        [
+          -77.0046092520734,
+          -12.105711323890747
+        ],
+        [
+          -77.0046092520734,
+          -12.115271977525188
+        ]
+      ]
+    },
+    {
+      "id": "rz-9",
+      "name": "Cuadrante San Borja 2",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -76.99526221120279,
+          -12.12093042545222
+        ],
+        [
+          -76.98570637719662,
+          -12.12093042545222
+        ],
+        [
+          -76.98570637719662,
+          -12.11137459144606
+        ],
+        [
+          -76.99526221120279,
+          -12.11137459144606
+        ],
+        [
+          -76.99526221120279,
+          -12.12093042545222
+        ]
+      ]
+    },
+    {
+      "id": "rz-10",
+      "name": "Cuadrante San Borja 3",
+      "riskLevel": "medium",
+      "bounds": [
+        [
+          -76.99084658991599,
+          -12.108992943229408
+        ],
+        [
+          -76.98341134063703,
+          -12.108992943229408
+        ],
+        [
+          -76.98341134063703,
+          -12.101557693950452
+        ],
+        [
+          -76.99084658991599,
+          -12.101557693950452
+        ],
+        [
+          -76.99084658991599,
+          -12.108992943229408
+        ]
+      ]
+    },
+    {
+      "id": "rz-11",
+      "name": "Cuadrante San Borja 4",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -77.00686304848462,
+          -12.104905686027584
+        ],
+        [
+          -76.99715266172505,
+          -12.104905686027584
+        ],
+        [
+          -76.99715266172505,
+          -12.095195299268026
+        ],
+        [
+          -77.00686304848462,
+          -12.095195299268026
+        ],
+        [
+          -77.00686304848462,
+          -12.104905686027584
+        ]
+      ]
+    },
+    {
+      "id": "rz-12",
+      "name": "Cuadrante San Borja 5",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -77.00461970657751,
+          -12.122673511497544
+        ],
+        [
+          -76.9964874539681,
+          -12.122673511497544
+        ],
+        [
+          -76.9964874539681,
+          -12.114541258888122
+        ],
+        [
+          -77.00461970657751,
+          -12.114541258888122
+        ],
+        [
+          -77.00461970657751,
+          -12.122673511497544
+        ]
+      ]
+    },
+    {
+      "id": "rz-13",
+      "name": "Cuadrante San Borja 6",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -76.99288024875695,
+          -12.099145280663047
+        ],
+        [
+          -76.98677923253057,
+          -12.099145280663047
+        ],
+        [
+          -76.98677923253057,
+          -12.093044264436672
+        ],
+        [
+          -76.99288024875695,
+          -12.093044264436672
+        ],
+        [
+          -76.99288024875695,
+          -12.099145280663047
+        ]
+      ]
+    },
+    {
+      "id": "rz-14",
+      "name": "Cuadrante San Borja 7",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -76.98330808226166,
+          -12.11401246745597
+        ],
+        [
+          -76.97685763533372,
+          -12.11401246745597
+        ],
+        [
+          -76.97685763533372,
+          -12.107562020528027
+        ],
+        [
+          -76.98330808226166,
+          -12.107562020528027
+        ],
+        [
+          -76.98330808226166,
+          -12.11401246745597
+        ]
+      ]
+    },
+    {
+      "id": "rz-15",
+      "name": "Cuadrante Lince/Cercado 1",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -77.0323363174954,
+          -12.077565185856377
+        ],
+        [
+          -77.02628439460747,
+          -12.077565185856377
+        ],
+        [
+          -77.02628439460747,
+          -12.071513262968457
+        ],
+        [
+          -77.0323363174954,
+          -12.071513262968457
+        ],
+        [
+          -77.0323363174954,
+          -12.077565185856377
+        ]
+      ]
+    },
+    {
+      "id": "rz-16",
+      "name": "Cuadrante Lince/Cercado 2",
+      "riskLevel": "medium",
+      "bounds": [
+        [
+          -77.04047658104511,
+          -12.067445021917605
+        ],
+        [
+          -77.03195776782158,
+          -12.067445021917605
+        ],
+        [
+          -77.03195776782158,
+          -12.058926208694073
+        ],
+        [
+          -77.04047658104511,
+          -12.058926208694073
+        ],
+        [
+          -77.04047658104511,
+          -12.067445021917605
+        ]
+      ]
+    },
+    {
+      "id": "rz-17",
+      "name": "Cuadrante Lince/Cercado 3",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.04818112744722,
+          -12.069554605864342
+        ],
+        [
+          -77.04076296522807,
+          -12.069554605864342
+        ],
+        [
+          -77.04076296522807,
+          -12.062136443645182
+        ],
+        [
+          -77.04818112744722,
+          -12.062136443645182
+        ],
+        [
+          -77.04818112744722,
+          -12.069554605864342
+        ]
+      ]
+    },
+    {
+      "id": "rz-18",
+      "name": "Cuadrante Lince/Cercado 4",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -77.03237671529516,
+          -12.065213541936101
+        ],
+        [
+          -77.02318984016634,
+          -12.065213541936101
+        ],
+        [
+          -77.02318984016634,
+          -12.05602666680729
+        ],
+        [
+          -77.03237671529516,
+          -12.05602666680729
+        ],
+        [
+          -77.03237671529516,
+          -12.065213541936101
+        ]
+      ]
+    },
+    {
+      "id": "rz-19",
+      "name": "Cuadrante Lince/Cercado 5",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.04675796918912,
+          -12.085512957248502
+        ],
+        [
+          -77.03939106485242,
+          -12.085512957248502
+        ],
+        [
+          -77.03939106485242,
+          -12.07814605291181
+        ],
+        [
+          -77.04675796918912,
+          -12.07814605291181
+        ],
+        [
+          -77.04675796918912,
+          -12.085512957248502
+        ]
+      ]
+    },
+    {
+      "id": "rz-20",
+      "name": "Cuadrante Lince/Cercado 6",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.02433722827108,
+          -12.081339440229812
+        ],
+        [
+          -77.01686869341613,
+          -12.081339440229812
+        ],
+        [
+          -77.01686869341613,
+          -12.073870905374857
+        ],
+        [
+          -77.02433722827108,
+          -12.073870905374857
+        ],
+        [
+          -77.02433722827108,
+          -12.081339440229812
+        ]
+      ]
+    },
+    {
+      "id": "rz-21",
+      "name": "Cuadrante La Victoria 1",
+      "riskLevel": "medium",
+      "bounds": [
+        [
+          -77.00471966474949,
+          -12.058131425873478
+        ],
+        [
+          -76.99575540434905,
+          -12.058131425873478
+        ],
+        [
+          -76.99575540434905,
+          -12.049167165473056
+        ],
+        [
+          -77.00471966474949,
+          -12.049167165473056
+        ],
+        [
+          -77.00471966474949,
+          -12.058131425873478
+        ]
+      ]
+    },
+    {
+      "id": "rz-22",
+      "name": "Cuadrante La Victoria 2",
+      "riskLevel": "medium",
+      "bounds": [
+        [
+          -77.01700404072334,
+          -12.077172244411088
+        ],
+        [
+          -77.00774709154872,
+          -12.077172244411088
+        ],
+        [
+          -77.00774709154872,
+          -12.067915295236485
+        ],
+        [
+          -77.01700404072334,
+          -12.067915295236485
+        ],
+        [
+          -77.01700404072334,
+          -12.077172244411088
+        ]
+      ]
+    },
+    {
+      "id": "rz-23",
+      "name": "Cuadrante La Victoria 3",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.02186041252425,
+          -12.054125694280973
+        ],
+        [
+          -77.01551010815719,
+          -12.054125694280973
+        ],
+        [
+          -77.01551010815719,
+          -12.047775389913909
+        ],
+        [
+          -77.02186041252425,
+          -12.047775389913909
+        ],
+        [
+          -77.02186041252425,
+          -12.054125694280973
+        ]
+      ]
+    },
+    {
+      "id": "rz-24",
+      "name": "Cuadrante La Victoria 4",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.02792957664175,
+          -12.072955064131051
+        ],
+        [
+          -77.01938229444201,
+          -12.072955064131051
+        ],
+        [
+          -77.01938229444201,
+          -12.064407781931315
+        ],
+        [
+          -77.02792957664175,
+          -12.064407781931315
+        ],
+        [
+          -77.02792957664175,
+          -12.072955064131051
+        ]
+      ]
+    },
+    {
+      "id": "rz-25",
+      "name": "Cuadrante La Victoria 5",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.0314728458038,
+          -12.056104029045038
+        ],
+        [
+          -77.0233690190447,
+          -12.056104029045038
+        ],
+        [
+          -77.0233690190447,
+          -12.048000202285927
+        ],
+        [
+          -77.0314728458038,
+          -12.048000202285927
+        ],
+        [
+          -77.0314728458038,
+          -12.056104029045038
+        ]
+      ]
+    },
+    {
+      "id": "rz-26",
+      "name": "Cuadrante La Victoria 6",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.01882121916789,
+          -12.067152262941265
+        ],
+        [
+          -77.01069167700699,
+          -12.067152262941265
+        ],
+        [
+          -77.01069167700699,
+          -12.059022720780371
+        ],
+        [
+          -77.01882121916789,
+          -12.059022720780371
+        ],
+        [
+          -77.01882121916789,
+          -12.067152262941265
+        ]
+      ]
+    },
+    {
+      "id": "rz-27",
+      "name": "Cuadrante La Victoria 7",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.00482904318393,
+          -12.076811938373945
+        ],
+        [
+          -76.99610807871808,
+          -12.076811938373945
+        ],
+        [
+          -76.99610807871808,
+          -12.068090973908083
+        ],
+        [
+          -77.00482904318393,
+          -12.068090973908083
+        ],
+        [
+          -77.00482904318393,
+          -12.076811938373945
+        ]
+      ]
+    },
+    {
+      "id": "rz-28",
+      "name": "Cuadrante SJL (Valle) 1",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.0111484702365,
+          -12.0107141273642
+        ],
+        [
+          -77.00491519118508,
+          -12.0107141273642
+        ],
+        [
+          -77.00491519118508,
+          -12.004480848312763
+        ],
+        [
+          -77.0111484702365,
+          -12.004480848312763
+        ],
+        [
+          -77.0111484702365,
+          -12.0107141273642
+        ]
+      ]
+    },
+    {
+      "id": "rz-29",
+      "name": "Cuadrante SJL (Valle) 2",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -76.99391729759617,
+          -12.007875111958016
+        ],
+        [
+          -76.98612659283012,
+          -12.007875111958016
+        ],
+        [
+          -76.98612659283012,
+          -12.000084407191954
+        ],
+        [
+          -76.99391729759617,
+          -12.000084407191954
+        ],
+        [
+          -76.99391729759617,
+          -12.007875111958016
+        ]
+      ]
+    },
+    {
+      "id": "rz-30",
+      "name": "Cuadrante SJL (Valle) 3",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.00045878523058,
+          -12.000275517276037
+        ],
+        [
+          -76.99347577668233,
+          -12.000275517276037
+        ],
+        [
+          -76.99347577668233,
+          -11.99329250872778
+        ],
+        [
+          -77.00045878523058,
+          -11.99329250872778
+        ],
+        [
+          -77.00045878523058,
+          -12.000275517276037
+        ]
+      ]
+    },
+    {
+      "id": "rz-31",
+      "name": "Cuadrante SJL (Valle) 4",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -77.00028155172053,
+          -12.023541815565537
+        ],
+        [
+          -76.99330865535477,
+          -12.023541815565537
+        ],
+        [
+          -76.99330865535477,
+          -12.016568919199774
+        ],
+        [
+          -77.00028155172053,
+          -12.016568919199774
+        ],
+        [
+          -77.00028155172053,
+          -12.023541815565537
+        ]
+      ]
+    },
+    {
+      "id": "rz-32",
+      "name": "Cuadrante SJL (Valle) 5",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -77.00588827070887,
+          -12.017983512632094
+        ],
+        [
+          -76.99702322432945,
+          -12.017983512632094
+        ],
+        [
+          -76.99702322432945,
+          -12.009118466252685
+        ],
+        [
+          -77.00588827070887,
+          -12.009118466252685
+        ],
+        [
+          -77.00588827070887,
+          -12.017983512632094
+        ]
+      ]
+    },
+    {
+      "id": "rz-33",
+      "name": "Cuadrante SJL (Valle) 6",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.01540487355825,
+          -12.027180744292444
+        ],
+        [
+          -77.00606353259079,
+          -12.027180744292444
+        ],
+        [
+          -77.00606353259079,
+          -12.017839403324981
+        ],
+        [
+          -77.01540487355825,
+          -12.017839403324981
+        ],
+        [
+          -77.01540487355825,
+          -12.027180744292444
+        ]
+      ]
+    },
+    {
+      "id": "rz-34",
+      "name": "Cuadrante SJL (Valle) 7",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -76.99181780401113,
+          -12.019043855537802
+        ],
+        [
+          -76.98419361805611,
+          -12.019043855537802
+        ],
+        [
+          -76.98419361805611,
+          -12.011419669582764
+        ],
+        [
+          -76.99181780401113,
+          -12.011419669582764
+        ],
+        [
+          -76.99181780401113,
+          -12.019043855537802
+        ]
+      ]
+    },
+    {
+      "id": "rz-35",
+      "name": "Cuadrante Los Olivos 1",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.08183938741848,
+          -11.984886647070695
+        ],
+        [
+          -77.07555715020388,
+          -11.984886647070695
+        ],
+        [
+          -77.07555715020388,
+          -11.978604409856104
+        ],
+        [
+          -77.08183938741848,
+          -11.978604409856104
+        ],
+        [
+          -77.08183938741848,
+          -11.984886647070695
+        ]
+      ]
+    },
+    {
+      "id": "rz-36",
+      "name": "Cuadrante Los Olivos 2",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.06198566885254,
+          -11.993732640244168
+        ],
+        [
+          -77.05219035112759,
+          -11.993732640244168
+        ],
+        [
+          -77.05219035112759,
+          -11.983937322519218
+        ],
+        [
+          -77.06198566885254,
+          -11.983937322519218
+        ],
+        [
+          -77.06198566885254,
+          -11.993732640244168
+        ]
+      ]
+    },
+    {
+      "id": "rz-37",
+      "name": "Cuadrante Los Olivos 3",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.07340819158254,
+          -11.969381104748734
+        ],
+        [
+          -77.06506359141402,
+          -11.969381104748734
+        ],
+        [
+          -77.06506359141402,
+          -11.961036504580218
+        ],
+        [
+          -77.07340819158254,
+          -11.961036504580218
+        ],
+        [
+          -77.07340819158254,
+          -11.969381104748734
+        ]
+      ]
+    },
+    {
+      "id": "rz-38",
+      "name": "Cuadrante Los Olivos 4",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -77.07416809218604,
+          -11.989614148863113
+        ],
+        [
+          -77.06659781338031,
+          -11.989614148863113
+        ],
+        [
+          -77.06659781338031,
+          -11.982043870057387
+        ],
+        [
+          -77.07416809218604,
+          -11.982043870057387
+        ],
+        [
+          -77.07416809218604,
+          -11.989614148863113
+        ]
+      ]
+    },
+    {
+      "id": "rz-39",
+      "name": "Cuadrante Los Olivos 5",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.06395742176306,
+          -11.981949685158915
+        ],
+        [
+          -77.05598071467244,
+          -11.981949685158915
+        ],
+        [
+          -77.05598071467244,
+          -11.973972978068298
+        ],
+        [
+          -77.06395742176306,
+          -11.973972978068298
+        ],
+        [
+          -77.06395742176306,
+          -11.981949685158915
+        ]
+      ]
+    },
+    {
+      "id": "rz-40",
+      "name": "Cuadrante Los Olivos 6",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.0780959770064,
+          -11.980481940283719
+        ],
+        [
+          -77.06837052878655,
+          -11.980481940283719
+        ],
+        [
+          -77.06837052878655,
+          -11.97075649206388
+        ],
+        [
+          -77.0780959770064,
+          -11.97075649206388
+        ],
+        [
+          -77.0780959770064,
+          -11.980481940283719
+        ]
+      ]
+    },
+    {
+      "id": "rz-41",
+      "name": "Cuadrante Los Olivos 7",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -77.0829577809321,
+          -11.972972439461394
+        ],
+        [
+          -77.07444453608466,
+          -11.972972439461394
+        ],
+        [
+          -77.07444453608466,
+          -11.964459194613948
+        ],
+        [
+          -77.0829577809321,
+          -11.964459194613948
+        ],
+        [
+          -77.0829577809321,
+          -11.972972439461394
+        ]
+      ]
+    },
+    {
+      "id": "rz-42",
+      "name": "Cuadrante SJM (Urbano) 1",
+      "riskLevel": "medium",
+      "bounds": [
+        [
+          -76.96486294579611,
+          -12.160648098062934
+        ],
+        [
+          -76.95626914488994,
+          -12.160648098062934
+        ],
+        [
+          -76.95626914488994,
+          -12.152054297156772
+        ],
+        [
+          -76.96486294579611,
+          -12.152054297156772
+        ],
+        [
+          -76.96486294579611,
+          -12.160648098062934
+        ]
+      ]
+    },
+    {
+      "id": "rz-43",
+      "name": "Cuadrante SJM (Urbano) 2",
+      "riskLevel": "medium",
+      "bounds": [
+        [
+          -76.96494204491948,
+          -12.168342549389275
+        ],
+        [
+          -76.95736963777141,
+          -12.168342549389275
+        ],
+        [
+          -76.95736963777141,
+          -12.1607701422412
+        ],
+        [
+          -76.96494204491948,
+          -12.1607701422412
+        ],
+        [
+          -76.96494204491948,
+          -12.168342549389275
+        ]
+      ]
+    },
+    {
+      "id": "rz-44",
+      "name": "Cuadrante SJM (Urbano) 3",
+      "riskLevel": "medium",
+      "bounds": [
+        [
+          -76.97914112261154,
+          -12.152525556151959
+        ],
+        [
+          -76.97138296443879,
+          -12.152525556151959
+        ],
+        [
+          -76.97138296443879,
+          -12.144767397979214
+        ],
+        [
+          -76.97914112261154,
+          -12.144767397979214
+        ],
+        [
+          -76.97914112261154,
+          -12.152525556151959
+        ]
+      ]
+    },
+    {
+      "id": "rz-45",
+      "name": "Cuadrante SJM (Urbano) 4",
+      "riskLevel": "low",
+      "bounds": [
+        [
+          -76.98428797494483,
+          -12.169952711860487
+        ],
+        [
+          -76.976879534711,
+          -12.169952711860487
+        ],
+        [
+          -76.976879534711,
+          -12.162544271626667
+        ],
+        [
+          -76.98428797494483,
+          -12.162544271626667
+        ],
+        [
+          -76.98428797494483,
+          -12.169952711860487
+        ]
+      ]
+    },
+    {
+      "id": "rz-46",
+      "name": "Cuadrante SJM (Urbano) 5",
+      "riskLevel": "medium",
+      "bounds": [
+        [
+          -76.98895536445639,
+          -12.152241930991682
+        ],
+        [
+          -76.98212459501346,
+          -12.152241930991682
+        ],
+        [
+          -76.98212459501346,
+          -12.14541116154875
+        ],
+        [
+          -76.98895536445639,
+          -12.14541116154875
+        ],
+        [
+          -76.98895536445639,
+          -12.152241930991682
+        ]
+      ]
+    },
+    {
+      "id": "rz-47",
+      "name": "Cuadrante SJM (Urbano) 6",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -76.96648860373475,
+          -12.178475895806542
+        ],
+        [
+          -76.957524166079,
+          -12.178475895806542
+        ],
+        [
+          -76.957524166079,
+          -12.16951145815079
+        ],
+        [
+          -76.96648860373475,
+          -12.16951145815079
+        ],
+        [
+          -76.96648860373475,
+          -12.178475895806542
+        ]
+      ]
+    },
+    {
+      "id": "rz-48",
+      "name": "Cuadrante SJM (Urbano) 7",
+      "riskLevel": "high",
+      "bounds": [
+        [
+          -76.97862969863223,
+          -12.165866740879636
+        ],
+        [
+          -76.96896652062213,
+          -12.165866740879636
+        ],
+        [
+          -76.96896652062213,
+          -12.156203562869528
+        ],
+        [
+          -76.97862969863223,
+          -12.156203562869528
+        ],
+        [
+          -76.97862969863223,
+          -12.165866740879636
+        ]
+      ]
+    }
+  ],
+  "incidents": [
+    {
+      "id": "inc-1",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.091197475533507,
+      "longitude": -77.04377840430159,
+      "reportedAt": "2026-09-29T21:16:12.604Z"
+    },
+    {
+      "id": "inc-2",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -12.101735559909141,
+      "longitude": -77.03776517389798,
+      "reportedAt": "2026-09-29T21:16:12.612Z"
+    },
+    {
+      "id": "inc-3",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "resolved",
+      "latitude": -12.08723846203693,
+      "longitude": -77.02935441356273,
+      "reportedAt": "2026-09-30T13:16:12.612Z"
+    },
+    {
+      "id": "inc-4",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.098473440889894,
+      "longitude": -77.01542337162361,
+      "reportedAt": "2026-09-29T23:16:12.612Z"
+    },
+    {
+      "id": "inc-5",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -12.097148715069038,
+      "longitude": -77.01450414527595,
+      "reportedAt": "2026-09-29T21:16:12.612Z"
+    },
+    {
+      "id": "inc-6",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -12.09581758647598,
+      "longitude": -77.01243972019492,
+      "reportedAt": "2026-09-30T04:16:12.612Z"
+    },
+    {
+      "id": "inc-7",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.104527857884054,
+      "longitude": -76.98438581839443,
+      "reportedAt": "2026-09-30T07:16:12.613Z"
+    },
+    {
+      "id": "inc-8",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.102416827271647,
+      "longitude": -76.98491356925908,
+      "reportedAt": "2026-09-30T09:16:12.613Z"
+    },
+    {
+      "id": "inc-9",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "resolved",
+      "latitude": -12.107981897847,
+      "longitude": -76.98371618899776,
+      "reportedAt": "2026-09-29T22:16:12.613Z"
+    },
+    {
+      "id": "inc-10",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.104574918463708,
+      "longitude": -77.00383359196925,
+      "reportedAt": "2026-09-29T19:16:12.613Z"
+    },
+    {
+      "id": "inc-11",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -12.065527212745376,
+      "longitude": -77.03581136804617,
+      "reportedAt": "2026-09-29T22:16:12.613Z"
+    },
+    {
+      "id": "inc-12",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "resolved",
+      "latitude": -12.06440184818335,
+      "longitude": -77.03593043839106,
+      "reportedAt": "2026-09-29T22:16:12.613Z"
+    },
+    {
+      "id": "inc-13",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -12.059772363431968,
+      "longitude": -77.03346423774461,
+      "reportedAt": "2026-09-30T15:16:12.613Z"
+    },
+    {
+      "id": "inc-14",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.063801329597158,
+      "longitude": -77.04707374944668,
+      "reportedAt": "2026-09-29T18:16:12.613Z"
+    },
+    {
+      "id": "inc-15",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.065776552571878,
+      "longitude": -77.04303005169736,
+      "reportedAt": "2026-09-29T21:16:12.613Z"
+    },
+    {
+      "id": "inc-16",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -12.06696175890706,
+      "longitude": -77.04597038625849,
+      "reportedAt": "2026-09-30T08:16:12.613Z"
+    },
+    {
+      "id": "inc-17",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -12.064536882599244,
+      "longitude": -77.04611818847641,
+      "reportedAt": "2026-09-30T09:16:12.613Z"
+    },
+    {
+      "id": "inc-18",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.067636916084494,
+      "longitude": -77.04636610257448,
+      "reportedAt": "2026-09-29T20:16:12.613Z"
+    },
+    {
+      "id": "inc-19",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "resolved",
+      "latitude": -12.082890101601848,
+      "longitude": -77.0411838165741,
+      "reportedAt": "2026-09-30T00:16:12.613Z"
+    },
+    {
+      "id": "inc-20",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "resolved",
+      "latitude": -12.08320018592119,
+      "longitude": -77.04121529673769,
+      "reportedAt": "2026-09-29T20:16:12.613Z"
+    },
+    {
+      "id": "inc-21",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.078943519317498,
+      "longitude": -77.04307312632666,
+      "reportedAt": "2026-09-30T09:16:12.613Z"
+    },
+    {
+      "id": "inc-22",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.084456793720959,
+      "longitude": -77.04318028466703,
+      "reportedAt": "2026-09-30T05:16:12.613Z"
+    },
+    {
+      "id": "inc-23",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.080547901785117,
+      "longitude": -77.04285795852381,
+      "reportedAt": "2026-09-30T09:16:12.613Z"
+    },
+    {
+      "id": "inc-24",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "resolved",
+      "latitude": -12.082684668788332,
+      "longitude": -77.04559749148117,
+      "reportedAt": "2026-09-30T05:16:12.613Z"
+    },
+    {
+      "id": "inc-25",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.076962921866217,
+      "longitude": -77.0182626779377,
+      "reportedAt": "2026-09-29T22:16:12.613Z"
+    },
+    {
+      "id": "inc-26",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.078810187105509,
+      "longitude": -77.01890073251066,
+      "reportedAt": "2026-09-29T22:16:12.613Z"
+    },
+    {
+      "id": "inc-27",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.079642382982325,
+      "longitude": -77.02368978251471,
+      "reportedAt": "2026-09-29T22:16:12.613Z"
+    },
+    {
+      "id": "inc-28",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.080275630899317,
+      "longitude": -77.0202199926629,
+      "reportedAt": "2026-09-30T14:16:12.613Z"
+    },
+    {
+      "id": "inc-29",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.076919528435418,
+      "longitude": -77.02026269829285,
+      "reportedAt": "2026-09-29T21:16:12.613Z"
+    },
+    {
+      "id": "inc-30",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "resolved",
+      "latitude": -12.077565937571816,
+      "longitude": -77.01907914304739,
+      "reportedAt": "2026-09-30T07:16:12.613Z"
+    },
+    {
+      "id": "inc-31",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.074984679580755,
+      "longitude": -77.0202751267117,
+      "reportedAt": "2026-09-30T11:16:12.613Z"
+    },
+    {
+      "id": "inc-32",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.051214777160116,
+      "longitude": -76.99899525728286,
+      "reportedAt": "2026-09-30T13:16:12.613Z"
+    },
+    {
+      "id": "inc-33",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.05469673490679,
+      "longitude": -77.00042726918878,
+      "reportedAt": "2026-09-30T07:16:12.613Z"
+    },
+    {
+      "id": "inc-34",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "resolved",
+      "latitude": -12.05588198523542,
+      "longitude": -77.00279303885993,
+      "reportedAt": "2026-09-29T20:16:12.613Z"
+    },
+    {
+      "id": "inc-35",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -12.070968890794974,
+      "longitude": -77.0148071839029,
+      "reportedAt": "2026-09-30T08:16:12.613Z"
+    },
+    {
+      "id": "inc-36",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -12.074526238404314,
+      "longitude": -77.00899994326858,
+      "reportedAt": "2026-09-30T06:16:12.613Z"
+    },
+    {
+      "id": "inc-37",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.07081054597495,
+      "longitude": -77.01599177131503,
+      "reportedAt": "2026-09-29T23:16:12.613Z"
+    },
+    {
+      "id": "inc-38",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "resolved",
+      "latitude": -12.074113464966713,
+      "longitude": -77.01314186449238,
+      "reportedAt": "2026-09-30T09:16:12.613Z"
+    },
+    {
+      "id": "inc-39",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -12.051124750309699,
+      "longitude": -77.0208326418314,
+      "reportedAt": "2026-09-30T14:16:12.613Z"
+    },
+    {
+      "id": "inc-40",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.052320318546487,
+      "longitude": -77.01574446141156,
+      "reportedAt": "2026-09-30T09:16:12.613Z"
+    },
+    {
+      "id": "inc-41",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "resolved",
+      "latitude": -12.048738437086564,
+      "longitude": -77.01838759064925,
+      "reportedAt": "2026-09-30T11:16:12.613Z"
+    },
+    {
+      "id": "inc-42",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.05087732838963,
+      "longitude": -77.01843663608189,
+      "reportedAt": "2026-09-30T16:16:12.613Z"
+    },
+    {
+      "id": "inc-43",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -12.048969441133254,
+      "longitude": -77.0212323892931,
+      "reportedAt": "2026-09-30T04:16:12.613Z"
+    },
+    {
+      "id": "inc-44",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.050137552639557,
+      "longitude": -77.01584496566953,
+      "reportedAt": "2026-09-30T03:16:12.613Z"
+    },
+    {
+      "id": "inc-45",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -12.051554762254492,
+      "longitude": -77.02043265483485,
+      "reportedAt": "2026-09-30T16:16:12.613Z"
+    },
+    {
+      "id": "inc-46",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.06841706171302,
+      "longitude": -77.02748019027536,
+      "reportedAt": "2026-09-29T18:16:12.613Z"
+    },
+    {
+      "id": "inc-47",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -12.067077391486096,
+      "longitude": -77.0224108802041,
+      "reportedAt": "2026-09-29T18:16:12.613Z"
+    },
+    {
+      "id": "inc-48",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.07251743953596,
+      "longitude": -77.02021371473722,
+      "reportedAt": "2026-09-30T13:16:12.613Z"
+    },
+    {
+      "id": "inc-49",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -12.067356516104159,
+      "longitude": -77.0219823502955,
+      "reportedAt": "2026-09-30T01:16:12.613Z"
+    },
+    {
+      "id": "inc-50",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.070898176546825,
+      "longitude": -77.02613504311358,
+      "reportedAt": "2026-09-30T15:16:12.613Z"
+    },
+    {
+      "id": "inc-51",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.071282956211002,
+      "longitude": -77.02483159389611,
+      "reportedAt": "2026-09-30T16:16:12.613Z"
+    },
+    {
+      "id": "inc-52",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "resolved",
+      "latitude": -12.0680402804298,
+      "longitude": -77.02637644153326,
+      "reportedAt": "2026-09-29T22:16:12.613Z"
+    },
+    {
+      "id": "inc-53",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.065488773240205,
+      "longitude": -77.0216264030121,
+      "reportedAt": "2026-09-29T21:16:12.613Z"
+    },
+    {
+      "id": "inc-54",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.049888527429792,
+      "longitude": -77.02773348796694,
+      "reportedAt": "2026-09-29T22:16:12.613Z"
+    },
+    {
+      "id": "inc-55",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.05018719020929,
+      "longitude": -77.02799430761148,
+      "reportedAt": "2026-09-30T14:16:12.613Z"
+    },
+    {
+      "id": "inc-56",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -12.05464859701525,
+      "longitude": -77.02422173474424,
+      "reportedAt": "2026-09-30T07:16:12.613Z"
+    },
+    {
+      "id": "inc-57",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.053737502703747,
+      "longitude": -77.02839101959596,
+      "reportedAt": "2026-09-29T23:16:12.613Z"
+    },
+    {
+      "id": "inc-58",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.055235795034246,
+      "longitude": -77.02739408045146,
+      "reportedAt": "2026-09-30T11:16:12.613Z"
+    },
+    {
+      "id": "inc-59",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.05429801387731,
+      "longitude": -77.0240719103938,
+      "reportedAt": "2026-09-30T07:16:12.613Z"
+    },
+    {
+      "id": "inc-60",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.063184169952946,
+      "longitude": -77.0152002079261,
+      "reportedAt": "2026-09-30T07:16:12.613Z"
+    },
+    {
+      "id": "inc-61",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "resolved",
+      "latitude": -12.064564561569757,
+      "longitude": -77.01445636833489,
+      "reportedAt": "2026-09-29T18:16:12.613Z"
+    },
+    {
+      "id": "inc-62",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.059345979964263,
+      "longitude": -77.01572964318107,
+      "reportedAt": "2026-09-29T19:16:12.613Z"
+    },
+    {
+      "id": "inc-63",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -12.064741879405494,
+      "longitude": -77.01355817000558,
+      "reportedAt": "2026-09-30T01:16:12.613Z"
+    },
+    {
+      "id": "inc-64",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.064310538348222,
+      "longitude": -77.01537970361005,
+      "reportedAt": "2026-09-29T17:16:12.613Z"
+    },
+    {
+      "id": "inc-65",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.060424808715908,
+      "longitude": -77.01794789185315,
+      "reportedAt": "2026-09-30T06:16:12.613Z"
+    },
+    {
+      "id": "inc-66",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.06334498994156,
+      "longitude": -77.01548753374023,
+      "reportedAt": "2026-09-29T23:16:12.613Z"
+    },
+    {
+      "id": "inc-67",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.071662430500968,
+      "longitude": -76.99745849813043,
+      "reportedAt": "2026-09-30T09:16:12.613Z"
+    },
+    {
+      "id": "inc-68",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "resolved",
+      "latitude": -12.070238986154394,
+      "longitude": -76.99930221191282,
+      "reportedAt": "2026-09-30T03:16:12.613Z"
+    },
+    {
+      "id": "inc-69",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.070112647948285,
+      "longitude": -77.00369958241772,
+      "reportedAt": "2026-09-29T23:16:12.613Z"
+    },
+    {
+      "id": "inc-70",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "resolved",
+      "latitude": -12.073621446804598,
+      "longitude": -77.00267904143774,
+      "reportedAt": "2026-09-29T19:16:12.613Z"
+    },
+    {
+      "id": "inc-71",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.072026191172812,
+      "longitude": -76.99788935777826,
+      "reportedAt": "2026-09-30T06:16:12.613Z"
+    },
+    {
+      "id": "inc-72",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "resolved",
+      "latitude": -12.00895736940455,
+      "longitude": -77.00642063648505,
+      "reportedAt": "2026-09-30T16:16:12.613Z"
+    },
+    {
+      "id": "inc-73",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "resolved",
+      "latitude": -12.005443372943223,
+      "longitude": -77.0104243136302,
+      "reportedAt": "2026-09-30T01:16:12.613Z"
+    },
+    {
+      "id": "inc-74",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.008771289642628,
+      "longitude": -77.00748825840573,
+      "reportedAt": "2026-09-29T21:16:12.613Z"
+    },
+    {
+      "id": "inc-75",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.007921340371466,
+      "longitude": -77.0104277629418,
+      "reportedAt": "2026-09-30T11:16:12.613Z"
+    },
+    {
+      "id": "inc-76",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "resolved",
+      "latitude": -12.007140112495383,
+      "longitude": -77.01027075162344,
+      "reportedAt": "2026-09-30T10:16:12.613Z"
+    },
+    {
+      "id": "inc-77",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -11.995144027287681,
+      "longitude": -76.99512495376099,
+      "reportedAt": "2026-09-30T03:16:12.613Z"
+    },
+    {
+      "id": "inc-78",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -11.996640385699001,
+      "longitude": -76.99953815200386,
+      "reportedAt": "2026-09-29T23:16:12.613Z"
+    },
+    {
+      "id": "inc-79",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -11.99871592494062,
+      "longitude": -76.99666480358592,
+      "reportedAt": "2026-09-30T12:16:12.613Z"
+    },
+    {
+      "id": "inc-80",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -11.994165939459752,
+      "longitude": -76.99630759742922,
+      "reportedAt": "2026-09-29T22:16:12.613Z"
+    },
+    {
+      "id": "inc-81",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -11.998240409056885,
+      "longitude": -76.99599337770091,
+      "reportedAt": "2026-09-30T14:16:12.613Z"
+    },
+    {
+      "id": "inc-82",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -11.998883051448374,
+      "longitude": -76.99538716505137,
+      "reportedAt": "2026-09-30T08:16:12.613Z"
+    },
+    {
+      "id": "inc-83",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -12.02079014743312,
+      "longitude": -77.00661375786443,
+      "reportedAt": "2026-09-30T09:16:12.613Z"
+    },
+    {
+      "id": "inc-84",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -12.025086811378571,
+      "longitude": -77.0078409485503,
+      "reportedAt": "2026-09-29T21:16:12.613Z"
+    },
+    {
+      "id": "inc-85",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.026864125970421,
+      "longitude": -77.00928831615305,
+      "reportedAt": "2026-09-30T02:16:12.613Z"
+    },
+    {
+      "id": "inc-86",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -12.021150798979965,
+      "longitude": -77.01470796339025,
+      "reportedAt": "2026-09-29T20:16:12.613Z"
+    },
+    {
+      "id": "inc-87",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -12.020856216588312,
+      "longitude": -77.00960648284851,
+      "reportedAt": "2026-09-29T22:16:12.613Z"
+    },
+    {
+      "id": "inc-88",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.023296980595052,
+      "longitude": -77.00820805630042,
+      "reportedAt": "2026-09-29T23:16:12.613Z"
+    },
+    {
+      "id": "inc-89",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.01894830926439,
+      "longitude": -77.0065368125338,
+      "reportedAt": "2026-09-30T15:16:12.613Z"
+    },
+    {
+      "id": "inc-90",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.012770998589733,
+      "longitude": -76.98709935779142,
+      "reportedAt": "2026-09-30T15:16:12.613Z"
+    },
+    {
+      "id": "inc-91",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -11.98130325020063,
+      "longitude": -77.07859628650965,
+      "reportedAt": "2026-09-30T15:16:12.613Z"
+    },
+    {
+      "id": "inc-92",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -11.98423123922583,
+      "longitude": -77.07645323125372,
+      "reportedAt": "2026-09-30T03:16:12.613Z"
+    },
+    {
+      "id": "inc-93",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -11.984679736320047,
+      "longitude": -77.07820974591422,
+      "reportedAt": "2026-09-30T01:16:12.613Z"
+    },
+    {
+      "id": "inc-94",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "resolved",
+      "latitude": -11.97969600294247,
+      "longitude": -77.0768417485453,
+      "reportedAt": "2026-09-29T21:16:12.613Z"
+    },
+    {
+      "id": "inc-95",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -11.980806566091903,
+      "longitude": -77.07678406807517,
+      "reportedAt": "2026-09-30T12:16:12.613Z"
+    },
+    {
+      "id": "inc-96",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -11.991491314552627,
+      "longitude": -77.0590001212733,
+      "reportedAt": "2026-09-30T00:16:12.613Z"
+    },
+    {
+      "id": "inc-97",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -11.99045638855768,
+      "longitude": -77.06061801544375,
+      "reportedAt": "2026-09-30T00:16:12.613Z"
+    },
+    {
+      "id": "inc-98",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "resolved",
+      "latitude": -11.991485031301258,
+      "longitude": -77.05690633288245,
+      "reportedAt": "2026-09-29T21:16:12.613Z"
+    },
+    {
+      "id": "inc-99",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -11.986455481369369,
+      "longitude": -77.05432841479872,
+      "reportedAt": "2026-09-29T23:16:12.613Z"
+    },
+    {
+      "id": "inc-100",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "resolved",
+      "latitude": -11.991080582080803,
+      "longitude": -77.06037262754721,
+      "reportedAt": "2026-09-30T15:16:12.613Z"
+    },
+    {
+      "id": "inc-101",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -11.98807682246122,
+      "longitude": -77.0558866462348,
+      "reportedAt": "2026-09-30T09:16:12.613Z"
+    },
+    {
+      "id": "inc-102",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -11.98848096270439,
+      "longitude": -77.06001721236531,
+      "reportedAt": "2026-09-29T20:16:12.613Z"
+    },
+    {
+      "id": "inc-103",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -11.98551488047511,
+      "longitude": -77.05265565051691,
+      "reportedAt": "2026-09-29T18:16:12.613Z"
+    },
+    {
+      "id": "inc-104",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -11.966078778705748,
+      "longitude": -77.0698175001478,
+      "reportedAt": "2026-09-30T05:16:12.613Z"
+    },
+    {
+      "id": "inc-105",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -11.966613410574407,
+      "longitude": -77.06673705180852,
+      "reportedAt": "2026-09-30T10:16:12.613Z"
+    },
+    {
+      "id": "inc-106",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -11.96571797686385,
+      "longitude": -77.06695199286585,
+      "reportedAt": "2026-09-29T17:16:12.613Z"
+    },
+    {
+      "id": "inc-107",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -11.961872203856627,
+      "longitude": -77.06988562008577,
+      "reportedAt": "2026-09-29T18:16:12.613Z"
+    },
+    {
+      "id": "inc-108",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -11.964979359330892,
+      "longitude": -77.07203898636502,
+      "reportedAt": "2026-09-30T05:16:12.613Z"
+    },
+    {
+      "id": "inc-109",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -11.968482624834884,
+      "longitude": -77.06657462479775,
+      "reportedAt": "2026-09-30T05:16:12.613Z"
+    },
+    {
+      "id": "inc-110",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "resolved",
+      "latitude": -11.975837812823174,
+      "longitude": -77.0594367270337,
+      "reportedAt": "2026-09-30T01:16:12.613Z"
+    },
+    {
+      "id": "inc-111",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -11.981319960393044,
+      "longitude": -77.06091933190822,
+      "reportedAt": "2026-09-30T08:16:12.613Z"
+    },
+    {
+      "id": "inc-112",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -11.980244831698364,
+      "longitude": -77.0622785162362,
+      "reportedAt": "2026-09-29T21:16:12.613Z"
+    },
+    {
+      "id": "inc-113",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -11.977981195113717,
+      "longitude": -77.05808907317748,
+      "reportedAt": "2026-09-30T08:16:12.613Z"
+    },
+    {
+      "id": "inc-114",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -11.974192413483415,
+      "longitude": -77.06069616537394,
+      "reportedAt": "2026-09-30T16:16:12.613Z"
+    },
+    {
+      "id": "inc-115",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -11.980817579202483,
+      "longitude": -77.0592759129906,
+      "reportedAt": "2026-09-30T02:16:12.613Z"
+    },
+    {
+      "id": "inc-116",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "resolved",
+      "latitude": -11.978876511136772,
+      "longitude": -77.06197625917417,
+      "reportedAt": "2026-09-29T18:16:12.613Z"
+    },
+    {
+      "id": "inc-117",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -11.979123919528488,
+      "longitude": -77.06294625681878,
+      "reportedAt": "2026-09-29T17:16:12.613Z"
+    },
+    {
+      "id": "inc-118",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -11.976058172526995,
+      "longitude": -77.07661071226237,
+      "reportedAt": "2026-09-30T05:16:12.613Z"
+    },
+    {
+      "id": "inc-119",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -11.972850499916271,
+      "longitude": -77.07588553669227,
+      "reportedAt": "2026-09-30T16:16:12.614Z"
+    },
+    {
+      "id": "inc-120",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -11.977246301484127,
+      "longitude": -77.0752953650699,
+      "reportedAt": "2026-09-30T12:16:12.614Z"
+    },
+    {
+      "id": "inc-121",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "resolved",
+      "latitude": -11.972770386565516,
+      "longitude": -77.07472149792359,
+      "reportedAt": "2026-09-29T22:16:12.614Z"
+    },
+    {
+      "id": "inc-122",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -11.977862990485681,
+      "longitude": -77.07396769540607,
+      "reportedAt": "2026-09-30T16:16:12.614Z"
+    },
+    {
+      "id": "inc-123",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -11.96962943524668,
+      "longitude": -77.07946019030456,
+      "reportedAt": "2026-09-30T09:16:12.614Z"
+    },
+    {
+      "id": "inc-124",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -11.967945457448227,
+      "longitude": -77.07708649642109,
+      "reportedAt": "2026-09-30T09:16:12.614Z"
+    },
+    {
+      "id": "inc-125",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -11.96594235590479,
+      "longitude": -77.07642684295246,
+      "reportedAt": "2026-09-30T02:16:12.614Z"
+    },
+    {
+      "id": "inc-126",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -11.972072393438495,
+      "longitude": -77.07636635130241,
+      "reportedAt": "2026-09-30T05:16:12.614Z"
+    },
+    {
+      "id": "inc-127",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -11.965239494119428,
+      "longitude": -77.07487768352796,
+      "reportedAt": "2026-09-30T06:16:12.614Z"
+    },
+    {
+      "id": "inc-128",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -11.968867910668628,
+      "longitude": -77.07465904810837,
+      "reportedAt": "2026-09-30T04:16:12.614Z"
+    },
+    {
+      "id": "inc-129",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "resolved",
+      "latitude": -11.968715291001645,
+      "longitude": -77.07843681107897,
+      "reportedAt": "2026-09-30T10:16:12.614Z"
+    },
+    {
+      "id": "inc-130",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.155670057500371,
+      "longitude": -76.95688058466854,
+      "reportedAt": "2026-09-30T09:16:12.614Z"
+    },
+    {
+      "id": "inc-131",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -12.160393756149048,
+      "longitude": -76.9595214815048,
+      "reportedAt": "2026-09-30T15:16:12.614Z"
+    },
+    {
+      "id": "inc-132",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.157851541407966,
+      "longitude": -76.96188895300881,
+      "reportedAt": "2026-09-29T18:16:12.614Z"
+    },
+    {
+      "id": "inc-133",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -12.16622579653392,
+      "longitude": -76.96280793229471,
+      "reportedAt": "2026-09-30T09:16:12.614Z"
+    },
+    {
+      "id": "inc-134",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "resolved",
+      "latitude": -12.16173689042895,
+      "longitude": -76.95950993222019,
+      "reportedAt": "2026-09-30T11:16:12.614Z"
+    },
+    {
+      "id": "inc-135",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "resolved",
+      "latitude": -12.165087187222804,
+      "longitude": -76.95911852467489,
+      "reportedAt": "2026-09-30T02:16:12.614Z"
+    },
+    {
+      "id": "inc-136",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -12.164090701622266,
+      "longitude": -76.96457093065533,
+      "reportedAt": "2026-09-29T19:16:12.614Z"
+    },
+    {
+      "id": "inc-137",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.145597462384991,
+      "longitude": -76.97161743836213,
+      "reportedAt": "2026-09-29T19:16:12.614Z"
+    },
+    {
+      "id": "inc-138",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -12.149024395650178,
+      "longitude": -76.97692393577674,
+      "reportedAt": "2026-09-30T12:16:12.614Z"
+    },
+    {
+      "id": "inc-139",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.151571308309876,
+      "longitude": -76.97234752987896,
+      "reportedAt": "2026-09-29T21:16:12.614Z"
+    },
+    {
+      "id": "inc-140",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.164554679907296,
+      "longitude": -76.97943040946932,
+      "reportedAt": "2026-09-29T20:16:12.614Z"
+    },
+    {
+      "id": "inc-141",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.147035411097633,
+      "longitude": -76.98430665728756,
+      "reportedAt": "2026-09-30T05:16:12.615Z"
+    },
+    {
+      "id": "inc-142",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.150639555154008,
+      "longitude": -76.98831546442351,
+      "reportedAt": "2026-09-29T17:16:12.615Z"
+    },
+    {
+      "id": "inc-143",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "active",
+      "latitude": -12.150736832732113,
+      "longitude": -76.98719379246054,
+      "reportedAt": "2026-09-29T23:16:12.615Z"
+    },
+    {
+      "id": "inc-144",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "resolved",
+      "latitude": -12.146904742252987,
+      "longitude": -76.98689017261063,
+      "reportedAt": "2026-09-30T05:16:12.615Z"
+    },
+    {
+      "id": "inc-145",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "resolved",
+      "latitude": -12.17138552721897,
+      "longitude": -76.9611894981233,
+      "reportedAt": "2026-09-30T13:16:12.615Z"
+    },
+    {
+      "id": "inc-146",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.175223971132919,
+      "longitude": -76.9635097278151,
+      "reportedAt": "2026-09-30T16:16:12.615Z"
+    },
+    {
+      "id": "inc-147",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.17106507673623,
+      "longitude": -76.96381160770045,
+      "reportedAt": "2026-09-30T10:16:12.615Z"
+    },
+    {
+      "id": "inc-148",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "resolved",
+      "latitude": -12.17596990241606,
+      "longitude": -76.95986130556308,
+      "reportedAt": "2026-09-29T23:16:12.615Z"
+    },
+    {
+      "id": "inc-149",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -12.173123377118305,
+      "longitude": -76.96072759593007,
+      "reportedAt": "2026-09-30T14:16:12.615Z"
+    },
+    {
+      "id": "inc-150",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.175893526911612,
+      "longitude": -76.95993329862657,
+      "reportedAt": "2026-09-29T22:16:12.615Z"
+    },
+    {
+      "id": "inc-151",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -12.170264128148576,
+      "longitude": -76.96021323448312,
+      "reportedAt": "2026-09-30T04:16:12.615Z"
+    },
+    {
+      "id": "inc-152",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.160602897843075,
+      "longitude": -76.97035501724967,
+      "reportedAt": "2026-09-29T20:16:12.615Z"
+    },
+    {
+      "id": "inc-153",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.16501011433013,
+      "longitude": -76.97219019803715,
+      "reportedAt": "2026-09-30T13:16:12.615Z"
+    },
+    {
+      "id": "inc-154",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -12.15913802461745,
+      "longitude": -76.97648672124534,
+      "reportedAt": "2026-09-29T21:16:12.615Z"
+    },
+    {
+      "id": "inc-155",
+      "title": "Alerta: Vandalismo",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "assault",
+      "status": "resolved",
+      "latitude": -12.161221717972523,
+      "longitude": -76.97638874875898,
+      "reportedAt": "2026-09-30T13:16:12.615Z"
+    },
+    {
+      "id": "inc-156",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "active",
+      "latitude": -12.165571494142357,
+      "longitude": -76.9764969365545,
+      "reportedAt": "2026-09-30T04:16:12.615Z"
+    },
+    {
+      "id": "inc-157",
+      "title": "Alerta: Sospechoso Merodeando",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "person",
+      "status": "active",
+      "latitude": -12.163009239513222,
+      "longitude": -76.97153191135719,
+      "reportedAt": "2026-09-29T23:16:12.615Z"
+    },
+    {
+      "id": "inc-158",
+      "title": "Alerta: Hurto Sistemico",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "vandalism",
+      "status": "resolved",
+      "latitude": -12.1638753135928,
+      "longitude": -76.97830622664559,
+      "reportedAt": "2026-09-29T22:16:12.615Z"
+    },
+    {
+      "id": "inc-159",
+      "title": "Alerta: Asalto a Mano Armada",
+      "description": "Reporte captado por botón de pánico de negocio asociado.",
+      "type": "robbery",
+      "status": "active",
+      "latitude": -12.163297866383324,
+      "longitude": -76.97193484522336,
+      "reportedAt": "2026-09-30T10:16:12.615Z"
+    }
+  ],
+  "businesses": [
+    {
+      "id": "bus-1",
+      "name": "Bodega San Isidro 587",
+      "address": "Av. Principal 990",
+      "isVerified": true,
+      "latitude": -12.097832315915754,
+      "longitude": -77.0253812738735
+    },
+    {
+      "id": "bus-2",
+      "name": "Bodega San Isidro 408",
+      "address": "Av. Principal 901",
+      "isVerified": true,
+      "latitude": -12.095867828521422,
+      "longitude": -77.02806571117749
+    },
+    {
+      "id": "bus-3",
+      "name": "Bodega San Isidro 877",
+      "address": "Av. Principal 430",
+      "isVerified": true,
+      "latitude": -12.098448023779232,
+      "longitude": -77.0239796286768
+    },
+    {
+      "id": "bus-4",
+      "name": "Bodega San Isidro 832",
+      "address": "Av. Principal 818",
+      "isVerified": true,
+      "latitude": -12.090674301151049,
+      "longitude": -77.04301635273845
+    },
+    {
+      "id": "bus-5",
+      "name": "Bodega San Isidro 282",
+      "address": "Av. Principal 539",
+      "isVerified": true,
+      "latitude": -12.09262772708227,
+      "longitude": -77.04338019397314
+    },
+    {
+      "id": "bus-6",
+      "name": "Bodega San Isidro 774",
+      "address": "Av. Principal 22",
+      "isVerified": true,
+      "latitude": -12.102596873095179,
+      "longitude": -77.03490559444916
+    },
+    {
+      "id": "bus-7",
+      "name": "Bodega San Isidro 196",
+      "address": "Av. Principal 691",
+      "isVerified": true,
+      "latitude": -12.08330472465079,
+      "longitude": -77.03185528930558
+    },
+    {
+      "id": "bus-8",
+      "name": "Bodega San Isidro 364",
+      "address": "Av. Principal 685",
+      "isVerified": true,
+      "latitude": -12.083180300548605,
+      "longitude": -77.03075163159137
+    },
+    {
+      "id": "bus-9",
+      "name": "Bodega San Isidro 717",
+      "address": "Av. Principal 941",
+      "isVerified": true,
+      "latitude": -12.086935954137559,
+      "longitude": -77.01615466584506
+    },
+    {
+      "id": "bus-10",
+      "name": "Bodega San Isidro 880",
+      "address": "Av. Principal 813",
+      "isVerified": true,
+      "latitude": -12.08721647834814,
+      "longitude": -77.01982589179576
+    },
+    {
+      "id": "bus-11",
+      "name": "Bodega San Isidro 541",
+      "address": "Av. Principal 834",
+      "isVerified": true,
+      "latitude": -12.097777950930139,
+      "longitude": -77.01672961510694
+    },
+    {
+      "id": "bus-12",
+      "name": "Bodega San Isidro 3",
+      "address": "Av. Principal 78",
+      "isVerified": true,
+      "latitude": -12.097391376706629,
+      "longitude": -77.01464793199985
+    },
+    {
+      "id": "bus-13",
+      "name": "Bodega San Isidro 180",
+      "address": "Av. Principal 524",
+      "isVerified": true,
+      "latitude": -12.095177255976417,
+      "longitude": -77.01677902331335
+    },
+    {
+      "id": "bus-14",
+      "name": "Bodega San Isidro 113",
+      "address": "Av. Principal 84",
+      "isVerified": true,
+      "latitude": -12.109419632141906,
+      "longitude": -77.02170137842984
+    },
+    {
+      "id": "bus-15",
+      "name": "Bodega San Isidro 519",
+      "address": "Av. Principal 446",
+      "isVerified": true,
+      "latitude": -12.106137014412072,
+      "longitude": -77.02445940428501
+    },
+    {
+      "id": "bus-16",
+      "name": "Bodega San Isidro 569",
+      "address": "Av. Principal 864",
+      "isVerified": true,
+      "latitude": -12.10916833459813,
+      "longitude": -77.02324967739409
+    },
+    {
+      "id": "bus-17",
+      "name": "Bodega San Borja 456",
+      "address": "Av. Principal 619",
+      "isVerified": true,
+      "latitude": -12.111153375506928,
+      "longitude": -76.99847486124614
+    },
+    {
+      "id": "bus-18",
+      "name": "Bodega San Borja 96",
+      "address": "Av. Principal 149",
+      "isVerified": true,
+      "latitude": -12.113897678576606,
+      "longitude": -77.00110352739357
+    },
+    {
+      "id": "bus-19",
+      "name": "Bodega San Borja 679",
+      "address": "Av. Principal 905",
+      "isVerified": true,
+      "latitude": -12.108395989163284,
+      "longitude": -77.00391422801154
+    },
+    {
+      "id": "bus-20",
+      "name": "Bodega San Borja 758",
+      "address": "Av. Principal 516",
+      "isVerified": true,
+      "latitude": -12.112956198207671,
+      "longitude": -76.99226158838152
+    },
+    {
+      "id": "bus-21",
+      "name": "Bodega San Borja 520",
+      "address": "Av. Principal 334",
+      "isVerified": true,
+      "latitude": -12.115345039387165,
+      "longitude": -76.99016625750521
+    },
+    {
+      "id": "bus-22",
+      "name": "Bodega San Borja 272",
+      "address": "Av. Principal 572",
+      "isVerified": true,
+      "latitude": -12.114337735843524,
+      "longitude": -76.99072381407224
+    },
+    {
+      "id": "bus-23",
+      "name": "Bodega San Borja 359",
+      "address": "Av. Principal 759",
+      "isVerified": true,
+      "latitude": -12.106532310257695,
+      "longitude": -76.98445258925261
+    },
+    {
+      "id": "bus-24",
+      "name": "Bodega San Borja 354",
+      "address": "Av. Principal 418",
+      "isVerified": true,
+      "latitude": -12.098691856823269,
+      "longitude": -76.99861127530303
+    },
+    {
+      "id": "bus-25",
+      "name": "Bodega San Borja 159",
+      "address": "Av. Principal 952",
+      "isVerified": true,
+      "latitude": -12.11699636106286,
+      "longitude": -77.0014578885583
+    },
+    {
+      "id": "bus-26",
+      "name": "Bodega San Borja 924",
+      "address": "Av. Principal 887",
+      "isVerified": true,
+      "latitude": -12.095292156124511,
+      "longitude": -76.98759288173258
+    },
+    {
+      "id": "bus-27",
+      "name": "Bodega San Borja 21",
+      "address": "Av. Principal 710",
+      "isVerified": true,
+      "latitude": -12.096515786652548,
+      "longitude": -76.99114318830361
+    },
+    {
+      "id": "bus-28",
+      "name": "Bodega San Borja 741",
+      "address": "Av. Principal 194",
+      "isVerified": true,
+      "latitude": -12.110381143347551,
+      "longitude": -76.97916616574146
+    },
+    {
+      "id": "bus-29",
+      "name": "Bodega San Borja 192",
+      "address": "Av. Principal 737",
+      "isVerified": true,
+      "latitude": -12.110484367814337,
+      "longitude": -76.98012337308678
+    },
+    {
+      "id": "bus-30",
+      "name": "Bodega San Borja 140",
+      "address": "Av. Principal 593",
+      "isVerified": true,
+      "latitude": -12.110605972576558,
+      "longitude": -76.97772268494582
+    },
+    {
+      "id": "bus-31",
+      "name": "Bodega Lince/Cercado 345",
+      "address": "Av. Principal 756",
+      "isVerified": true,
+      "latitude": -12.075782471691323,
+      "longitude": -77.03102270086676
+    },
+    {
+      "id": "bus-32",
+      "name": "Bodega Lince/Cercado 312",
+      "address": "Av. Principal 365",
+      "isVerified": true,
+      "latitude": -12.076836152699762,
+      "longitude": -77.03053799421637
+    },
+    {
+      "id": "bus-33",
+      "name": "Bodega Lince/Cercado 98",
+      "address": "Av. Principal 15",
+      "isVerified": true,
+      "latitude": -12.075326192671465,
+      "longitude": -77.03147925886047
+    },
+    {
+      "id": "bus-34",
+      "name": "Bodega Lince/Cercado 264",
+      "address": "Av. Principal 187",
+      "isVerified": true,
+      "latitude": -12.061902201974647,
+      "longitude": -77.03335753567318
+    },
+    {
+      "id": "bus-35",
+      "name": "Bodega Lince/Cercado 132",
+      "address": "Av. Principal 953",
+      "isVerified": true,
+      "latitude": -12.063785203447004,
+      "longitude": -77.03570705093917
+    },
+    {
+      "id": "bus-36",
+      "name": "Bodega Lince/Cercado 61",
+      "address": "Av. Principal 72",
+      "isVerified": true,
+      "latitude": -12.068875394810213,
+      "longitude": -77.04694831410629
+    },
+    {
+      "id": "bus-37",
+      "name": "Bodega Lince/Cercado 804",
+      "address": "Av. Principal 851",
+      "isVerified": true,
+      "latitude": -12.059545426201204,
+      "longitude": -77.02698458819664
+    },
+    {
+      "id": "bus-38",
+      "name": "Bodega Lince/Cercado 916",
+      "address": "Av. Principal 477",
+      "isVerified": true,
+      "latitude": -12.056550700679132,
+      "longitude": -77.02589932168586
+    },
+    {
+      "id": "bus-39",
+      "name": "Bodega Lince/Cercado 110",
+      "address": "Av. Principal 661",
+      "isVerified": true,
+      "latitude": -12.061003914027074,
+      "longitude": -77.02713459432779
+    },
+    {
+      "id": "bus-40",
+      "name": "Bodega Lince/Cercado 880",
+      "address": "Av. Principal 263",
+      "isVerified": true,
+      "latitude": -12.080681482743412,
+      "longitude": -77.04345354652968
+    },
+    {
+      "id": "bus-41",
+      "name": "Bodega Lince/Cercado 815",
+      "address": "Av. Principal 783",
+      "isVerified": true,
+      "latitude": -12.082639531719806,
+      "longitude": -77.04450811475621
+    },
+    {
+      "id": "bus-42",
+      "name": "Bodega Lince/Cercado 110",
+      "address": "Av. Principal 400",
+      "isVerified": true,
+      "latitude": -12.081873621311189,
+      "longitude": -77.04542015153837
+    },
+    {
+      "id": "bus-43",
+      "name": "Bodega Lince/Cercado 56",
+      "address": "Av. Principal 852",
+      "isVerified": true,
+      "latitude": -12.079956950192205,
+      "longitude": -77.02130513495395
+    },
+    {
+      "id": "bus-44",
+      "name": "Bodega Lince/Cercado 301",
+      "address": "Av. Principal 171",
+      "isVerified": true,
+      "latitude": -12.079913778907267,
+      "longitude": -77.02124271442062
+    },
+    {
+      "id": "bus-45",
+      "name": "Bodega Lince/Cercado 218",
+      "address": "Av. Principal 566",
+      "isVerified": true,
+      "latitude": -12.079999820579314,
+      "longitude": -77.02095006383004
+    },
+    {
+      "id": "bus-46",
+      "name": "Bodega La Victoria 909",
+      "address": "Av. Principal 824",
+      "isVerified": true,
+      "latitude": -12.054035386649149,
+      "longitude": -77.00314029362855
+    },
+    {
+      "id": "bus-47",
+      "name": "Bodega La Victoria 853",
+      "address": "Av. Principal 413",
+      "isVerified": true,
+      "latitude": -12.053718919726244,
+      "longitude": -77.00212880872823
+    },
+    {
+      "id": "bus-48",
+      "name": "Bodega La Victoria 26",
+      "address": "Av. Principal 184",
+      "isVerified": true,
+      "latitude": -12.050145681184029,
+      "longitude": -77.00194505548903
+    },
+    {
+      "id": "bus-49",
+      "name": "Bodega La Victoria 910",
+      "address": "Av. Principal 559",
+      "isVerified": true,
+      "latitude": -12.072850701523631,
+      "longitude": -77.00831216828976
+    },
+    {
+      "id": "bus-50",
+      "name": "Bodega La Victoria 242",
+      "address": "Av. Principal 779",
+      "isVerified": true,
+      "latitude": -12.053411549448013,
+      "longitude": -77.02068642019927
+    },
+    {
+      "id": "bus-51",
+      "name": "Bodega La Victoria 311",
+      "address": "Av. Principal 845",
+      "isVerified": true,
+      "latitude": -12.049100053832557,
+      "longitude": -77.0185120197407
+    },
+    {
+      "id": "bus-52",
+      "name": "Bodega La Victoria 420",
+      "address": "Av. Principal 497",
+      "isVerified": true,
+      "latitude": -12.070690909236392,
+      "longitude": -77.0220813217691
+    },
+    {
+      "id": "bus-53",
+      "name": "Bodega La Victoria 317",
+      "address": "Av. Principal 685",
+      "isVerified": true,
+      "latitude": -12.070699177650123,
+      "longitude": -77.02298300318823
+    },
+    {
+      "id": "bus-54",
+      "name": "Bodega La Victoria 716",
+      "address": "Av. Principal 514",
+      "isVerified": true,
+      "latitude": -12.06622956526518,
+      "longitude": -77.02281905508312
+    },
+    {
+      "id": "bus-55",
+      "name": "Bodega La Victoria 264",
+      "address": "Av. Principal 666",
+      "isVerified": true,
+      "latitude": -12.050798463823693,
+      "longitude": -77.02996553168583
+    },
+    {
+      "id": "bus-56",
+      "name": "Bodega La Victoria 388",
+      "address": "Av. Principal 487",
+      "isVerified": true,
+      "latitude": -12.060769559936864,
+      "longitude": -77.01691847301537
+    },
+    {
+      "id": "bus-57",
+      "name": "Bodega La Victoria 231",
+      "address": "Av. Principal 166",
+      "isVerified": true,
+      "latitude": -12.071299387301984,
+      "longitude": -77.00326079955282
+    },
+    {
+      "id": "bus-58",
+      "name": "Bodega La Victoria 388",
+      "address": "Av. Principal 66",
+      "isVerified": true,
+      "latitude": -12.073653005088675,
+      "longitude": -77.00312283638608
+    },
+    {
+      "id": "bus-59",
+      "name": "Bodega La Victoria 696",
+      "address": "Av. Principal 475",
+      "isVerified": true,
+      "latitude": -12.072571625828983,
+      "longitude": -76.99903249223578
+    },
+    {
+      "id": "bus-60",
+      "name": "Bodega SJL (Valle) 172",
+      "address": "Av. Principal 262",
+      "isVerified": true,
+      "latitude": -12.009176786775011,
+      "longitude": -77.01038495485545
+    },
+    {
+      "id": "bus-61",
+      "name": "Bodega SJL (Valle) 554",
+      "address": "Av. Principal 415",
+      "isVerified": true,
+      "latitude": -12.008627363972254,
+      "longitude": -77.00924401665954
+    },
+    {
+      "id": "bus-62",
+      "name": "Bodega SJL (Valle) 201",
+      "address": "Av. Principal 358",
+      "isVerified": true,
+      "latitude": -12.002647710995864,
+      "longitude": -76.98713963628533
+    },
+    {
+      "id": "bus-63",
+      "name": "Bodega SJL (Valle) 575",
+      "address": "Av. Principal 59",
+      "isVerified": true,
+      "latitude": -12.001062117005063,
+      "longitude": -76.98738742907969
+    },
+    {
+      "id": "bus-64",
+      "name": "Bodega SJL (Valle) 14",
+      "address": "Av. Principal 600",
+      "isVerified": true,
+      "latitude": -12.005452150283407,
+      "longitude": -76.9908809207882
+    },
+    {
+      "id": "bus-65",
+      "name": "Bodega SJL (Valle) 55",
+      "address": "Av. Principal 704",
+      "isVerified": true,
+      "latitude": -11.995290687401033,
+      "longitude": -76.9957316883519
+    },
+    {
+      "id": "bus-66",
+      "name": "Bodega SJL (Valle) 373",
+      "address": "Av. Principal 193",
+      "isVerified": true,
+      "latitude": -11.997531521148167,
+      "longitude": -76.99441410854502
+    },
+    {
+      "id": "bus-67",
+      "name": "Bodega SJL (Valle) 651",
+      "address": "Av. Principal 610",
+      "isVerified": true,
+      "latitude": -12.02230844534998,
+      "longitude": -76.99595874636073
+    },
+    {
+      "id": "bus-68",
+      "name": "Bodega SJL (Valle) 779",
+      "address": "Av. Principal 977",
+      "isVerified": true,
+      "latitude": -12.017349495545778,
+      "longitude": -76.9943448181481
+    },
+    {
+      "id": "bus-69",
+      "name": "Bodega SJL (Valle) 237",
+      "address": "Av. Principal 450",
+      "isVerified": true,
+      "latitude": -12.015813716472953,
+      "longitude": -77.00119588436193
+    },
+    {
+      "id": "bus-70",
+      "name": "Bodega SJL (Valle) 176",
+      "address": "Av. Principal 869",
+      "isVerified": true,
+      "latitude": -12.01050476903775,
+      "longitude": -77.00239949598382
+    },
+    {
+      "id": "bus-71",
+      "name": "Bodega SJL (Valle) 852",
+      "address": "Av. Principal 505",
+      "isVerified": true,
+      "latitude": -12.020063331654175,
+      "longitude": -77.00782745964275
+    },
+    {
+      "id": "bus-72",
+      "name": "Bodega SJL (Valle) 365",
+      "address": "Av. Principal 914",
+      "isVerified": true,
+      "latitude": -12.025596193527765,
+      "longitude": -77.01100920093107
+    },
+    {
+      "id": "bus-73",
+      "name": "Bodega SJL (Valle) 353",
+      "address": "Av. Principal 629",
+      "isVerified": true,
+      "latitude": -12.02294764649008,
+      "longitude": -77.00913716667668
+    },
+    {
+      "id": "bus-74",
+      "name": "Bodega SJL (Valle) 844",
+      "address": "Av. Principal 181",
+      "isVerified": true,
+      "latitude": -12.014123270401463,
+      "longitude": -76.98663721975954
+    },
+    {
+      "id": "bus-75",
+      "name": "Bodega SJL (Valle) 856",
+      "address": "Av. Principal 254",
+      "isVerified": true,
+      "latitude": -12.018261711580156,
+      "longitude": -76.98987752223292
+    },
+    {
+      "id": "bus-76",
+      "name": "Bodega Los Olivos 694",
+      "address": "Av. Principal 664",
+      "isVerified": true,
+      "latitude": -11.984151137329357,
+      "longitude": -77.07924944597674
+    },
+    {
+      "id": "bus-77",
+      "name": "Bodega Los Olivos 136",
+      "address": "Av. Principal 696",
+      "isVerified": true,
+      "latitude": -11.986221072105806,
+      "longitude": -77.05338402909514
+    },
+    {
+      "id": "bus-78",
+      "name": "Bodega Los Olivos 346",
+      "address": "Av. Principal 708",
+      "isVerified": true,
+      "latitude": -11.985821708487494,
+      "longitude": -77.05512948475226
+    },
+    {
+      "id": "bus-79",
+      "name": "Bodega Los Olivos 214",
+      "address": "Av. Principal 647",
+      "isVerified": true,
+      "latitude": -11.992519594900173,
+      "longitude": -77.0551242337001
+    },
+    {
+      "id": "bus-80",
+      "name": "Bodega Los Olivos 19",
+      "address": "Av. Principal 657",
+      "isVerified": true,
+      "latitude": -11.965047269805265,
+      "longitude": -77.0704173612512
+    },
+    {
+      "id": "bus-81",
+      "name": "Bodega Los Olivos 560",
+      "address": "Av. Principal 820",
+      "isVerified": true,
+      "latitude": -11.96504145381236,
+      "longitude": -77.07252802476573
+    },
+    {
+      "id": "bus-82",
+      "name": "Bodega Los Olivos 243",
+      "address": "Av. Principal 980",
+      "isVerified": true,
+      "latitude": -11.988859463261337,
+      "longitude": -77.07304557422161
+    },
+    {
+      "id": "bus-83",
+      "name": "Bodega Los Olivos 360",
+      "address": "Av. Principal 308",
+      "isVerified": true,
+      "latitude": -11.978362655061426,
+      "longitude": -77.06291520107877
+    },
+    {
+      "id": "bus-84",
+      "name": "Bodega Los Olivos 515",
+      "address": "Av. Principal 704",
+      "isVerified": true,
+      "latitude": -11.980314388026752,
+      "longitude": -77.05888564637776
+    },
+    {
+      "id": "bus-85",
+      "name": "Bodega Los Olivos 9",
+      "address": "Av. Principal 676",
+      "isVerified": true,
+      "latitude": -11.975685296920886,
+      "longitude": -77.06008067653686
+    },
+    {
+      "id": "bus-86",
+      "name": "Bodega Los Olivos 435",
+      "address": "Av. Principal 618",
+      "isVerified": true,
+      "latitude": -11.972880355692,
+      "longitude": -77.06972832154916
+    },
+    {
+      "id": "bus-87",
+      "name": "Bodega Los Olivos 221",
+      "address": "Av. Principal 197",
+      "isVerified": true,
+      "latitude": -11.975715719057357,
+      "longitude": -77.07496747367362
+    },
+    {
+      "id": "bus-88",
+      "name": "Bodega Los Olivos 584",
+      "address": "Av. Principal 95",
+      "isVerified": true,
+      "latitude": -11.97907450944523,
+      "longitude": -77.0758950944466
+    },
+    {
+      "id": "bus-89",
+      "name": "Bodega Los Olivos 185",
+      "address": "Av. Principal 478",
+      "isVerified": true,
+      "latitude": -11.971421129160756,
+      "longitude": -77.08066243896609
+    },
+    {
+      "id": "bus-90",
+      "name": "Bodega SJM (Urbano) 722",
+      "address": "Av. Principal 861",
+      "isVerified": true,
+      "latitude": -12.15826018981588,
+      "longitude": -76.9634740839198
+    },
+    {
+      "id": "bus-91",
+      "name": "Bodega SJM (Urbano) 89",
+      "address": "Av. Principal 424",
+      "isVerified": true,
+      "latitude": -12.159745614674708,
+      "longitude": -76.96162778911125
+    },
+    {
+      "id": "bus-92",
+      "name": "Bodega SJM (Urbano) 929",
+      "address": "Av. Principal 606",
+      "isVerified": true,
+      "latitude": -12.159451259428552,
+      "longitude": -76.95984286980458
+    },
+    {
+      "id": "bus-93",
+      "name": "Bodega SJM (Urbano) 865",
+      "address": "Av. Principal 907",
+      "isVerified": true,
+      "latitude": -12.16741160316142,
+      "longitude": -76.9641075683987
+    },
+    {
+      "id": "bus-94",
+      "name": "Bodega SJM (Urbano) 938",
+      "address": "Av. Principal 569",
+      "isVerified": true,
+      "latitude": -12.16135189039398,
+      "longitude": -76.96200364212719
+    },
+    {
+      "id": "bus-95",
+      "name": "Bodega SJM (Urbano) 344",
+      "address": "Av. Principal 989",
+      "isVerified": true,
+      "latitude": -12.164274326370386,
+      "longitude": -76.9592207424269
+    },
+    {
+      "id": "bus-96",
+      "name": "Bodega SJM (Urbano) 996",
+      "address": "Av. Principal 33",
+      "isVerified": true,
+      "latitude": -12.146570981637032,
+      "longitude": -76.97582784109355
+    },
+    {
+      "id": "bus-97",
+      "name": "Bodega SJM (Urbano) 353",
+      "address": "Av. Principal 851",
+      "isVerified": true,
+      "latitude": -12.150613728128667,
+      "longitude": -76.97386103455942
+    },
+    {
+      "id": "bus-98",
+      "name": "Bodega SJM (Urbano) 284",
+      "address": "Av. Principal 549",
+      "isVerified": true,
+      "latitude": -12.149518758579852,
+      "longitude": -76.97697547439557
+    },
+    {
+      "id": "bus-99",
+      "name": "Bodega SJM (Urbano) 937",
+      "address": "Av. Principal 84",
+      "isVerified": true,
+      "latitude": -12.165674627304242,
+      "longitude": -76.97800901900101
+    },
+    {
+      "id": "bus-100",
+      "name": "Bodega SJM (Urbano) 263",
+      "address": "Av. Principal 499",
+      "isVerified": true,
+      "latitude": -12.164104992389275,
+      "longitude": -76.98132990154704
+    },
+    {
+      "id": "bus-101",
+      "name": "Bodega SJM (Urbano) 779",
+      "address": "Av. Principal 280",
+      "isVerified": true,
+      "latitude": -12.150327412229682,
+      "longitude": -76.98629291119357
+    },
+    {
+      "id": "bus-102",
+      "name": "Bodega SJM (Urbano) 92",
+      "address": "Av. Principal 703",
+      "isVerified": true,
+      "latitude": -12.147250904582139,
+      "longitude": -76.98607572944513
+    },
+    {
+      "id": "bus-103",
+      "name": "Bodega SJM (Urbano) 18",
+      "address": "Av. Principal 622",
+      "isVerified": true,
+      "latitude": -12.176257356059333,
+      "longitude": -76.96331552727143
+    },
+    {
+      "id": "bus-104",
+      "name": "Bodega SJM (Urbano) 138",
+      "address": "Av. Principal 976",
+      "isVerified": true,
+      "latitude": -12.164807103525748,
+      "longitude": -76.97555471856698
+    },
+    {
+      "id": "bus-105",
+      "name": "Bodega SJM (Urbano) 480",
+      "address": "Av. Principal 121",
+      "isVerified": true,
+      "latitude": -12.1584424633436,
+      "longitude": -76.97639530798176
+    }
+  ],
+  "alerts": [
+    {
+      "employeeId": "demo-employee",
+      "kind": "panic",
+      "status": "pending-report",
+      "category": "other",
+      "location": "-12.07334, -77.05891",
+      "latitude": -12.073338,
+      "longitude": -77.058907,
+      "moment": "",
+      "description": "",
+      "createdAt": "2026-10-03T22:26:06.559Z",
+      "activatedAt": "2026-10-03T22:26:06.559Z",
+      "endedAt": "2026-10-03T22:26:19.226Z",
+      "submittedAt": null,
+      "completedAt": null,
+      "updatedAt": "2026-10-03T22:26:36.779Z",
+      "id": 1
+    },
+    {
+      "employeeId": "demo-employee",
+      "kind": "panic",
+      "status": "pending-report",
+      "category": "",
+      "location": "-12.07334, -77.05891",
+      "latitude": -12.073338,
+      "longitude": -77.058907,
+      "moment": "",
+      "description": "",
+      "createdAt": "2026-10-03T22:27:21.030Z",
+      "activatedAt": "2026-10-03T22:27:21.030Z",
+      "endedAt": "2026-10-03T22:27:36.212Z",
+      "submittedAt": null,
+      "completedAt": null,
+      "updatedAt": "2026-10-03T22:27:36.212Z",
+      "id": 2
+    },
+    {
+      "employeeId": "demo-employee",
+      "kind": "panic",
+      "status": "pending-report",
+      "category": "",
+      "location": "-12.07288, -77.05978",
+      "latitude": -12.072882,
+      "longitude": -77.059775,
+      "moment": "",
+      "description": "",
+      "createdAt": "2026-10-03T22:29:58.874Z",
+      "activatedAt": "2026-10-03T22:29:58.874Z",
+      "endedAt": "2026-10-03T22:36:13.503Z",
+      "submittedAt": null,
+      "completedAt": null,
+      "updatedAt": "2026-10-03T22:36:13.503Z",
+      "id": 3
+    },
+    {
+      "employeeId": "demo-employee",
+      "kind": "panic",
+      "status": "pending-report",
+      "category": "",
+      "location": "-12.07306, -77.06013",
+      "latitude": -12.0730554968867,
+      "longitude": -77.06013371276181,
+      "moment": "",
+      "description": "",
+      "createdAt": "2026-10-03T22:51:07.752Z",
+      "activatedAt": "2026-10-03T22:51:07.752Z",
+      "endedAt": "2026-10-03T22:51:17.689Z",
+      "submittedAt": null,
+      "completedAt": null,
+      "updatedAt": "2026-10-03T22:51:17.689Z",
+      "id": 4
+    },
+    {
+      "employeeId": "demo-employee",
+      "kind": "suspicious-activity",
+      "status": "submitted",
+      "category": "vehicle",
+      "location": "-12.07275, -77.06015",
+      "latitude": -12.072746538393877,
+      "longitude": -77.06014573568476,
+      "moment": "2003-05-31T00:55:00.000Z",
+      "description": "vi un vehiculo negro sospechoso que se quedo viendo el negocio",
+      "createdAt": "2026-10-04T00:56:03.418Z",
+      "activatedAt": null,
+      "endedAt": null,
+      "submittedAt": "2026-10-04T00:56:03.418Z",
+      "completedAt": null,
+      "updatedAt": "2026-10-04T00:56:03.418Z",
+      "id": 5
+    }
+  ],
+  "alertPreferences": [
+    {
+      "employeeId": "demo-employee",
+      "panicGracePeriodSeconds": 2,
+      "id": 1
+    }
+  ],
+  "business-members": [
+    {
+      "id": "member-admin",
+      "businessId": "bus-1",
+      "userId": "demo-admin",
+      "displayName": "Administrador demo",
+      "email": "admin@example.test",
+      "role": "Administrator",
+      "status": "active"
+    },
+    {
+      "id": "member-ana",
+      "businessId": "bus-1",
+      "userId": "demo-employee",
+      "displayName": "Ana Torres",
+      "email": "ana@example.test",
+      "role": "Operative",
+      "status": "active"
+    },
+    {
+      "id": "member-luis",
+      "businessId": "bus-1",
+      "userId": "demo-luis",
+      "displayName": "Luis Ramos",
+      "email": "luis@example.test",
+      "role": "Operative",
+      "status": "active"
+    },
+    {
+      "id": "member-mario",
+      "businessId": "bus-1",
+      "userId": "demo-mario",
+      "displayName": "Mario Vega",
+      "email": "mario@example.test",
+      "role": "Operative",
+      "status": "inactive"
+    }
+  ],
+  "staff-invitations": [
+    {
+      "id": "invite-elena",
+      "businessId": "bus-1",
+      "displayName": "Elena Díaz",
+      "email": "elena@example.test",
+      "status": "cancelled",
+      "createdAt": "2026-10-04T12:00:00.000Z",
+      "updatedAt": "2026-10-04T14:52:41.936Z",
+      "lastResentAt": null
+    },
+    {
+      "id": "invite-roberto",
+      "businessId": "bus-1",
+      "displayName": "Roberto Soto",
+      "email": "roberto@example.test",
+      "status": "cancelled",
+      "createdAt": "2026-10-04T12:00:00.000Z",
+      "updatedAt": "2026-10-04T12:00:00.000Z",
+      "lastResentAt": null
+    },
+    {
+      "id": "ND6OJFo",
+      "businessId": "bus-1",
+      "displayName": "Prueba CRUD editada",
+      "email": "qa.business@example.test",
+      "status": "cancelled",
+      "createdAt": "2026-10-04T14:21:49.589Z",
+      "updatedAt": "2026-10-04T14:24:31.347Z",
+      "lastResentAt": null
+    }
+  ],
+  "plans": [
+    {
+      "id": "demo-basic",
+      "name": "Essential",
+      "price": 50,
+      "priceUsd": 15,
+      "currency": "PEN",
+      "billingCycle": "monthly",
+      "maxEmployees": 4,
+      "features": ["bracelets2", "incidentAlerts24h", "monthlyMaintenance"]
+    },
+    {
+      "id": "demo-standard",
+      "name": "Professional",
+      "price": 100,
+      "priceUsd": 30,
+      "currency": "PEN",
+      "billingCycle": "monthly",
+      "maxEmployees": 8,
+      "features": ["bracelets5", "priorityAlerts24h", "monthlyMaintenance", "localRiskReports"]
+    },
+    {
+      "id": "demo-extended",
+      "name": "Business",
+      "price": 150,
+      "priceUsd": 45,
+      "currency": "PEN",
+      "billingCycle": "monthly",
+      "maxEmployees": 15,
+      "features": ["bracelets8", "organizationPriority24h", "monthlyMaintenance", "advancedAlertsImplementation"]
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "sub-demo-01",
+      "businessId": "bus-1",
+      "planId": "demo-standard",
+      "status": "active",
+      "currentPeriodEnd": "2026-11-04",
+      "cancelAtPeriodEnd": false
+    }
+  ]
 }
