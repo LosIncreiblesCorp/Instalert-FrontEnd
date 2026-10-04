@@ -10,7 +10,7 @@
       <h4>Recent Incidents in Zone</h4>
       <ul v-if="incidentsInZone.length > 0">
         <li v-for="incident in incidentsInZone" :key="incident.id">
-          <strong>{{ incident.title }}</strong> ({{ incident.type }})
+          <strong>{{ incident.title }}</strong> ({{ incidentCategoryLabel(incident.type) }})
           <br>
           <small>{{ incident.reportedAt.toLocaleString() }}</small>
         </li>
@@ -25,6 +25,14 @@
 
 <script setup>
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t, te } = useI18n();
+
+function incidentCategoryLabel(category) {
+  const key = `mapping.incidentCategories.${category}`;
+  return te(key) ? t(key) : category ?? t('mapping.incidentCategories.other');
+}
 
 const props = defineProps({
   zone: {
