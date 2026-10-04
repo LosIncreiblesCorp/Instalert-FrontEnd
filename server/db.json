@@ -3829,5 +3829,102 @@
       "panicGracePeriodSeconds": 2,
       "id": 1
     }
+  ],
+  "business-members": [
+    {
+      "id": "member-admin",
+      "businessId": "bus-1",
+      "userId": "demo-admin",
+      "displayName": "Administrador demo",
+      "email": "admin@example.test",
+      "role": "Administrator",
+      "status": "active"
+    },
+    {
+      "id": "member-ana",
+      "businessId": "bus-1",
+      "userId": "demo-employee",
+      "displayName": "Ana Torres",
+      "email": "ana@example.test",
+      "role": "Operative",
+      "status": "active"
+    },
+    {
+      "id": "member-luis",
+      "businessId": "bus-1",
+      "userId": "demo-luis",
+      "displayName": "Luis Ramos",
+      "email": "luis@example.test",
+      "role": "Operative",
+      "status": "active"
+    },
+    {
+      "id": "member-mario",
+      "businessId": "bus-1",
+      "userId": "demo-mario",
+      "displayName": "Mario Vega",
+      "email": "mario@example.test",
+      "role": "Operative",
+      "status": "inactive"
+    }
+  ],
+  "staff-invitations": [
+    {
+      "id": "invite-elena",
+      "businessId": "bus-1",
+      "displayName": "Elena Díaz",
+      "email": "elena@example.test",
+      "status": "cancelled",
+      "createdAt": "2026-10-04T12:00:00.000Z",
+      "updatedAt": "2026-10-04T14:52:41.936Z",
+      "lastResentAt": null
+    },
+    {
+      "id": "invite-roberto",
+      "businessId": "bus-1",
+      "displayName": "Roberto Soto",
+      "email": "roberto@example.test",
+      "status": "cancelled",
+      "createdAt": "2026-10-04T12:00:00.000Z",
+      "updatedAt": "2026-10-04T12:00:00.000Z",
+      "lastResentAt": null
+    },
+    {
+      "id": "ND6OJFo",
+      "businessId": "bus-1",
+      "displayName": "Prueba CRUD editada",
+      "email": "qa.business@example.test",
+      "status": "cancelled",
+      "createdAt": "2026-10-04T14:21:49.589Z",
+      "updatedAt": "2026-10-04T14:24:31.347Z",
+      "lastResentAt": null
+    }
+  ],
+  "plans": [
+    {
+      "id": "demo-basic",
+      "name": "Plan 3",
+      "maxEmployees": 3
+    },
+    {
+      "id": "demo-standard",
+      "name": "Plan 5",
+      "maxEmployees": 5
+    },
+    {
+      "id": "demo-extended",
+      "name": "Plan 8",
+      "maxEmployees": 8
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "sub-demo-01",
+      "businessId": "bus-1",
+      "planId": "demo-standard",
+      "status": "active",
+      "currentPeriodEnd": "2026-11-04",
+      "cancelAtPeriodEnd": false
+    }
   ]
 }

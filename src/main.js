@@ -1,6 +1,6 @@
 import { createApp, watch } from 'vue'
 import PrimeVue from 'primevue/config'
-import { Button, Card, ConfirmationService, ConfirmDialog, DatePicker, InputNumber, InputText, Select, SelectButton, Textarea } from 'primevue'
+import { Button, Card, Column, ConfirmationService, ConfirmDialog, DataTable, DatePicker, InputNumber, InputText, Select, SelectButton, Textarea } from 'primevue'
 import Material from '@primeuix/themes/material'
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
@@ -17,12 +17,14 @@ const app = createApp(App)
 app
     .use(i18n)
     .use(PrimeVue, {
-        theme: { preset: Material },
+        theme: { preset: Material, options: { darkModeSelector: false } },
         ripple: true,
         license: primeUiLicenseKey
     })
     .use(ConfirmationService)
     .component('pv-button', Button)
+    .component('pv-column', Column)
+    .component('pv-data-table', DataTable)
     .component('pv-confirm-dialog', ConfirmDialog)
     .component('pv-card', Card)
     .component('pv-date-picker', DatePicker)

@@ -41,6 +41,94 @@
       }
     }
   },
+  "business": {
+    "personnel": {
+      "title": "Personal del comercio",
+      "description": "Administra empleados, membresías e invitaciones.",
+      "eyebrow": "Gestión de personal",
+      "name": "Nombre",
+      "status": "Estado",
+      "actions": "Acciones",
+      "employees": "Empleados",
+      "invitations": "Invitaciones",
+      "recordType": "Tipo de registro",
+      "search": "Buscar por nombre o correo",
+      "quota": "Cupos de suscripción",
+      "planLimit": "Límite del plan",
+      "occupied": "Ocupados",
+      "reserved": "Reservados",
+      "available": "Disponibles",
+      "activeEmployees": "Empleados activos",
+      "pendingInvitations": "Invitaciones pendientes",
+      "adminExcluded": "El administrador no ocupa un cupo.",
+      "limitsUnavailable": "Información del plan no disponible",
+      "emptyEmployees": "No hay empleados para mostrar",
+      "emptyInvitations": "No hay invitaciones para mostrar",
+      "emptyHelp": "Prueba otra búsqueda o actualiza la lista."
+    },
+    "invitation": {
+      "title": "Nueva invitación",
+      "description": "Ingresa los datos del empleado para crear una invitación.",
+      "email": "Correo electrónico",
+      "emailHelp": "Ingresa el correo electrónico del empleado.",
+      "nameHelp": "Obligatorio. Ingresa un nombre de hasta 100 caracteres.",
+      "quotaSummary": "{available} de {limit} cupos disponibles",
+      "create": "Crear invitación",
+      "back": "Volver a Personal"
+    },
+    "statuses": {
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "pending": "Pendiente",
+      "cancelled": "Cancelada",
+      "accepted": "Aceptada"
+    },
+    "actions": {
+      "edit": "Editar",
+      "save": "Guardar cambios",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "confirmTitle": "Confirmar acción",
+      "activate": "Activar",
+      "deactivate": "Desactivar",
+      "delete": "Eliminar",
+      "resend": "Reenviar",
+      "cancelInvitation": "Cancelar invitación",
+      "refresh": "Actualizar"
+    },
+    "confirmations": {
+      "activate": "¿Activar la membresía de {name}? Ocupará un cupo.",
+      "deactivate": "¿Desactivar la membresía de {name}? Liberará un cupo.",
+      "deleteMember": "¿Eliminar la membresía de {name}? Se eliminará su relación con el comercio.",
+      "cancelInvitation": "¿Cancelar la invitación pendiente de {name}? Se liberará su cupo reservado.",
+      "deleteInvitation": "¿Eliminar la invitación cancelada de {name}?"
+    },
+    "messages": {
+      "invitationCreated": "Invitación creada. Aparece en la pestaña Invitaciones.",
+      "invitationCancelled": "Invitación cancelada. Su cupo reservado está disponible.",
+      "updated": "Cambios guardados.",
+      "membershipUpdated": "Membresía actualizada.",
+      "deleted": "Registro eliminado.",
+      "resendRecorded": "Solicitud de reenvío registrada."
+    },
+    "errors": {
+      "businessRequired": "Debes seleccionar un comercio.",
+      "nameInvalid": "Ingresa un nombre de entre 1 y 100 caracteres.",
+      "emailInvalid": "Ingresa un correo electrónico válido.",
+      "invalidState": "El registro tiene un estado inválido.",
+      "limitsUnavailable": "No se pudo consultar el límite del plan. Actualiza antes de ocupar un cupo.",
+      "subscriptionInactive": "El comercio no tiene una suscripción activa.",
+      "noSeats": "No hay cupos disponibles. Primero desactiva un empleado o cancela una invitación pendiente.",
+      "duplicateEmail": "Este correo ya pertenece a un empleado o a una invitación pendiente.",
+      "notFound": "El registro ya no está disponible. Actualiza la lista.",
+      "administratorProtected": "Esta acción está disponible solo para empleados.",
+      "invitationNotPending": "Solo se pueden editar, cancelar o reenviar invitaciones pendientes.",
+      "cancelBeforeDelete": "Cancela la invitación antes de eliminarla. No se pueden eliminar invitaciones aceptadas aquí.",
+      "load": "No se pudo cargar el personal o el plan. Actualiza e inténtalo nuevamente.",
+      "save": "No se pudo guardar el cambio. Inténtalo nuevamente.",
+      "overCapacity": "Los cupos ocupados y reservados superan el límite del plan. Libera cupos antes de agregar más."
+    }
+  },
   "roles": {
     "administrator": "Administrador",
     "employee": "Personal operativo"

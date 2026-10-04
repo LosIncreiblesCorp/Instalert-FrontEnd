@@ -41,6 +41,94 @@
       }
     }
   },
+  "business": {
+    "personnel": {
+      "title": "Business staff",
+      "description": "Manage employees, memberships and invitations.",
+      "eyebrow": "Staff management",
+      "name": "Name",
+      "status": "Status",
+      "actions": "Actions",
+      "employees": "Employees",
+      "invitations": "Invitations",
+      "recordType": "Record type",
+      "search": "Search by name or email",
+      "quota": "Subscription seats",
+      "planLimit": "Plan limit",
+      "occupied": "Occupied",
+      "reserved": "Reserved",
+      "available": "Available",
+      "activeEmployees": "Active employees",
+      "pendingInvitations": "Pending invitations",
+      "adminExcluded": "The administrator does not occupy a seat.",
+      "limitsUnavailable": "Plan information unavailable",
+      "emptyEmployees": "No employees to display",
+      "emptyInvitations": "No invitations to display",
+      "emptyHelp": "Try a different search or refresh the list."
+    },
+    "invitation": {
+      "title": "New invitation",
+      "description": "Enter the employee's details to create an invitation.",
+      "email": "Email address",
+      "emailHelp": "Enter the employee's email address.",
+      "nameHelp": "Required. Enter a name of up to 100 characters.",
+      "quotaSummary": "{available} of {limit} seats available",
+      "create": "Create invitation",
+      "back": "Back to staff"
+    },
+    "statuses": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "cancelled": "Cancelled",
+      "accepted": "Accepted"
+    },
+    "actions": {
+      "edit": "Edit",
+      "save": "Save changes",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "confirmTitle": "Confirm action",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "delete": "Delete",
+      "resend": "Resend",
+      "cancelInvitation": "Cancel invitation",
+      "refresh": "Refresh"
+    },
+    "confirmations": {
+      "activate": "Activate the membership of {name}? This will occupy one seat.",
+      "deactivate": "Deactivate the membership of {name}? This will free one seat.",
+      "deleteMember": "Delete the membership of {name}? This removes their association with the business.",
+      "cancelInvitation": "Cancel the pending invitation for {name}? This will release its reserved seat.",
+      "deleteInvitation": "Delete the cancelled invitation for {name}?"
+    },
+    "messages": {
+      "invitationCreated": "Invitation created. It is listed under Invitations.",
+      "invitationCancelled": "Invitation cancelled. Its reserved seat is now available.",
+      "updated": "Changes saved.",
+      "membershipUpdated": "Membership updated.",
+      "deleted": "Record deleted.",
+      "resendRecorded": "Resend request recorded."
+    },
+    "errors": {
+      "businessRequired": "A business must be selected.",
+      "nameInvalid": "Enter a name between 1 and 100 characters.",
+      "emailInvalid": "Enter a valid email address.",
+      "invalidState": "The record has an invalid state.",
+      "limitsUnavailable": "Unable to retrieve the plan limit. Refresh before occupying a seat.",
+      "subscriptionInactive": "There is no active subscription for this business.",
+      "noSeats": "No seats available. Deactivate an employee or cancel a pending invitation first.",
+      "duplicateEmail": "This email already belongs to an employee or a pending invitation.",
+      "notFound": "The record is no longer available. Refresh the list.",
+      "administratorProtected": "This action is available only for employees.",
+      "invitationNotPending": "Only pending invitations can be edited, cancelled or resent.",
+      "cancelBeforeDelete": "Cancel the invitation before deleting it. Accepted invitations cannot be deleted here.",
+      "load": "Unable to load staff or plan information. Please refresh and try again.",
+      "save": "Unable to save the change. Please try again.",
+      "overCapacity": "Occupied and reserved seats exceed the current plan limit. Free seats before adding more."
+    }
+  },
   "roles": {
     "administrator": "Administrator",
     "employee": "Operational staff"

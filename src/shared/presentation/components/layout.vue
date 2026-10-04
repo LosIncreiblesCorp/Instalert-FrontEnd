@@ -88,7 +88,6 @@ function closeMobileNavigation() {
           <span class="role-mark" aria-hidden="true"><i class="pi pi-user"></i></span>
           <span class="role-copy">
             <span class="role-name">{{ currentRoleLabel }}</span>
-            <span class="role-caption">{{ t("common.demoView") }}</span>
           </span>
           <span class="profile-label">{{ t("common.profile") }}</span>
         </RouterLink>
@@ -261,12 +260,6 @@ function closeMobileNavigation() {
 .role-name {
   font-size: 12px;
   font-weight: 700;
-  line-height: 1.2;
-}
-
-.role-caption {
-  color: var(--muted);
-  font-size: 10px;
   line-height: 1.2;
 }
 
@@ -465,10 +458,6 @@ select:focus-visible {
 
   .role-copy {
     min-width: auto;
-  }
-
-  .role-caption {
-    display: none;
   }
 
   .app-sidebar {
