@@ -1,3 +1,21 @@
+// Category codes in the geographical projection contract, aligned with Alert.
+// These are incident categories, not the Alert record kinds (panic, past incident, etc.).
+export const IncidentCategory = Object.freeze({
+    ROBBERY: 'robbery',
+    ATTEMPTED_ROBBERY: 'attemptedRobbery',
+    ASSAULT: 'assault',
+    EXTORTION: 'extortion',
+    VANDALISM: 'vandalism',
+    PERSON: 'person',
+    VEHICLE: 'vehicle',
+    UNUSUAL_BEHAVIOR: 'unusualBehavior',
+    SURVEILLANCE: 'surveillance',
+    LOW_LIGHTING: 'lowLighting',
+    POLICE_PRESENCE: 'policePresence',
+    ROAD_BLOCKAGE: 'roadBlockage',
+    OTHER: 'other',
+});
+
 export class IncidentMarker {
     constructor({ id, title, description, type, status, latitude, longitude, reportedAt }) {
         this.id = id;
