@@ -175,12 +175,15 @@ Tip: if your API is running on a different port, update `VITE_INSTALERT_PLATFORM
 - Global `beforeEach` sets the document title from route metadata (`InstAlert | <translated title>`).
 
 ## API and Data Notes
-- Local mock data currently includes `risk_zones` (48), `incidents` (159), `businesses` (105), `alerts`, `alertPreferences`, `business-members`, `staff-invitations`, `plans` (3), `emergency-contacts` and `subscriptions` collections.
-- Endpoints follow the shared `BaseApi + BaseEndpoint` convention (`getAll/getById/create/update/delete`); `ContactsApi` shows the env-override pattern for endpoint paths.
+- Local mock data currently includes `categories` and `tutorials` collections.
+- IAM endpoints are configured via env variables and infrastructure classes, but your runtime backend must provide those routes for full authentication flows.
 
 ## Documentation
-- Code-level docs: JSDoc annotations across domain entities, stores, and infrastructure classes (`@class`, `@param`, `@returns`, `@type`), plus per-function JSDoc in `<script setup>` views/components.
-- UI strings: `src/locales/en.json`, `src/locales/es.json`.
+- Domain and architecture references:
+  - `docs/class-diagram.puml`
+  - `docs/user-stories.md`
+- Project history and release notes:
+  - `CHANGELOG.md`
 
 ## Recommended Development Practices
 - Keep each feature inside its bounded context first; move to `shared` only when truly cross-context.
