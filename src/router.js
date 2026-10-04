@@ -4,6 +4,7 @@ import PageNotFound from "./shared/presentation/views/page-not-found.vue";
 import { paymentsRoutes } from "./payments/presentation/payments-routes.js";
 import businessRoutes from "./business/presentation/business-routes.js";
 import alertRoutes from "./alert/presentation/alert-routes.js";
+import contactsRoutes from "./contacts/presentation/contacts-routes.js";
 
 const EmptyRouteView = { render: () => null };
 
@@ -73,6 +74,7 @@ const routes = [
     meta: { role: "employee", menuKey: "risk-map", title: "navigation.riskMap" },
   },
   ...employeeAlertRoutes,
+  ...contactsRoutes,
   {
     path: "/employee/profile",
     name: "employee-profile",
