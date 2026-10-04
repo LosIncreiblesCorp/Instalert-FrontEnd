@@ -11,7 +11,35 @@
     "notFoundCode": "ERROR 404",
     "notFoundTitle": "Page not found",
     "notFoundDescription": "The page you requested does not exist or may have moved.",
-    "goBack": "Go back"
+    "goBack": "Go back",
+    "calendar": {
+      "firstDayOfWeek": 1,
+      "dayNames": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      "dayNamesShort": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      "dayNamesMin": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+      "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+      "monthNamesShort": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      "today": "Today",
+      "clear": "Clear",
+      "aria": {
+        "chooseDate": "Choose date and time",
+        "prevMonth": "Previous month",
+        "nextMonth": "Next month",
+        "prevYear": "Previous year",
+        "nextYear": "Next year",
+        "prevDecade": "Previous decade",
+        "nextDecade": "Next decade",
+        "chooseMonth": "Choose month",
+        "chooseYear": "Choose year",
+        "switchToMonthView": "Choose month",
+        "switchToYearView": "Choose year",
+        "switchToDayView": "Choose day",
+        "prevHour": "Previous hour",
+        "nextHour": "Next hour",
+        "prevMinute": "Previous minute",
+        "nextMinute": "Next minute"
+      }
+    }
   },
   "roles": {
     "administrator": "Administrator",
@@ -30,6 +58,193 @@
     "subscription": "Subscription"
   },
   "alerts": {
+    "workflow": {
+      "sectionLabel": "Alert operations center",
+      "subtitle": "Activate a panic alert or report a situation to your team.",
+      "loading": "Loading alert data…",
+      "saving": "Saving changes…",
+      "notRecorded": "Not recorded",
+      "preference": {
+        "title": "Panic grace period",
+        "description": "Choose how long you have to cancel before the alert becomes active.",
+        "seconds": "Grace period in seconds",
+        "range": "From 1 to 60 seconds · initial value: 5",
+        "compactRange": "1–60 seconds",
+        "increase": "Increase grace period",
+        "decrease": "Decrease grace period",
+        "saved": "Preference saved.",
+        "failed": "The preference could not be saved.",
+        "invalid": "Enter a whole number from 1 to 60."
+      },
+      "panic": {
+        "activate": "Activate panic alert",
+        "title": "Panic alert",
+        "description": "For robberies, assaults, or dangerous situations in progress.",
+        "start": "Start countdown · {seconds}s",
+        "disclaimer": "The countdown continues if you navigate to another section. Cancel it before it reaches zero if it was accidental."
+      },
+      "reports": {
+        "title": "Other reports",
+        "subtitle": "Report a past incident, suspicious activity, or another condition in the area."
+      },
+      "reportKinds": {
+        "past-incident": {
+          "description": "Report something that happened earlier and could not be reported with the panic button.",
+          "action": "Report past incident"
+        },
+        "suspicious-activity": {
+          "description": "Describe a person, vehicle, or behavior that seems unusual to you.",
+          "action": "Report suspicious activity"
+        },
+        "other-situation": {
+          "description": "Report low lighting, police presence, or another condition in the area.",
+          "action": "Report another situation"
+        },
+        "cancel": "Discard report",
+        "submit": "Submit report"
+      },
+      "kinds": {
+        "all": "All types",
+        "panic": "Panic alert",
+        "past-incident": "Past incident",
+        "suspicious-activity": "Suspicious activity",
+        "other-situation": "Other situation"
+      },
+      "categories": {
+        "robbery": "Robbery",
+        "attemptedRobbery": "Attempted robbery",
+        "assault": "Assault",
+        "extortion": "Extortion",
+        "vandalism": "Vandalism",
+        "person": "Suspicious person",
+        "vehicle": "Suspicious vehicle",
+        "unusualBehavior": "Unusual behavior",
+        "surveillance": "Surveillance or following",
+        "lowLighting": "Low lighting",
+        "policePresence": "Police presence",
+        "roadBlockage": "Road or area blockage",
+        "other": "Other"
+      },
+      "moments": {
+        "now": "Right now",
+        "15-30-minutes": "15–30 minutes ago",
+        "over-one-hour": "Over an hour ago"
+      },
+      "categoryDescriptions": {
+        "robbery": "Property was taken",
+        "attemptedRobbery": "An attempted theft",
+        "assault": "Violence or intimidation",
+        "extortion": "Threats or demands",
+        "vandalism": "Damage to property",
+        "person": "Suspicious actions nearby",
+        "vehicle": "Unusual vehicle activity",
+        "unusualBehavior": "Something out of the ordinary",
+        "surveillance": "Watching or following",
+        "lowLighting": "Poor visibility in the area",
+        "policePresence": "Police activity nearby",
+        "roadBlockage": "Obstructed access or passage",
+        "other": "Describe another situation"
+      },
+      "statuses": {
+        "all": "All statuses",
+        "active": "Active",
+        "pending-report": "Incomplete report",
+        "completed": "Completed",
+        "submitted": "Sent",
+        "resolved": "Resolved",
+        "false-alarm": "False alarm"
+      },
+      "location": {
+        "useCurrent": "Use my location",
+        "manualPlaceholder": "Enter an address or landmark",
+        "requesting": "Getting your current location…",
+        "ready": "Current location recorded; you can edit it.",
+        "manualHelp": "Location could not be retrieved. You can enter a reference manually.",
+        "notAvailable": "Location unavailable"
+      },
+      "form": {
+        "category": "Incident type",
+        "chooseCategory": "Select an option",
+        "location": "Location",
+        "moment": "When did it happen?",
+        "dateTimePlaceholder": "Select date and time",
+        "dateTimeHelp": "Choose the date and exact time (24-hour format), in your local time zone. Future dates are not allowed.",
+        "description": "Description",
+        "descriptionPlaceholder": "Describe what happened with the details you remember.",
+        "required": "Complete all required fields before continuing.",
+        "noAttachments": "Photos and file attachments are not available for this report."
+      },
+      "countdown": {
+        "badge": "Cancelable countdown",
+        "title": "The alert will activate in {seconds} seconds",
+        "description": "Cancel now if this was a mistake. Otherwise, the alert activates automatically.",
+        "remaining": "{seconds} seconds left to cancel the alert",
+        "remainingLabel": "Time remaining",
+        "seconds": "seconds",
+        "continues": "The countdown continues if you navigate to another section of the app.",
+        "cancel": "Cancel panic alert"
+      },
+      "active": {
+        "status": "Active alert",
+        "title": "The panic alert is active",
+        "subtitle": "The alert appears in the team's history while it remains active.",
+        "startedAt": "Activated at",
+        "elapsed": "Time active",
+        "elapsedHelp": "Time since the alert was activated",
+        "location": "Recorded location",
+        "finishHelp": "End the alert only after the dangerous situation has ended.",
+        "finish": "End panic situation",
+        "open": "View active alert"
+      },
+      "panicReport": {
+        "title": "Complete the incident report",
+        "subtitle": "The alert has ended. Its record remains incomplete until you finish and save this report.",
+        "autosave": "Your progress is saved automatically. You can complete it later from history.",
+        "later": "Complete later",
+        "complete": "Complete and save report"
+      },
+      "pending": {
+        "title": "You have an incomplete report",
+        "subtitle": "The record will remain incomplete until you finish it.",
+        "action": "Continue report"
+      },
+      "results": {
+        "sentTitle": "Report sent",
+        "sentDescription": "The report is registered and can be viewed in history.",
+        "completedTitle": "Report completed",
+        "completedDescription": "The panic alert report is saved and appears as completed in history."
+      },
+      "history": {
+        "label": "User activity log",
+        "title": "Alert history",
+        "open": "View history",
+        "subtitle": "Review active alerts and submitted reports.",
+        "count": "{count} records",
+        "filters": "History filters",
+        "search": "Search by type, description, or location",
+        "kindFilter": "Type",
+        "statusFilter": "Status",
+        "openRecord": "View record details",
+        "emptyTitle": "There are no records yet",
+        "emptyDescription": "Active alerts, incomplete reports, and submitted reports will appear here.",
+        "createdAt": "Recorded at",
+        "record": "Record",
+        "readOnly": "Submitted reports can be viewed but not edited.",
+        "back": "Go back"
+      },
+      "discard": {
+        "header": "Discard this report?",
+        "message": "If you leave now, the report will not be sent or added to history.",
+        "confirm": "Discard report",
+        "keepEditing": "Keep editing"
+      },
+      "home": { "back": "Back to Alerts" },
+      "actions": { "retry": "Retry" },
+      "errors": {
+        "requestFailed": "Could not reach the alert service. Check that JSON Server is running and try again.",
+        "activationTitle": "The active alert could not be registered"
+      }
+    },
     "title": "Alerts",
     "skip": "Skip to content",
     "preview": "Preview",
