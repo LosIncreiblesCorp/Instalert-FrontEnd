@@ -18,9 +18,19 @@
           <button :class="{ active: timeFilter === '30d' }" @click="timeFilter = '30d'">30 días</button>
         </div>
         <div class="divider"></div>
-        <select class="type-filter">
-          <option>Todos los incidentes</option>
-        </select>
+        <pv-select
+          v-model="incidentTypeFilter"
+          class="type-filter"
+          :options="incidentTypeOptions"
+          option-label="label"
+          option-value="value"
+          :aria-label="t('mapping.filters.incidentCategory')"
+          :pt="{ overlay: { class: 'mapping-incident-options' } }"
+        >
+          <template #value>
+            <span class="selected-incident-type" :title="selectedIncidentTypeLabel">{{ selectedIncidentTypeLabel }}</span>
+          </template>
+        </pv-select>
       </div>
     </div>
 
@@ -50,16 +60,31 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useMappingStore } from '../../application/mapping.store.js';
+import { IncidentCategory } from '../../domain/model/incident-marker.entity.js';
 import RiskMap from '../components/risk-map.vue';
 import TacticalInspector from '../components/tactical-inspector.vue';
 
 const mappingStore = useMappingStore();
+const { t } = useI18n();
 
 const selectedItem = ref(null);
 const selectedType = ref('');
 const timeFilter = ref('24h');
+const incidentTypeFilter = ref('all');
+const incidentTypeOptions = computed(() => [
+  { value: 'all', label: t('mapping.filters.allIncidents') },
+  ...Object.values(IncidentCategory).map(value => ({
+    value,
+    label: t(`mapping.incidentCategories.${value}`),
+  })),
+]);
+const selectedIncidentTypeLabel = computed(() =>
+  incidentTypeOptions.value.find(option => option.value === incidentTypeFilter.value)?.label
+  ?? t('mapping.filters.allIncidents')
+);
 
 const filteredIncidents = computed(() => {
   if (!mappingStore.incidents) return [];
@@ -75,7 +100,17 @@ const filteredIncidents = computed(() => {
     timeLimit.setDate(now.getDate() - 30);
   }
 
-  return mappingStore.incidents.filter(inc => new Date(inc.reportedAt) >= timeLimit);
+  return mappingStore.incidents.filter(inc =>
+    new Date(inc.reportedAt) >= timeLimit &&
+    (incidentTypeFilter.value === 'all' || inc.type === incidentTypeFilter.value)
+  );
+});
+
+watch(filteredIncidents, (incidents) => {
+  if (selectedType.value === 'incident' && selectedItem.value &&
+      !incidents.some(incident => incident.id === selectedItem.value.id)) {
+    selectedItem.value = null;
+  }
 });
 
 onMounted(() => {
@@ -155,14 +190,42 @@ const handleBusinessSelected = (businessId) => {
 }
 
 .type-filter {
+  min-width: 175px;
+  max-width: 240px;
   border: none;
-  background: transparent;
+  background: #fff;
   font-weight: 500;
   font-size: 13px;
-  color: #333;
+  color: #172033;
+  color-scheme: light;
   cursor: pointer;
   outline: none;
 }
+
+.type-filter :deep(.p-select-label) {
+  padding: 6px 8px;
+  font-size: 13px;
+  color: #172033;
+  background: transparent;
+}
+
+.selected-incident-type {
+  display: block;
+  overflow: hidden;
+  color: #172033;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.type-filter :deep(.p-select-dropdown) {
+  width: 28px;
+  color: #536179;
+}
+
+:global(.mapping-incident-options) { color: #172033; background: #fff; color-scheme: light; }
+:global(.mapping-incident-options .p-select-option) { color: #172033; }
+:global(.mapping-incident-options .p-select-option:not(.p-select-option-selected):not(.p-disabled):hover) { background: #f1f5fc; }
+:global(.mapping-incident-options .p-select-option-selected) { color: #174ba2; background: #e7efff; }
 
 .floating-legend {
   position: absolute;
