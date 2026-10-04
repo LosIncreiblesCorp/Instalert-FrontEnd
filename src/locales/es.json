@@ -31,12 +31,15 @@
   },
   "payments": {
     "title": "Suscripción y facturación",
-    "subtitle": "Gestiona tu plan, método de pago y facturas. Datos de demostración en PEN, sin cargo real.",
+    "subtitle": "Gestiona tu plan, método de pago y facturas.",
     "loading": "Cargando suscripción...",
     "empty": "No se encontró una suscripción activa para este negocio.",
     "availablePlans": "Planes disponibles",
     "matrixTitle": "Planes",
-    "matrixSubtitle": "Elige el plan según tu operación. Precios en PEN, impuestos incluidos.",
+    "matrixSubtitle": "Elige el plan según tu operación. Consulta los precios en soles o dólares.",
+    "currencyLabel": "Moneda de los planes",
+    "currencySoles": "Soles (S/)",
+    "currencyDollars": "Dólares (US$)",
     "billingToggleLabel": "Ciclo de facturación",
     "billingMonthly": "Mensual",
     "billingAnnual": "Anual",
@@ -63,26 +66,35 @@
     "statusPaid": "Pagada",
     "tiers": {
       "basic": {
-        "eyebrow": "BÁSICO",
-        "description": "Cobertura esencial para puestos pequeños."
+        "eyebrow": "ESSENTIAL",
+        "description": "Protección esencial para equipos de hasta 4 empleados."
       },
       "professional": {
         "eyebrow": "MÁS POPULAR",
-        "description": "Operación completa con historial y personal."
+        "description": "Alertas prioritarias y reportes de riesgo para equipos de hasta 8 empleados."
       },
       "enterprise": {
-        "eyebrow": "EMPRESARIAL",
-        "description": "Redes grandes con soporte prioritario."
+        "eyebrow": "BUSINESS",
+        "description": "Atención prioritaria y acompañamiento para organizaciones de hasta 15 empleados."
       }
     },
     "features": {
+      "bracelets2": "2 pulseras InstAlert de regalo en el primer pago",
+      "bracelets5": "5 pulseras InstAlert de regalo en el primer pago",
+      "bracelets8": "8 pulseras InstAlert de regalo en el primer pago",
+      "incidentAlerts24h": "Alertas de incidentes y atención 24/7",
+      "priorityAlerts24h": "Atención 24/7 y alertas prioritarias",
+      "organizationPriority24h": "Atención prioritaria 24/7 para tu organización",
+      "monthlyMaintenance": "Mantenimiento del servicio gratis cada mes",
+      "localRiskReports": "Reportes de riesgo local para tu equipo",
+      "advancedAlertsImplementation": "Alertas avanzadas y acompañamiento de implementación",
       "activeAlerts": "Alertas activas",
       "riskMap": "Mapa de riesgo",
       "alertHistory": "Historial de alertas",
       "personnel": "Gestión de personal",
       "prioritySupport": "Soporte prioritario"
     },
-    "upToEmployees": "Hasta {count} empleados",
+    "upToEmployees": "Hasta {count} empleados incluidos",
     "showDetails": "Ver detalles",
     "hideDetails": "Ocultar detalles",
     "planDetailsLabel": "Detalles del plan",

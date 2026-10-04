@@ -31,12 +31,15 @@
   },
   "payments": {
     "title": "Subscription and billing",
-    "subtitle": "Manage your plan, payment method and invoices. Demo data in PEN, no real charge.",
+    "subtitle": "Manage your plan, payment method and invoices.",
     "loading": "Loading subscription...",
     "empty": "No active subscription found for this business.",
     "availablePlans": "Available plans",
     "matrixTitle": "Plans",
-    "matrixSubtitle": "Choose the plan that fits your operation. Prices in PEN, taxes included.",
+    "matrixSubtitle": "Choose the plan that fits your operation. View prices in soles or dollars.",
+    "currencyLabel": "Plan currency",
+    "currencySoles": "Soles (S/)",
+    "currencyDollars": "Dollars (US$)",
     "billingToggleLabel": "Billing cycle",
     "billingMonthly": "Monthly",
     "billingAnnual": "Annual",
@@ -63,26 +66,35 @@
     "statusPaid": "Paid",
     "tiers": {
       "basic": {
-        "eyebrow": "BASIC",
-        "description": "Essential coverage for small posts."
+        "eyebrow": "ESSENTIAL",
+        "description": "Essential protection for teams of up to 4 employees."
       },
       "professional": {
         "eyebrow": "MOST POPULAR",
-        "description": "Full operation with history and staff."
+        "description": "Priority alerts and risk reports for teams of up to 8 employees."
       },
       "enterprise": {
-        "eyebrow": "ENTERPRISE",
-        "description": "Large networks with priority support."
+        "eyebrow": "BUSINESS",
+        "description": "Priority support and implementation guidance for organizations of up to 15 employees."
       }
     },
     "features": {
+      "bracelets2": "2 complimentary InstAlert bracelets with the first payment",
+      "bracelets5": "5 complimentary InstAlert bracelets with the first payment",
+      "bracelets8": "8 complimentary InstAlert bracelets with the first payment",
+      "incidentAlerts24h": "Incident alerts and 24/7 support",
+      "priorityAlerts24h": "24/7 support and priority alerts",
+      "organizationPriority24h": "Priority 24/7 support for your organization",
+      "monthlyMaintenance": "Free service maintenance every month",
+      "localRiskReports": "Local risk reports for your team",
+      "advancedAlertsImplementation": "Advanced alerts and implementation guidance",
       "activeAlerts": "Active alerts",
       "riskMap": "Risk map",
       "alertHistory": "Alert history",
       "personnel": "Staff management",
       "prioritySupport": "Priority support"
     },
-    "upToEmployees": "Up to {count} employees",
+    "upToEmployees": "Up to {count} employees included",
     "showDetails": "Show details",
     "hideDetails": "Hide details",
     "planDetailsLabel": "Plan details",

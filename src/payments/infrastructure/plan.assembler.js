@@ -6,6 +6,7 @@ export class PlanAssembler {
             id: dto.id,
             name: dto.name,
             price: dto.price,
+            priceUsd: dto.priceUsd,
             currency: dto.currency,
             billingCycle: dto.billingCycle,
             maxEmployees: dto.maxEmployees,

@@ -1,13 +1,14 @@
 <script setup>
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { annualPrice, formatMoney } from "../payments-format.js";
+import { planPrice, formatMoney } from "../payments-format.js";
 
 const props = defineProps({
   plan: { type: Object, required: true },
   selected: { type: Boolean, default: false },
   selecting: { type: Boolean, default: false },
   billingCycle: { type: String, default: "monthly" },
+  currency: { type: String, default: "PEN" },
   accent: { type: Boolean, default: false },
   // UI-level guard only: the quota counts active employees.
   // The definitive validation belongs to the backend.
@@ -34,14 +35,10 @@ const eyebrow = computed(() => (te(`${tierKey.value}.eyebrow`) ? t(`${tierKey.va
 const description = computed(() => (te(`${tierKey.value}.description`) ? t(`${tierKey.value}.description`) : ""));
 const tierIcon = computed(() => tierIcons[props.plan.id] ?? "pi pi-shield");
 
-const rawPrice = computed(() =>
-    props.billingCycle === "annual"
-        ? annualPrice(props.plan.price)
-        : (props.plan.price ?? 0)
-);
+const rawPrice = computed(() => planPrice(props.plan, props.currency, props.billingCycle));
 
 const displayPrice = computed(() =>
-    formatMoney(rawPrice.value, props.plan.currency, locale.value)
+    formatMoney(rawPrice.value, props.currency, locale.value)
 );
 
 const suffix = computed(() =>

@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useConfirm } from "primevue/useconfirm";
 import { usePaymentsStore } from "../../application/payments.store.js";
-import { annualPrice, formatMoney } from "../payments-format.js";
+import { planPrice, formatMoney } from "../payments-format.js";
 import PlanCard from "../components/plan-card.vue";
 import SubscriptionSummary from "../components/subscription-summary.vue";
 import PaymentMethodCard from "../components/payment-method-card.vue";
@@ -18,6 +18,11 @@ const cancelling = ref(false);
 const notice = ref("");
 // Simulated billing-cycle toggle: visual only, it just re-renders plan prices.
 const billingCycle = ref("monthly");
+const currency = ref("PEN");
+const currencyOptions = computed(() => [
+  { label: t("payments.currencySoles"), value: "PEN" },
+  { label: t("payments.currencyDollars"), value: "USD" }
+]);
 
 const currentPlan = computed(() => paymentsStore.currentPlan ?? null);
 const assignedOperators = computed(() => paymentsStore.assignedOperators);
@@ -37,8 +42,7 @@ function isBlocked(plan) {
 }
 
 function formatPlanPrice(plan, cycle) {
-  const raw = cycle === "annual" ? annualPrice(plan.price) : (plan.price ?? 0);
-  return formatMoney(raw, plan.currency, locale.value);
+  return formatMoney(planPrice(plan, currency.value, cycle), currency.value, locale.value);
 }
 
 onMounted(() => {
@@ -105,6 +109,7 @@ function handleCancelClick() {
       <SubscriptionSummary
           :subscription="paymentsStore.currentSubscription"
           :plan="currentPlan"
+          :currency="currency"
           :assigned-operators="assignedOperators"
       />
 
@@ -116,6 +121,15 @@ function handleCancelClick() {
           </div>
 
           <div class="billing-toggle">
+            <span id="plan-currency-label" class="sr-only">{{ $t("payments.currencyLabel") }}</span>
+            <pv-select-button
+                v-model="currency"
+                :options="currencyOptions"
+                option-label="label"
+                option-value="value"
+                :allow-empty="false"
+                aria-labelledby="plan-currency-label"
+            />
             <span id="billing-cycle-label" class="sr-only">
               {{ $t("payments.billingToggleLabel") }}
             </span>
@@ -124,6 +138,7 @@ function handleCancelClick() {
                 :options="billingOptions"
                 option-label="label"
                 option-value="value"
+                :allow-empty="false"
                 aria-labelledby="billing-cycle-label"
             >
               <template #option="{ option }">
@@ -142,6 +157,7 @@ function handleCancelClick() {
               :selected="plan.id === paymentsStore.currentSubscription.planId"
               :selecting="selectingPlanId === plan.id"
               :billing-cycle="billingCycle"
+              :currency="currency"
               :accent="plan.id === topPlanId"
               :blocked="plan.id !== paymentsStore.currentSubscription.planId && isBlocked(plan)"
               :assigned-operators="assignedOperators"
@@ -254,6 +270,12 @@ function handleCancelClick() {
   margin: 8px 0 0;
   font-size: 13px;
   color: #68758a;
+}
+
+.billing-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .billing-toggle :deep(.p-selectbutton) {

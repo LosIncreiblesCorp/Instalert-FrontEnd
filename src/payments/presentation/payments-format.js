@@ -1,13 +1,21 @@
 ﻿// Single place for Payments display formatting.
-// Amounts and catalog prices are simulated (PEN); no real charge.
+// Catalog conversion uses the agreed fixed prices, not a live exchange rate.
 
 export const PEN_CURRENCY = "PEN";
 
 const ANNUAL_MONTHS = 12;
 const ANNUAL_DISCOUNT = 0.8;
+const CATALOG_USD_PER_SOL = 15 / 50;
 
 export function annualPrice(monthly) {
     return Math.round((monthly ?? 0) * ANNUAL_MONTHS * ANNUAL_DISCOUNT);
+}
+
+export function planPrice(plan, currency = PEN_CURRENCY, billingCycle = "monthly") {
+    const monthly = currency === "USD"
+        ? (plan.priceUsd ?? (plan.price ?? 0) * CATALOG_USD_PER_SOL)
+        : (plan.price ?? 0);
+    return billingCycle === "annual" ? annualPrice(monthly) : monthly;
 }
 
 function localeTag(locale) {

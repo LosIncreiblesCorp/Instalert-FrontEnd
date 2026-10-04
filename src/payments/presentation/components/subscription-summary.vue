@@ -1,11 +1,12 @@
 <script setup>
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { formatDate, formatMoney } from "../payments-format.js";
+import { formatDate, formatMoney, planPrice } from "../payments-format.js";
 
 const props = defineProps({
   subscription: { type: Object, required: true },
   plan: { type: Object, default: null },
+  currency: { type: String, default: "PEN" },
   assignedOperators: { type: Number, default: 0 }
 });
 
@@ -17,7 +18,7 @@ const percent = computed(() =>
 );
 
 const rateText = computed(() =>
-    props.plan ? formatMoney(props.plan.price, props.plan.currency, locale.value) : ""
+    props.plan ? formatMoney(planPrice(props.plan, props.currency), props.currency, locale.value) : ""
 );
 
 const renewalDate = computed(() => formatDate(props.subscription.currentPeriodEnd, locale.value));

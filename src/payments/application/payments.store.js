@@ -7,35 +7,38 @@ import { InvoiceAssembler } from "../infrastructure/invoice.assembler.js";
 
 const SIMULATED_BUSINESS_ID = "demo-business";
 
-// Simulated catalog: demo prices in PEN (S/ 120 / 220 / 480 per month), no real charge.
+// Monthly catalog prices in PEN and USD; no real charge.
 // The quota counts only active employees (admin and pending invites excluded).
 const SIMULATED_PLANS = [
     {
         id: "basic",
-        name: "Sentinel Esencial",
-        price: 120,
+        name: "Essential",
+        price: 50,
+        priceUsd: 15,
         currency: "PEN",
         billingCycle: "monthly",
-        maxEmployees: 5,
-        features: ["activeAlerts", "riskMap"]
+        maxEmployees: 4,
+        features: ["bracelets2", "incidentAlerts24h", "monthlyMaintenance"]
     },
     {
         id: "professional",
-        name: "Sentinel Pro",
-        price: 220,
+        name: "Professional",
+        price: 100,
+        priceUsd: 30,
         currency: "PEN",
         billingCycle: "monthly",
-        maxEmployees: 15,
-        features: ["activeAlerts", "riskMap", "alertHistory", "personnel"]
+        maxEmployees: 8,
+        features: ["bracelets5", "priorityAlerts24h", "monthlyMaintenance", "localRiskReports"]
     },
     {
         id: "enterprise",
-        name: "Sentinel Red Enterprise",
-        price: 480,
+        name: "Business",
+        price: 150,
+        priceUsd: 45,
         currency: "PEN",
         billingCycle: "monthly",
-        maxEmployees: 50,
-        features: ["activeAlerts", "riskMap", "alertHistory", "personnel", "prioritySupport"]
+        maxEmployees: 15,
+        features: ["bracelets8", "organizationPriority24h", "monthlyMaintenance", "advancedAlertsImplementation"]
     }
 ];
 
@@ -46,7 +49,7 @@ const SIMULATED_SUBSCRIPTION = {
     status: "active",
     currentPeriodEnd: "2026-11-01",
     cancelAtPeriodEnd: false,
-    maxEmployees: 15
+    maxEmployees: 8
 };
 
 // Simulated payment method: only the last 4 digits are shown.
