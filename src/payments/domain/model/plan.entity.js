@@ -1,4 +1,6 @@
+/** Subscription plan offered in the catalog. @class Plan */
 export class Plan {
+    /** Creates a plan value object. @param {Object} params - Plan attributes. */
     constructor({ id, name, price, priceUsd, currency, billingCycle, maxEmployees, features }) {
         this.id = id;
         this.name = name;
