@@ -1,4 +1,5 @@
 <script setup>
+/** Subscription management page with plans and billing. */
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useConfirm } from "primevue/useconfirm";
@@ -37,10 +38,12 @@ const topPlanId = computed(() => {
   return [...paymentsStore.plans].sort((a, b) => (b.price ?? 0) - (a.price ?? 0))[0].id;
 });
 
+/** Checks whether a plan is blocked by seat usage. @param {Object} plan - Plan entity. @returns {boolean} True when blocked. */
 function isBlocked(plan) {
   return !paymentsStore.seatUsageAvailable || plan.maxEmployees < assignedOperators.value;
 }
 
+/** Formats a plan price for the selected cycle. @param {Object} plan - Plan entity. @param {string} cycle - Billing cycle. @returns {string} Formatted price. */
 function formatPlanPrice(plan, cycle) {
   return formatMoney(planPrice(plan, currency.value, cycle), currency.value, locale.value);
 }
@@ -49,6 +52,7 @@ onMounted(() => {
   paymentsStore.fetchPaymentsData();
 });
 
+/** Asks for confirmation and applies a plan change. @param {string} planId - Plan identifier. @returns {void} */
 function handleSelectRequest(planId) {
   const next = paymentsStore.plans.find((p) => p.id === planId);
   if (!next || isBlocked(next)) return;
@@ -72,6 +76,7 @@ function handleSelectRequest(planId) {
   });
 }
 
+/** Asks for confirmation and cancels the subscription. @returns {void} */
 function handleCancelClick() {
   confirm.require({
     message: t("payments.confirmCancelMessage"),

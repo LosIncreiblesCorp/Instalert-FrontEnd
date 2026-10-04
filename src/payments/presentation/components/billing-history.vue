@@ -1,4 +1,5 @@
 ﻿<script setup>
+/** Billing history table with simulated invoices. */
 import { useI18n } from "vue-i18n";
 import { formatDate, formatMoney } from "../payments-format.js";
 
@@ -10,14 +11,17 @@ defineProps({
 
 const { locale, t } = useI18n();
 
+/** Formats an invoice issue date. @param {string} iso - ISO date string. @returns {string} Formatted date. */
 function formatIssuedAt(iso) {
   return formatDate(iso, locale.value);
 }
 
+/** Formats an invoice amount. @param {Object} invoice - Invoice entity. @returns {string} Formatted amount. */
 function formatInvoiceAmount(invoice) {
   return formatMoney(invoice.amount, invoice.currency, locale.value);
 }
 
+/** Resolves the localized invoice status label. @param {string} status - Invoice status. @returns {string} Status label. */
 function statusLabel(status) {
   return status === "paid" ? t("payments.statusPaid") : t(`payments.status.${status}`);
 }

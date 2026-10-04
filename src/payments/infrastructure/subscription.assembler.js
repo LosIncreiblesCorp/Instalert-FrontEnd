@@ -1,6 +1,8 @@
 import { Subscription } from "../domain/model/subscription.entity.js";
 
+/** Maps subscription API resources to and from domain entities. @class SubscriptionAssembler */
 export class SubscriptionAssembler {
+    /** Converts a subscription DTO to domain. @param {Object} dto - Subscription resource. @returns {import('../domain/model/subscription.entity.js').Subscription} Domain subscription. */
     static toDomain(dto) {
         return new Subscription({
             id: dto.id,
@@ -13,6 +15,7 @@ export class SubscriptionAssembler {
         });
     }
 
+    /** Converts a subscription entity to API resource. @param {import('../domain/model/subscription.entity.js').Subscription} subscription - Domain subscription. @returns {Object} Subscription resource. */
     static toResource(subscription) {
         return {
             id: subscription.id,

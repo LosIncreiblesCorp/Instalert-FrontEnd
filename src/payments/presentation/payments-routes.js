@@ -1,3 +1,4 @@
+// Lazy-loaded components
 export const paymentsRoutes = [
     {
         path: "/admin/subscription",

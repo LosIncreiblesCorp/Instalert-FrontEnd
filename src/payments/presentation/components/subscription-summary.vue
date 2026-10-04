@@ -1,4 +1,5 @@
 <script setup>
+/** Current subscription summary with seat usage. */
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { formatDate, formatMoney, planPrice } from "../payments-format.js";

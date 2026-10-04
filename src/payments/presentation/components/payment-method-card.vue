@@ -1,4 +1,5 @@
 ﻿<script setup>
+/** Saved payment method card showing only the last 4 digits. */
 // Simulated saved payment method: only the last 4 digits are displayed.
 // Card numbers are never requested, processed or stored.
 defineProps({

@@ -1,4 +1,5 @@
 <script setup>
+/** Plan card with localized pricing and selection state. */
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { planPrice, formatMoney } from "../payments-format.js";

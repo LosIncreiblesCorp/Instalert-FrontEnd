@@ -59,6 +59,7 @@ const SIMULATED_INVOICES = [
     { id: "inv-2026-07", folio: "FAC-2026-0001", issuedAt: "2026-07-15", amount: 220, currency: "PEN", status: "paid" }
 ];
 
+/** Application service store for plans, subscription and billing. @returns {Object} Payments store. */
 export const usePaymentsStore = defineStore("payments", {
     state: () => ({
         plans: [],
@@ -91,6 +92,7 @@ export const usePaymentsStore = defineStore("payments", {
         }
     },
     actions: {
+        /** Loads the plan catalog, falling back to simulated data. @returns {Promise<void>} */
         async fetchPlans() {
             this.isLoading = true;
             const api = new PaymentsApi();
@@ -108,6 +110,7 @@ export const usePaymentsStore = defineStore("payments", {
                 this.isLoading = false;
             }
         },
+        /** Loads the active subscription for a business. @param {string} businessId - Business identifier. @returns {Promise<void>} */
         async fetchSubscription(businessId = SIMULATED_BUSINESS_ID) {
             this.isLoading = true;
             this.currentSubscription = null;
@@ -127,6 +130,7 @@ export const usePaymentsStore = defineStore("payments", {
                 this.isLoading = false;
             }
         },
+        /** Loads plans, subscription, billing and seat usage. @param {string} businessId - Business identifier. @returns {Promise<void>} */
         async fetchPaymentsData(businessId = SIMULATED_BUSINESS_ID) {
             this.errorMessage = null;
             await this.fetchPlans();
@@ -134,6 +138,7 @@ export const usePaymentsStore = defineStore("payments", {
             await this.fetchBilling();
             await this.fetchActiveEmployeeCount(businessId);
         },
+        /** Loads the payment method and invoices. @returns {Promise<void>} */
         async fetchBilling() {
             this.isLoading = true;
             const api = new PaymentsApi();
@@ -161,6 +166,7 @@ export const usePaymentsStore = defineStore("payments", {
                 this.isLoading = false;
             }
         },
+        /** Loads the seat usage for a business. @param {string} businessId - Business identifier. @returns {Promise<void>} */
         async fetchActiveEmployeeCount(businessId = SIMULATED_BUSINESS_ID) {
             this.seatUsageAvailable = false;
             try {
@@ -172,6 +178,7 @@ export const usePaymentsStore = defineStore("payments", {
                 this.errorMessage = 'payments.errors.seatUsageLoad';
             }
         },
+        /** Changes the subscription to the given plan. @param {string} planId - Plan identifier. @returns {Promise<boolean>} True when applied. */
         async selectPlan(planId) {
             const plan = this.plans.find((p) => p.id === planId);
             if (!plan || !this.currentSubscription) return false;
@@ -198,6 +205,7 @@ export const usePaymentsStore = defineStore("payments", {
             }
             return true;
         },
+        /** Schedules the subscription cancellation at period end. @returns {Promise<boolean>} True when applied. */
         async cancelSubscription() {
             if (!this.currentSubscription) return false;
             this.errorMessage = null;
