@@ -10,25 +10,42 @@ const alertApi = new AlertApi();
 const demoEmployeeId = 'demo-employee';
 const countdownStorageKey = `instalert:${demoEmployeeId}:panic-countdown`;
 
+/** Application service store for the alert bounded context. @returns {Object} The alert store. */
 const useAlertStore = defineStore('alert', () => {
+    /** @type {import('vue').Ref<import('../domain/model/alert-preferences.entity.js').AlertPreferences>} */
     const preferences = ref(new AlertPreferences({
         employeeId: demoEmployeeId,
         panicGracePeriodSeconds: DEFAULT_PANIC_GRACE_PERIOD_SECONDS,
     }));
+    /** @type {import('vue').Ref<import('../domain/model/alert-record.entity.js').AlertRecord[]>} */
     const alertRecords = ref([]);
+    /** @type {import('vue').Ref<string>} */
     const currentView = ref('home');
+    /** @type {import('vue').Ref<number|null>} */
     const countdownDeadline = ref(null);
+    /** @type {import('vue').Ref<number>} */
     const countdownDurationSeconds = ref(DEFAULT_PANIC_GRACE_PERIOD_SECONDS);
+    /** @type {import('vue').Ref<number>} */
     const remainingSeconds = ref(DEFAULT_PANIC_GRACE_PERIOD_SECONDS);
+    /** @type {import('vue').Ref<Object>} */
     const countdownLocation = ref({ location: '', latitude: null, longitude: null });
+    /** @type {import('vue').Ref<Object>} */
     const reportDraft = ref(createEmptyReportDraft());
+    /** @type {import('vue').Ref<string|null>} */
     const reportKind = ref(null);
+    /** @type {import('vue').Ref<string|null>} */
     const selectedRecordId = ref(null);
+    /** @type {import('vue').Ref<string|null>} */
     const lastSubmittedRecordId = ref(null);
+    /** @type {import('vue').Ref<boolean>} */
     const isLoading = ref(false);
+    /** @type {import('vue').Ref<boolean>} */
     const isSaving = ref(false);
+    /** @type {import('vue').Ref<boolean>} */
     const isInitialized = ref(false);
+    /** @type {import('vue').Ref<boolean>} */
     const isActivatingPanic = ref(false);
+    /** @type {import('vue').Ref<string|null>} */
     const errorMessage = ref(null);
 
     const countdownProgress = computed(() => countdownDurationSeconds.value > 0
@@ -51,6 +68,7 @@ const useAlertStore = defineStore('alert', () => {
     let draftSaveTimer = null;
     let pendingDraftSave = Promise.resolve(true);
 
+    /** Creates an empty incident report draft. @returns {Object} The blank draft. */
     function createEmptyReportDraft() {
         return {
             category: '',
@@ -62,16 +80,19 @@ const useAlertStore = defineStore('alert', () => {
         };
     }
 
+    /** Extracts a readable message from an API error. @param {Object} error - Caught error. @returns {string} The message. */
     function getErrorMessage(error) {
         return error?.response?.data?.message || error?.message || 'The alert service could not complete the request.';
     }
 
+    /** Inserts or replaces a record in the local collection. @param {Object} updatedRecord - Updated record entity. @returns {void} */
     function replaceRecord(updatedRecord) {
         const index = alertRecords.value.findIndex((record) => String(record.id) === String(updatedRecord.id));
         if (index === -1) alertRecords.value.unshift(updatedRecord);
         else alertRecords.value[index] = updatedRecord;
     }
 
+    /** Removes the persisted panic countdown snapshot. @returns {void} */
     function clearCountdownSnapshot() {
         try {
             window.sessionStorage.removeItem(countdownStorageKey);
@@ -80,6 +101,7 @@ const useAlertStore = defineStore('alert', () => {
         }
     }
 
+    /** Persists the panic countdown snapshot to session storage. @returns {void} */
     function saveCountdownSnapshot() {
         try {
             window.sessionStorage.setItem(countdownStorageKey, JSON.stringify({
@@ -92,11 +114,13 @@ const useAlertStore = defineStore('alert', () => {
         }
     }
 
+    /** Stops the panic countdown interval timer. @returns {void} */
     function stopCountdownTimer() {
         if (countdownTimer) window.clearInterval(countdownTimer);
         countdownTimer = null;
     }
 
+    /** Recalculates remaining seconds and activates panic at zero. @returns {void} */
     function updateCountdown() {
         if (!countdownDeadline.value) return;
         remainingSeconds.value = Math.max(0, Math.ceil((countdownDeadline.value - Date.now()) / 1000));
@@ -106,6 +130,7 @@ const useAlertStore = defineStore('alert', () => {
         }
     }
 
+    /** Restarts the panic countdown interval timer. @returns {void} */
     function runCountdownTimer() {
         stopCountdownTimer();
         updateCountdown();
@@ -114,6 +139,7 @@ const useAlertStore = defineStore('alert', () => {
         }
     }
 
+    /** Activates a panic alert once the countdown expires. @returns {Promise<boolean>} True when activated. */
     async function activatePanic() {
         if (isActivatingPanic.value || !countdownDeadline.value) return false;
         isActivatingPanic.value = true;
@@ -157,12 +183,14 @@ const useAlertStore = defineStore('alert', () => {
         }
     }
 
+    /** Reloads alert records sorted by creation date. @returns {Promise<void>} */
     async function loadAlertRecords() {
         const response = await alertApi.getAlerts();
         alertRecords.value = AlertRecordAssembler.toEntitiesFromResponse(response)
             .sort((first, second) => Date.parse(second.createdAt ?? '') - Date.parse(first.createdAt ?? ''));
     }
 
+    /** Restores an interrupted panic countdown from storage. @returns {Promise<boolean>} True when restored. */
     async function restoreCountdown() {
         let snapshot;
         try {
@@ -181,6 +209,7 @@ const useAlertStore = defineStore('alert', () => {
         return true;
     }
 
+    /** Initializes records, preferences and any pending countdown. @returns {Promise<boolean>} True when initialized. */
     async function initialize() {
         if (isInitialized.value) return true;
         if (initializationPromise) return initializationPromise;
@@ -228,11 +257,13 @@ const useAlertStore = defineStore('alert', () => {
         return initializationPromise;
     }
 
+    /** Forces a fresh store initialization after a failure. @returns {Promise<boolean>} True when initialized. */
     async function retryInitialization() {
         isInitialized.value = false;
         return initialize();
     }
 
+    /** Reloads the alert history with loading feedback. @returns {Promise<boolean>} True when loaded. */
     async function loadHistory() {
         isLoading.value = true;
         errorMessage.value = null;
@@ -247,12 +278,14 @@ const useAlertStore = defineStore('alert', () => {
         }
     }
 
+    /** Reloads history and navigates to the history view. @returns {Promise<boolean>} True when shown. */
     async function refreshHistory() {
         if (!await loadHistory()) return false;
         currentView.value = 'history';
         return true;
     }
 
+    /** Updates the panic grace period preference. @param {number} seconds - Grace period in seconds. @returns {Promise<boolean>} True when saved. */
     async function saveGracePeriod(seconds) {
         errorMessage.value = null;
         isSaving.value = true;
@@ -274,6 +307,7 @@ const useAlertStore = defineStore('alert', () => {
         }
     }
 
+    /** Sets the countdown location and syncs it to the active record. @param {Object} [location] - Location fields. @returns {void} */
     function setCountdownLocation(location = {}) {
         countdownLocation.value = {
             location: location.location ?? '',
@@ -299,6 +333,7 @@ const useAlertStore = defineStore('alert', () => {
         }
     }
 
+    /** Starts the panic countdown with an optional location. @param {Object} [location] - Location fields. @returns {boolean} True when started. */
     function startPanicCountdown(location = {}) {
         if (!isInitialized.value || activePanicRecord.value || countdownDeadline.value) return false;
 
@@ -317,6 +352,7 @@ const useAlertStore = defineStore('alert', () => {
         return true;
     }
 
+    /** Cancels the running panic countdown. @returns {boolean} True when cancelled. */
     function cancelPanicCountdown() {
         if (!countdownDeadline.value || currentView.value !== 'countdown') return false;
         stopCountdownTimer();
@@ -328,12 +364,14 @@ const useAlertStore = defineStore('alert', () => {
         return true;
     }
 
+    /** Retries panic activation after an error view. @returns {Promise<boolean>} True when activated. */
     async function retryPanicActivation() {
         errorMessage.value = null;
         countdownDeadline.value = Date.now();
         return activatePanic();
     }
 
+    /** Finishes the active panic and opens its report form. @returns {Promise<boolean>} True when finished. */
     async function finishActivePanic() {
         const activeRecord = activePanicRecord.value;
         if (!activeRecord) return false;
@@ -360,6 +398,7 @@ const useAlertStore = defineStore('alert', () => {
         }
     }
 
+    /** Updates the panic report draft with autosave debounce. @param {Object} [fields] - Draft fields. @returns {boolean} True when applied. */
     function updatePanicReportDraft(fields = {}) {
         const record = alertRecords.value.find((item) =>
             String(item.id) === String(selectedRecordId.value)
@@ -381,6 +420,7 @@ const useAlertStore = defineStore('alert', () => {
         return true;
     }
 
+    /** Persists a pending panic report draft to the API. @param {string} recordId - Record id. @returns {Promise<boolean>} True when saved. */
     async function persistPanicReportDraft(recordId) {
         const record = alertRecords.value.find((item) => String(item.id) === String(recordId));
         if (!record || record.status !== AlertRecordStatus.PENDING_REPORT) return true;
@@ -399,6 +439,7 @@ const useAlertStore = defineStore('alert', () => {
         }
     }
 
+    /** Flushes any debounced panic draft save immediately. @returns {Promise<boolean>} True when saved. */
     async function flushPanicReportDraft() {
         if (draftSaveTimer) {
             window.clearTimeout(draftSaveTimer);
@@ -409,6 +450,7 @@ const useAlertStore = defineStore('alert', () => {
         return pendingDraftSave;
     }
 
+    /** Opens a pending panic report for editing. @param {string} recordId - Record id. @returns {boolean} True when resumed. */
     function resumePanicReport(recordId) {
         const record = alertRecords.value.find((item) =>
             String(item.id) === String(recordId)
@@ -420,6 +462,7 @@ const useAlertStore = defineStore('alert', () => {
         return true;
     }
 
+    /** Saves the panic draft and returns to the home view. @returns {Promise<boolean>} True when deferred. */
     async function deferPanicReport() {
         if (!await flushPanicReportDraft()) return false;
         currentView.value = 'home';
@@ -427,6 +470,7 @@ const useAlertStore = defineStore('alert', () => {
         return true;
     }
 
+    /** Completes the selected panic report after flushing drafts. @returns {Promise<boolean>} True when completed. */
     async function completePanicReport() {
         if (!await flushPanicReportDraft()) return false;
         const record = alertRecords.value.find((item) => String(item.id) === String(selectedRecordId.value));
@@ -454,6 +498,7 @@ const useAlertStore = defineStore('alert', () => {
         }
     }
 
+    /** Starts a non-panic incident report draft. @param {string} kind - Report kind. @returns {boolean} True when started. */
     function startReport(kind) {
         if (!Object.values(AlertRecordKind).includes(kind) || kind === AlertRecordKind.PANIC) return false;
         reportKind.value = kind;
@@ -463,12 +508,14 @@ const useAlertStore = defineStore('alert', () => {
         return true;
     }
 
+    /** Merges fields into the current report draft. @param {Object} [fields] - Draft fields. @returns {boolean} True when applied. */
     function updateReportDraft(fields = {}) {
         if (currentView.value !== 'report-form') return false;
         reportDraft.value = { ...reportDraft.value, ...fields };
         return true;
     }
 
+    /** Submits the current incident report draft to the API. @returns {Promise<boolean>} True when submitted. */
     async function submitReport() {
         if (currentView.value !== 'report-form' || !reportKind.value) return false;
 
@@ -499,6 +546,7 @@ const useAlertStore = defineStore('alert', () => {
         }
     }
 
+    /** Discards the report draft and returns to the home view. @returns {void} */
     function discardReportDraft() {
         reportKind.value = null;
         reportDraft.value = createEmptyReportDraft();
@@ -506,26 +554,31 @@ const useAlertStore = defineStore('alert', () => {
         currentView.value = 'home';
     }
 
+    /** Flushes drafts and navigates to the history view. @returns {Promise<boolean>} True when shown. */
     async function showHistory() {
         if (currentView.value === 'panic-report' && !await flushPanicReportDraft()) return false;
         return refreshHistory();
     }
 
+    /** Returns from history to the countdown, active or home view. @returns {void} */
     function backFromHistory() {
         currentView.value = countdownDeadline.value
             ? 'countdown'
             : activePanicRecord.value ? 'active' : 'home';
     }
 
+    /** Opens a record detail view. @param {string} recordId - Record id. @returns {void} */
     function openRecord(recordId) {
         selectedRecordId.value = recordId;
         currentView.value = 'record-detail';
     }
 
+    /** Closes the record detail and returns to history. @returns {void} */
     function closeRecordDetail() {
         currentView.value = 'history';
     }
 
+    /** Opens the home, countdown or active view as applicable. @returns {void} */
     function openHome() {
         currentView.value = countdownDeadline.value
             ? 'countdown'

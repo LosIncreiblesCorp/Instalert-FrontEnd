@@ -1,3 +1,4 @@
+// Lazy-loaded components
 const employeeAlerts = () => import('./views/employee-alerts.vue');
 
 const alertRoutes = [

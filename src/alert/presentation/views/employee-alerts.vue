@@ -1,4 +1,5 @@
 <script setup>
+/** Employee alerts view with panic flow and report history. */
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
@@ -214,6 +215,7 @@ onUnmounted(() => {
   window.clearInterval(elapsedTimeInterval);
 });
 
+/** Formats an ISO date for display in the current locale. @param {string} value - ISO date value. @returns {string} The formatted date. */
 function formatDate(value) {
   if (!value) return t('alerts.workflow.notRecorded');
   const date = new Date(value);
@@ -222,10 +224,12 @@ function formatDate(value) {
   return new Intl.DateTimeFormat(language, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 }
 
+/** Resolves the localized title for an alert kind. @param {string} kind - Alert kind. @returns {string} The localized title. */
 function titleForKind(kind) {
   return t(`alerts.workflow.kinds.${kind}`);
 }
 
+/** Formats a report moment key or date for display. @param {string} value - Moment key or date. @returns {string} The formatted moment. */
 function formatReportMoment(value) {
   if (['now', '15-30-minutes', 'over-one-hour'].includes(value)) {
     return t(`alerts.workflow.moments.${value}`);
@@ -233,14 +237,17 @@ function formatReportMoment(value) {
   return formatDate(value);
 }
 
+/** Resolves the localized label for a category. @param {string} category - Category key. @returns {string} The localized label. */
 function titleForCategory(category) {
   return category ? t(`alerts.workflow.categories.${category}`) : t('alerts.workflow.notRecorded');
 }
 
+/** Resolves the localized label for a record status. @param {string} status - Record status. @returns {string} The localized label. */
 function statusLabel(status) {
   return t(`alerts.workflow.statuses.${status}`);
 }
 
+/** Requests geolocation and stores it in the given form target. @param {string} target - Form target key. @returns {void} */
 function requestCurrentLocation(target) {
   locationFeedback.value = 'requesting';
   if (!navigator.geolocation) {
@@ -266,6 +273,7 @@ function requestCurrentLocation(target) {
   }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 });
 }
 
+/** Preloads location when geolocation permission is already granted. @param {string} target - Form target key. @returns {Promise<void>} */
 async function preloadLocationIfAlreadyAllowed(target) {
   try {
     const permission = await navigator.permissions?.query({ name: 'geolocation' });
@@ -275,6 +283,7 @@ async function preloadLocationIfAlreadyAllowed(target) {
   }
 }
 
+/** Saves pending preferences if needed and starts the panic countdown. @returns {Promise<void>} */
 async function startPanic() {
   if (preferenceSavePromise && !await preferenceSavePromise) return;
   if (Number(gracePeriodDraft.value) !== preferences.value.panicGracePeriodSeconds
@@ -282,6 +291,7 @@ async function startPanic() {
   if (store.startPanicCountdown()) void preloadLocationIfAlreadyAllowed('panic');
 }
 
+/** Validates and saves the grace period draft preference. @returns {Promise<boolean>} True when saved. */
 async function saveGracePeriod() {
   const seconds = Number(gracePeriodDraft.value);
   if (seconds === preferences.value.panicGracePeriodSeconds) return true;
@@ -305,10 +315,12 @@ async function saveGracePeriod() {
   }
 }
 
+/** Starts an incident report draft of the given kind. @param {string} kind - Report kind. @returns {void} */
 function startReport(kind) {
   if (store.startReport(kind)) void preloadLocationIfAlreadyAllowed('report');
 }
 
+/** Asks the user to confirm discarding the report draft. @returns {Promise<boolean>} True when discarded. */
 function confirmDiscardReport() {
   return new Promise((resolve) => {
     let completed = false;
@@ -331,6 +343,7 @@ function confirmDiscardReport() {
   });
 }
 
+/** Guards navigation by flushing drafts before leaving the view. @param {string} destination - Destination view key. @returns {Promise<void>} */
 async function leaveCurrentView(destination) {
   if (hasUnsavedReportDraft.value) {
     if (!await confirmDiscardReport()) return;
@@ -342,25 +355,30 @@ async function leaveCurrentView(destination) {
   else store.openHome();
 }
 
+/** Navigates to the alert history view. @returns {Promise<void>} */
 async function openHistory() {
   await leaveCurrentView('history');
 }
 
+/** Opens a history record detail. @param {string} recordId - Record id. @returns {void} */
 function openHistoryRecord(recordId) {
   if (isHistoryOnly.value) historyRecordId.value = recordId;
   else store.openRecord(recordId);
 }
 
+/** Closes the open history record detail. @returns {void} */
 function closeHistoryRecord() {
   if (isHistoryOnly.value) historyRecordId.value = null;
   else store.closeRecordDetail();
 }
 
+/** Retries loading alerts after a failure. @returns {Promise<boolean>} True when reloaded. */
 function retryLoading() {
   if (isHistoryOnly.value) return store.loadHistory();
   return store.retryInitialization();
 }
 
+/** Validates and submits the incident report draft. @returns {Promise<void>} */
 async function submitOtherReport() {
   if (!reportFormIsComplete.value) {
     reportValidationError.value = true;
@@ -370,6 +388,7 @@ async function submitOtherReport() {
   await store.submitReport();
 }
 
+/** Validates and completes the panic report. @returns {Promise<void>} */
 async function completePanicReport() {
   if (!panicFormIsComplete.value) {
     panicValidationError.value = true;
@@ -379,6 +398,7 @@ async function completePanicReport() {
   await store.completePanicReport();
 }
 
+/** Route guard deciding whether the current view can be left. @returns {Promise<boolean>} True when navigation may continue. */
 async function canLeaveCurrentView() {
   if (isHistoryOnly.value) return true;
   if (hasUnsavedReportDraft.value) {
