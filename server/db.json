@@ -1,3 +1,101 @@
 {
-
+  "alerts": [
+    {
+      "employeeId": "demo-employee",
+      "kind": "panic",
+      "status": "pending-report",
+      "category": "other",
+      "location": "-12.07334, -77.05891",
+      "latitude": -12.073338,
+      "longitude": -77.058907,
+      "moment": "",
+      "description": "",
+      "createdAt": "2026-10-03T22:26:06.559Z",
+      "activatedAt": "2026-10-03T22:26:06.559Z",
+      "endedAt": "2026-10-03T22:26:19.226Z",
+      "submittedAt": null,
+      "completedAt": null,
+      "updatedAt": "2026-10-03T22:26:36.779Z",
+      "id": 1
+    },
+    {
+      "employeeId": "demo-employee",
+      "kind": "panic",
+      "status": "pending-report",
+      "category": "",
+      "location": "-12.07334, -77.05891",
+      "latitude": -12.073338,
+      "longitude": -77.058907,
+      "moment": "",
+      "description": "",
+      "createdAt": "2026-10-03T22:27:21.030Z",
+      "activatedAt": "2026-10-03T22:27:21.030Z",
+      "endedAt": "2026-10-03T22:27:36.212Z",
+      "submittedAt": null,
+      "completedAt": null,
+      "updatedAt": "2026-10-03T22:27:36.212Z",
+      "id": 2
+    },
+    {
+      "employeeId": "demo-employee",
+      "kind": "panic",
+      "status": "pending-report",
+      "category": "",
+      "location": "-12.07288, -77.05978",
+      "latitude": -12.072882,
+      "longitude": -77.059775,
+      "moment": "",
+      "description": "",
+      "createdAt": "2026-10-03T22:29:58.874Z",
+      "activatedAt": "2026-10-03T22:29:58.874Z",
+      "endedAt": "2026-10-03T22:36:13.503Z",
+      "submittedAt": null,
+      "completedAt": null,
+      "updatedAt": "2026-10-03T22:36:13.503Z",
+      "id": 3
+    },
+    {
+      "employeeId": "demo-employee",
+      "kind": "panic",
+      "status": "pending-report",
+      "category": "",
+      "location": "-12.07306, -77.06013",
+      "latitude": -12.0730554968867,
+      "longitude": -77.06013371276181,
+      "moment": "",
+      "description": "",
+      "createdAt": "2026-10-03T22:51:07.752Z",
+      "activatedAt": "2026-10-03T22:51:07.752Z",
+      "endedAt": "2026-10-03T22:51:17.689Z",
+      "submittedAt": null,
+      "completedAt": null,
+      "updatedAt": "2026-10-03T22:51:17.689Z",
+      "id": 4
+    },
+    {
+      "employeeId": "demo-employee",
+      "kind": "suspicious-activity",
+      "status": "submitted",
+      "category": "vehicle",
+      "location": "-12.07275, -77.06015",
+      "latitude": -12.072746538393877,
+      "longitude": -77.06014573568476,
+      "moment": "2003-05-31T00:55:00.000Z",
+      "description": "vi un vehiculo negro sospechoso que se quedo viendo el negocio",
+      "createdAt": "2026-10-04T00:56:03.418Z",
+      "activatedAt": null,
+      "endedAt": null,
+      "submittedAt": "2026-10-04T00:56:03.418Z",
+      "completedAt": null,
+      "updatedAt": "2026-10-04T00:56:03.418Z",
+      "id": 5
+    }
+  ],
+  "alertPreferences": [
+    {
+      "employeeId": "demo-employee",
+      "panicGracePeriodSeconds": 2,
+      "id": 1
+    }
+  ]
 }
