@@ -32,6 +32,7 @@ const employeeItems = [
   { key: "dashboard", label: "navigation.employeeDashboard", icon: "pi pi-home", routeName: "employee-dashboard" },
   { key: "risk-map", label: "navigation.riskMap", icon: "pi pi-map", routeName: "employee-risk-map" },
   { key: "alerts", label: "navigation.alerts", icon: "pi pi-bell", routeName: "employee-alerts" },
+  { key: "contacts", label: "navigation.emergencyContacts", icon: "pi pi-address-book", routeName: "employee-contacts" },
 ];
 
 const navigationItems = computed(() =>
