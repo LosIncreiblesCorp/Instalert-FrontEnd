@@ -3909,7 +3909,11 @@
       "currency": "PEN",
       "billingCycle": "monthly",
       "maxEmployees": 4,
-      "features": ["bracelets2", "incidentAlerts24h", "monthlyMaintenance"]
+      "features": [
+        "bracelets2",
+        "incidentAlerts24h",
+        "monthlyMaintenance"
+      ]
     },
     {
       "id": "demo-standard",
@@ -3919,7 +3923,12 @@
       "currency": "PEN",
       "billingCycle": "monthly",
       "maxEmployees": 8,
-      "features": ["bracelets5", "priorityAlerts24h", "monthlyMaintenance", "localRiskReports"]
+      "features": [
+        "bracelets5",
+        "priorityAlerts24h",
+        "monthlyMaintenance",
+        "localRiskReports"
+      ]
     },
     {
       "id": "demo-extended",
@@ -3929,10 +3938,27 @@
       "currency": "PEN",
       "billingCycle": "monthly",
       "maxEmployees": 15,
-      "features": ["bracelets8", "organizationPriority24h", "monthlyMaintenance", "advancedAlertsImplementation"]
+      "features": [
+        "bracelets8",
+        "organizationPriority24h",
+        "monthlyMaintenance",
+        "advancedAlertsImplementation"
+      ]
     }
   ],
-  "emergency-contacts": [],
+  "emergency-contacts": [
+    {
+      "employeeId": "demo-employee",
+      "fullName": "Jose Perez",
+      "relationship": "Amigo",
+      "phone": "+51981474844",
+      "email": "joseasto24@gmail.com",
+      "notes": "vive en cll huaraz",
+      "createdAt": "2026-10-04T16:46:09.216Z",
+      "updatedAt": "2026-10-04T16:46:09.216Z",
+      "id": 1
+    }
+  ],
   "subscriptions": [
     {
       "id": "sub-demo-01",
