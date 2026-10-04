@@ -19,6 +19,7 @@ const employeeAlertRoutes = alertRoutes.map((route) => ({
   },
 }));
 
+// Define lazy-loaded components
 const routes = [
   { path: "/", redirect: { name: "admin-dashboard" } },
   { path: "/admin", redirect: { name: "admin-dashboard" } },
@@ -100,7 +101,9 @@ const router = createRouter({
   routes,
 });
 
+/** Updates the document title on each navigation. @param {import('vue-router').RouteLocationNormalized} to - Target route. @param {import('vue-router').RouteLocationNormalized} from - Current route. @returns {void} */
 router.beforeEach((to) => {
+  // Set the page title
   document.title = `InstAlert | ${i18n.global.t(to.meta.title ?? "common.appName")}`;
 });
 

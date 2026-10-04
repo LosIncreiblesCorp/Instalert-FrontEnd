@@ -56,6 +56,7 @@ watch(
   { immediate: true },
 );
 
+/** Closes the mobile navigation drawer. @returns {void} */
 function closeMobileNavigation() {
   mobileNavigationOpen.value = false;
 }
