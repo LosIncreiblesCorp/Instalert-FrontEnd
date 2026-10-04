@@ -3932,6 +3932,7 @@
       "features": ["bracelets8", "organizationPriority24h", "monthlyMaintenance", "advancedAlertsImplementation"]
     }
   ],
+  "emergency-contacts": [],
   "subscriptions": [
     {
       "id": "sub-demo-01",
