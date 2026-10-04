@@ -13,8 +13,6 @@ const employeeAlertRoutes = alertRoutes.map((route) => ({
     role: "employee",
     menuKey: "alerts",
     panicActionAvailable: true,
-    // The current alert view owns its shell; remove this when rebuilding it on Shared Layout.
-    standalone: true,
   },
 }));
 
@@ -33,18 +31,17 @@ const routes = [
     component: EmptyRouteView,
     meta: { role: "administrator", menuKey: "risk-map", title: "navigation.riskMap" },
   },
-  { path: "/admin/alerts", redirect: { name: "admin-alerts-active" } },
+  { path: "/admin/alerts", redirect: { name: "admin-alerts-history" } },
   {
     path: "/admin/alerts/active",
     name: "admin-alerts-active",
-    component: EmptyRouteView,
-    meta: { role: "administrator", menuKey: "alerts", alertView: "active", title: "navigation.activeAlerts" },
+    redirect: { name: "admin-alerts-history" },
   },
   {
     path: "/admin/alerts/history",
     name: "admin-alerts-history",
-    component: EmptyRouteView,
-    meta: { role: "administrator", menuKey: "alerts", alertView: "history", title: "navigation.alertHistory" },
+    component: () => import("./alert/presentation/views/employee-alerts.vue"),
+    meta: { role: "administrator", menuKey: "alerts", alertView: "history", historyOnly: true, title: "navigation.alertHistory" },
   },
   {
     path: "/admin/personnel",
