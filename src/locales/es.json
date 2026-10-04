@@ -164,7 +164,66 @@
     "activeAlerts": "Alertas activas",
     "alertHistory": "Historial de alertas",
     "personnel": "Personal",
+    "emergencyContacts": "Contactos de emergencia",
     "subscription": "Suscripción"
+  },
+  "contacts": {
+    "eyebrow": "Tu círculo de confianza",
+    "title": "Mis contactos de emergencia",
+    "description": "Mantén los datos de tus familiares y personas de confianza en un solo lugar.",
+    "search": "Buscar por nombre, teléfono, relación o correo",
+    "total": "Contactos: {count}",
+    "loading": "Cargando contactos…",
+    "emptyTitle": "Tus contactos de emergencia, a mano",
+    "emptyHelp": "Agrega tu primer contacto para tener su información disponible cuando la necesites.",
+    "noResults": "No hay contactos que coincidan",
+    "noResultsHelp": "Prueba con otro nombre, teléfono o relación.",
+    "fields": {
+      "fullName": "Nombre completo",
+      "relationship": "Parentesco o relación",
+      "phone": "Número de teléfono",
+      "email": "Correo electrónico",
+      "notes": "Notas u observaciones"
+    },
+    "form": {
+      "createTitle": "Nuevo contacto de emergencia",
+      "editTitle": "Editar contacto de emergencia",
+      "description": "Ingresa los datos de una persona de confianza. Puedes actualizarlos cuando lo necesites.",
+      "relationshipPlaceholder": "Familiar, amigo, vecino…",
+      "phoneHelp": "Ingresa entre 7 y 15 dígitos. Puedes incluir el código de país, por ejemplo +51.",
+      "optional": "Opcional",
+      "characters": "{count}/{max} caracteres",
+      "requiredHelp": "Los campos marcados con * son obligatorios."
+    },
+    "actions": {
+      "add": "Agregar contacto",
+      "save": "Guardar contacto",
+      "saveChanges": "Guardar cambios",
+      "back": "Volver a contactos",
+      "cancel": "Cancelar",
+      "refresh": "Actualizar",
+      "editContact": "Editar contacto {name}",
+      "deleteContact": "Eliminar contacto {name}",
+      "delete": "Eliminar",
+      "deleteTitle": "Eliminar contacto de emergencia",
+      "deleteMessage": "¿Eliminar a {name} de tus contactos de emergencia?"
+    },
+    "messages": {
+      "created": "Contacto de emergencia agregado.",
+      "updated": "Datos del contacto actualizados.",
+      "deleted": "Contacto de emergencia eliminado."
+    },
+    "errors": {
+      "ownerRequired": "No se pudo identificar al empleado.",
+      "nameInvalid": "Ingresa un nombre de entre 1 y 100 caracteres.",
+      "relationshipInvalid": "Ingresa una relación de entre 1 y 60 caracteres.",
+      "phoneInvalid": "Ingresa un teléfono válido de 7 a 15 dígitos, con código de país + opcional.",
+      "emailInvalid": "Ingresa un correo válido o deja el campo vacío.",
+      "notesInvalid": "Las notas pueden tener hasta 140 caracteres.",
+      "notFound": "Este contacto ya no está disponible. Vuelve a tu lista de contactos.",
+      "load": "No se pudieron cargar tus contactos. Actualiza e inténtalo nuevamente.",
+      "save": "No se pudo guardar el cambio. Inténtalo nuevamente."
+    }
   },
   "payments": {
     "title": "Suscripción y facturación",
