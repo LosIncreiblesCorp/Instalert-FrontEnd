@@ -2,8 +2,20 @@ import { createRouter, createWebHistory } from "vue-router";
 import { i18n } from "./i18n.js";
 import PageNotFound from "./shared/presentation/views/page-not-found.vue";
 import businessRoutes from "./business/presentation/business-routes.js";
+import alertRoutes from "./alert/presentation/alert-routes.js";
 
 const EmptyRouteView = { render: () => null };
+
+const employeeAlertRoutes = alertRoutes.map((route) => ({
+  ...route,
+  path: `/employee/${route.path}`,
+  meta: {
+    ...route.meta,
+    role: "employee",
+    menuKey: "alerts",
+    panicActionAvailable: true,
+  },
+}));
 
 const routes = [
   { path: "/", redirect: { name: "admin-dashboard" } },
@@ -17,21 +29,20 @@ const routes = [
   {
     path: "/admin/risk-map",
     name: "admin-risk-map",
-    component: EmptyRouteView,
+    component: () => import('./mapping/presentation/views/risk-map-page.vue'),
     meta: { role: "administrator", menuKey: "risk-map", title: "navigation.riskMap" },
   },
-  { path: "/admin/alerts", redirect: { name: "admin-alerts-active" } },
+  { path: "/admin/alerts", redirect: { name: "admin-alerts-history" } },
   {
     path: "/admin/alerts/active",
     name: "admin-alerts-active",
-    component: EmptyRouteView,
-    meta: { role: "administrator", menuKey: "alerts", alertView: "active", title: "navigation.activeAlerts" },
+    redirect: { name: "admin-alerts-history" },
   },
   {
     path: "/admin/alerts/history",
     name: "admin-alerts-history",
-    component: EmptyRouteView,
-    meta: { role: "administrator", menuKey: "alerts", alertView: "history", title: "navigation.alertHistory" },
+    component: () => import("./alert/presentation/views/employee-alerts.vue"),
+    meta: { role: "administrator", menuKey: "alerts", alertView: "history", historyOnly: true, title: "navigation.alertHistory" },
   },
   ...businessRoutes,
   {
@@ -62,15 +73,10 @@ const routes = [
   {
     path: "/employee/risk-map",
     name: "employee-risk-map",
-    component: EmptyRouteView,
+    component: () => import('./mapping/presentation/views/risk-map-page.vue'),
     meta: { role: "employee", menuKey: "risk-map", title: "navigation.riskMap" },
   },
-  {
-    path: "/employee/alerts",
-    name: "employee-alerts",
-    component: EmptyRouteView,
-    meta: { role: "employee", menuKey: "alerts", panicActionAvailable: true, title: "navigation.alerts" },
-  },
+  ...employeeAlertRoutes,
   {
     path: "/employee/profile",
     name: "employee-profile",

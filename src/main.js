@@ -1,8 +1,9 @@
 import { createApp, watch } from 'vue'
 import PrimeVue from 'primevue/config'
-import { Button, Column, ConfirmationService, ConfirmDialog, DataTable, InputText, SelectButton } from 'primevue'
+import { Button, Card, Column, ConfirmationService, ConfirmDialog, DataTable, DatePicker, InputNumber, InputText, Select, SelectButton, Textarea } from 'primevue'
 import Material from '@primeuix/themes/material'
 import 'primeicons/primeicons.css'
+import 'primeflex/primeflex.css'
 import './style.css'
 import App from './App.vue'
 import i18n, { localeStorageKey, supportedLocales } from './i18n'
@@ -24,9 +25,14 @@ app
     .component('pv-button', Button)
     .component('pv-column', Column)
     .component('pv-data-table', DataTable)
-    .component('pv-input-text', InputText)
     .component('pv-confirm-dialog', ConfirmDialog)
+    .component('pv-card', Card)
+    .component('pv-date-picker', DatePicker)
+    .component('pv-input-number', InputNumber)
+    .component('pv-input-text', InputText)
+    .component('pv-select', Select)
     .component('pv-select-button', SelectButton)
+    .component('pv-textarea', Textarea)
     .use(router)
     .use(pinia)
 
@@ -34,6 +40,9 @@ watch(i18n.global.locale, (locale) => {
     const selectedLocale = supportedLocales.includes(locale) ? locale : 'en'
 
     document.documentElement.lang = selectedLocale === 'es' ? 'es-419' : 'en-US'
+    const { aria: calendarLabels, ...calendarLocale } = i18n.global.tm('common.calendar')
+    const primeVueLocale = app.config.globalProperties.$primevue.config.locale
+    Object.assign(primeVueLocale, calendarLocale, calendarLabels)
 
     try {
         window.localStorage.setItem(localeStorageKey, selectedLocale)

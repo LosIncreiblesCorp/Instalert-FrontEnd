@@ -19,12 +19,11 @@ const homeRouteName = computed(() =>
 const profileRouteName = computed(() =>
   isAdministrator.value ? "admin-profile" : "employee-profile",
 );
-const currentTitle = computed(() => t(route.meta.title ?? "common.appName"));
 
 const administratorItems = [
   { key: "dashboard", label: "navigation.adminDashboard", icon: "pi pi-home", routeName: "admin-dashboard" },
   { key: "risk-map", label: "navigation.riskMap", icon: "pi pi-map", routeName: "admin-risk-map" },
-  { key: "alerts", label: "navigation.alerts", icon: "pi pi-bell", routeName: "admin-alerts-active" },
+  { key: "alerts", label: "navigation.alerts", icon: "pi pi-bell", routeName: "admin-alerts-history" },
   { key: "personnel", label: "navigation.personnel", icon: "pi pi-users", routeName: "admin-personnel" },
   { key: "subscription", label: "navigation.subscription", icon: "pi pi-credit-card", routeName: "admin-subscription" },
 ];
@@ -135,7 +134,6 @@ function closeMobileNavigation() {
     </aside>
 
     <main id="main-content" class="workspace-main" tabindex="-1">
-      <h1 class="visually-hidden">{{ currentTitle }}</h1>
       <RouterView />
     </main>
   </div>
