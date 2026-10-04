@@ -11,7 +11,35 @@
     "notFoundCode": "ERROR 404",
     "notFoundTitle": "Página no encontrada",
     "notFoundDescription": "La página solicitada no existe o pudo haber cambiado de dirección.",
-    "goBack": "Volver"
+    "goBack": "Volver",
+    "calendar": {
+      "firstDayOfWeek": 1,
+      "dayNames": ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
+      "dayNamesShort": ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"],
+      "dayNamesMin": ["do", "lu", "ma", "mi", "ju", "vi", "sá"],
+      "monthNames": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+      "monthNamesShort": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
+      "today": "Hoy",
+      "clear": "Limpiar",
+      "aria": {
+        "chooseDate": "Elegir fecha y hora",
+        "prevMonth": "Mes anterior",
+        "nextMonth": "Mes siguiente",
+        "prevYear": "Año anterior",
+        "nextYear": "Año siguiente",
+        "prevDecade": "Década anterior",
+        "nextDecade": "Década siguiente",
+        "chooseMonth": "Elegir mes",
+        "chooseYear": "Elegir año",
+        "switchToMonthView": "Elegir mes",
+        "switchToYearView": "Elegir año",
+        "switchToDayView": "Elegir día",
+        "prevHour": "Hora anterior",
+        "nextHour": "Hora siguiente",
+        "prevMinute": "Minuto anterior",
+        "nextMinute": "Minuto siguiente"
+      }
+    }
   },
   "roles": {
     "administrator": "Administrador",
@@ -30,6 +58,193 @@
     "subscription": "Suscripción"
   },
   "alerts": {
+    "workflow": {
+      "sectionLabel": "Centro operativo de alertas",
+      "subtitle": "Activa una alerta de pánico o registra una situación para el equipo.",
+      "loading": "Cargando datos de alertas…",
+      "saving": "Guardando cambios…",
+      "notRecorded": "Sin registrar",
+      "preference": {
+        "title": "Cuenta regresiva de pánico",
+        "description": "Elige cuánto tiempo tienes para cancelar antes de que la alerta se active.",
+        "seconds": "Segundos de gracia",
+        "range": "Entre 1 y 60 segundos · inicial: 5",
+        "compactRange": "1–60 segundos",
+        "increase": "Aumentar segundos de gracia",
+        "decrease": "Disminuir segundos de gracia",
+        "saved": "Preferencia guardada.",
+        "failed": "No se pudo guardar la preferencia.",
+        "invalid": "Ingresa un número entero entre 1 y 60."
+      },
+      "panic": {
+        "activate": "Activar alerta de pánico",
+        "title": "Alerta de pánico",
+        "description": "Para robos, asaltos o situaciones de peligro en curso.",
+        "start": "Iniciar cuenta regresiva · {seconds} s",
+        "disclaimer": "La cuenta continúa aunque navegues a otra sección. Cancélala antes de que llegue a cero si fue accidental."
+      },
+      "reports": {
+        "title": "Otros reportes",
+        "subtitle": "Registra un incidente anterior, una actividad sospechosa u otra condición de la zona."
+      },
+      "reportKinds": {
+        "past-incident": {
+          "description": "Informa algo que ocurrió antes y que no pudiste reportar con el botón de pánico.",
+          "action": "Reportar incidente pasado"
+        },
+        "suspicious-activity": {
+          "description": "Describe una persona, vehículo o comportamiento que te parezca inusual.",
+          "action": "Reportar actividad sospechosa"
+        },
+        "other-situation": {
+          "description": "Avisa sobre poca iluminación, presencia policial u otra condición del entorno.",
+          "action": "Reportar otra situación"
+        },
+        "cancel": "Descartar reporte",
+        "submit": "Enviar reporte"
+      },
+      "kinds": {
+        "all": "Todos los tipos",
+        "panic": "Alerta de pánico",
+        "past-incident": "Incidente pasado",
+        "suspicious-activity": "Actividad sospechosa",
+        "other-situation": "Otra situación"
+      },
+      "categories": {
+        "robbery": "Robo",
+        "attemptedRobbery": "Intento de robo",
+        "assault": "Asalto",
+        "extortion": "Extorsión",
+        "vandalism": "Vandalismo",
+        "person": "Persona sospechosa",
+        "vehicle": "Vehículo sospechoso",
+        "unusualBehavior": "Comportamiento inusual",
+        "surveillance": "Vigilancia o seguimiento",
+        "lowLighting": "Poca iluminación",
+        "policePresence": "Presencia policial",
+        "roadBlockage": "Vía o zona bloqueada",
+        "other": "Otro"
+      },
+      "moments": {
+        "now": "En este momento",
+        "15-30-minutes": "Hace 15–30 minutos",
+        "over-one-hour": "Hace más de una hora"
+      },
+      "categoryDescriptions": {
+        "robbery": "Sustracción consumada",
+        "attemptedRobbery": "Intento de sustracción",
+        "assault": "Violencia o intimidación",
+        "extortion": "Amenazas o exigencias",
+        "vandalism": "Daños a la propiedad",
+        "person": "Acciones sospechosas cerca",
+        "vehicle": "Actividad vehicular inusual",
+        "unusualBehavior": "Algo fuera de lo habitual",
+        "surveillance": "Observación o seguimiento",
+        "lowLighting": "Poca visibilidad en la zona",
+        "policePresence": "Actividad policial cercana",
+        "roadBlockage": "Acceso o paso obstruido",
+        "other": "Describe otra situación"
+      },
+      "statuses": {
+        "all": "Todos los estados",
+        "active": "Activa",
+        "pending-report": "Falta completar",
+        "completed": "Terminada",
+        "submitted": "Enviado",
+        "resolved": "Resuelta",
+        "false-alarm": "Falsa alarma"
+      },
+      "location": {
+        "useCurrent": "Usar mi ubicación",
+        "manualPlaceholder": "Escribe una dirección o referencia",
+        "requesting": "Obteniendo la ubicación actual…",
+        "ready": "Ubicación actual registrada; puedes editarla.",
+        "manualHelp": "No se pudo obtener la ubicación. Puedes escribir una referencia manualmente.",
+        "notAvailable": "Ubicación no disponible"
+      },
+      "form": {
+        "category": "Tipo de incidente",
+        "chooseCategory": "Selecciona una opción",
+        "location": "Ubicación",
+        "moment": "¿Cuándo ocurrió?",
+        "dateTimePlaceholder": "Selecciona fecha y hora",
+        "dateTimeHelp": "Elige la fecha y hora exacta (formato de 24 horas), en tu zona horaria local. No se permiten fechas futuras.",
+        "description": "Descripción",
+        "descriptionPlaceholder": "Describe lo ocurrido con la información que recuerdes.",
+        "required": "Completa los campos obligatorios antes de continuar.",
+        "noAttachments": "Este reporte no admite fotos ni archivos adjuntos."
+      },
+      "countdown": {
+        "badge": "Cuenta regresiva cancelable",
+        "title": "La alerta se activará en {seconds} segundos",
+        "description": "Si fue un error, cancélala ahora. Si no la cancelas, se activará automáticamente.",
+        "remaining": "Quedan {seconds} segundos para cancelar la alerta",
+        "remainingLabel": "Tiempo restante",
+        "seconds": "segundos",
+        "continues": "La cuenta continúa aunque cambies de sección dentro de la aplicación.",
+        "cancel": "Cancelar alerta de pánico"
+      },
+      "active": {
+        "status": "Alerta activa",
+        "title": "La alerta de pánico está activa",
+        "subtitle": "La situación se muestra en el historial del equipo mientras permanezca activa.",
+        "startedAt": "Hora de activación",
+        "elapsed": "Tiempo activo",
+        "elapsedHelp": "Tiempo desde que se activó la alerta",
+        "location": "Ubicación registrada",
+        "finishHelp": "Finaliza la alerta solo cuando la situación de peligro haya terminado.",
+        "finish": "Finalizar situación de pánico",
+        "open": "Ver alerta activa"
+      },
+      "panicReport": {
+        "title": "Completa el reporte del incidente",
+        "subtitle": "La alerta terminó. Su registro seguirá como pendiente hasta que completes y guardes este reporte.",
+        "autosave": "El avance se guarda automáticamente. Puedes completarlo luego desde el historial.",
+        "later": "Completar más tarde",
+        "complete": "Completar y guardar reporte"
+      },
+      "pending": {
+        "title": "Tienes un reporte pendiente",
+        "subtitle": "El registro seguirá como «Falta completar» hasta que lo completes.",
+        "action": "Continuar reporte"
+      },
+      "results": {
+        "sentTitle": "Reporte enviado",
+        "sentDescription": "El reporte ya está registrado y puede consultarse en el historial.",
+        "completedTitle": "Reporte completado",
+        "completedDescription": "El reporte de la alerta de pánico se guardó y aparece como terminado en el historial."
+      },
+      "history": {
+        "label": "Registro del usuario",
+        "title": "Historial de alertas",
+        "open": "Ver historial",
+        "subtitle": "Consulta las alertas activas y los reportes registrados.",
+        "count": "{count} registros",
+        "filters": "Filtros del historial",
+        "search": "Buscar por tipo, descripción o ubicación",
+        "kindFilter": "Tipo",
+        "statusFilter": "Estado",
+        "openRecord": "Ver detalle del registro",
+        "emptyTitle": "Todavía no hay registros",
+        "emptyDescription": "Las alertas activas, los reportes pendientes y los reportes enviados aparecerán aquí.",
+        "createdAt": "Fecha de registro",
+        "record": "Registro",
+        "readOnly": "Los reportes enviados se pueden consultar, pero no editar.",
+        "back": "Volver"
+      },
+      "discard": {
+        "header": "¿Descartar este reporte?",
+        "message": "Si sales ahora, el reporte no se enviará ni aparecerá en el historial.",
+        "confirm": "Descartar reporte",
+        "keepEditing": "Seguir editando"
+      },
+      "home": { "back": "Volver a Alertas" },
+      "actions": { "retry": "Reintentar" },
+      "errors": {
+        "requestFailed": "No se pudo comunicar con el servicio de alertas. Verifica que JSON Server esté ejecutándose e inténtalo de nuevo.",
+        "activationTitle": "No se pudo registrar la alerta activa"
+      }
+    },
     "title": "Alertas",
     "skip": "Ir al contenido",
     "preview": "Vista previa",
