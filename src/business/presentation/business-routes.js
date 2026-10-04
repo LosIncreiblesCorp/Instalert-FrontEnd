@@ -1,3 +1,4 @@
+// Lazy-loaded components
 const businessRoutes = [
   {
     path: "/admin/personnel",

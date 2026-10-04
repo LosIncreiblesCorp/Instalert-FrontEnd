@@ -1,4 +1,5 @@
 <script setup>
+/** Staff invitation creation view. */
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
@@ -18,6 +19,7 @@ const emailInvalid = computed(() => email.value.trim().length > 254 || !/^[^\s@]
 
 onMounted(() => { store.clearMessages(); store.loadPersonnel(); });
 
+/** Validates the form and creates a staff invitation. @returns {Promise<void>} */
 async function createInvitation() {
     touched.value = true;
     if (nameInvalid.value || emailInvalid.value) {

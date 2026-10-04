@@ -9,13 +9,21 @@ import { StaffInvitationAssembler } from '../infrastructure/staff-invitation.ass
 const businessApi = new BusinessApi();
 const demoBusinessId = 'bus-1'; // Existing fictitious business. Demo scope, not an authorization boundary.
 
+/** Application service store for the business bounded context. @returns {Object} The business store. */
 const useBusinessStore = defineStore('business', () => {
+    /** @type {import('vue').Ref<import('../domain/model/business-member.entity.js').BusinessMember[]>} */
     const members = ref([]);
+    /** @type {import('vue').Ref<import('../domain/model/staff-invitation.entity.js').StaffInvitation[]>} */
     const invitations = ref([]);
+    /** @type {import('vue').Ref<Object|null>} */
     const planLimits = ref(null);
+    /** @type {import('vue').Ref<boolean>} */
     const isLoading = ref(false);
+    /** @type {import('vue').Ref<boolean>} */
     const isSaving = ref(false);
+    /** @type {import('vue').Ref<string|null>} */
     const errorMessage = ref(null);
+    /** @type {import('vue').Ref<string|null>} */
     const noticeMessage = ref(null);
     const employees = computed(() => members.value.filter(member => member.isEmployee));
     const occupiedSeats = computed(() => members.value.filter(member => member.occupiesSeat).length);
@@ -23,8 +31,10 @@ const useBusinessStore = defineStore('business', () => {
     const availableSeats = computed(() => planLimits.value == null ? null
         : Math.max(0, planLimits.value.maxEmployees - occupiedSeats.value - reservedSeats.value));
 
+    /** Clears store feedback messages. @returns {void} */
     function clearMessages() { errorMessage.value = null; noticeMessage.value = null; }
 
+    /** Reloads members and invitations scoped to the demo business. @returns {Promise<void>} */
     async function refreshRecords() {
         const [memberResponse, invitationResponse] = await Promise.all([
             businessApi.getMembers(demoBusinessId), businessApi.getInvitations(demoBusinessId),
@@ -36,11 +46,13 @@ const useBusinessStore = defineStore('business', () => {
             .filter(invitation => invitation.businessId === demoBusinessId);
     }
 
+    /** Reloads the subscription plan limits. @returns {Promise<void>} */
     async function refreshLimits() {
         planLimits.value = null;
         planLimits.value = await businessApi.getPlanLimits(demoBusinessId);
     }
 
+    /** Loads personnel records and plan limits into the store. @returns {Promise<void>} */
     async function loadPersonnel() {
         if (isLoading.value || isSaving.value) return;
         isLoading.value = true;
@@ -53,12 +65,14 @@ const useBusinessStore = defineStore('business', () => {
         } finally { isLoading.value = false; }
     }
 
+    /** Ensures a seat is available for a new employee or invitation. @returns {void} */
     function assertAvailableSeat() {
         if (availableSeats.value == null) throw new Error('business.errors.limitsUnavailable');
         if (!planLimits.value.subscriptionActive) throw new Error('business.errors.subscriptionInactive');
         if (availableSeats.value <= 0) throw new Error('business.errors.noSeats');
     }
 
+    /** Ensures an email is not already used by a member or invitation. @param {string} email - Email to check. @param {string|null} [memberId] - Member id to exclude. @param {string|null} [invitationId] - Invitation id to exclude. @returns {void} */
     function assertUniqueEmail(email, memberId = null, invitationId = null) {
         const memberExists = members.value.some(member => member.email === email
             && String(member.id) !== String(memberId));
@@ -67,6 +81,7 @@ const useBusinessStore = defineStore('business', () => {
         if (memberExists || invitationExists) throw new Error('business.errors.duplicateEmail');
     }
 
+    /** Runs a mutating command with shared loading and feedback handling. @param {Function} command - Command to execute. @param {string} successKey - Success message key. @returns {Promise<boolean>} True when the command succeeds. */
     async function runCommand(command, successKey) {
         if (isSaving.value || isLoading.value) return false;
         clearMessages();
@@ -83,6 +98,7 @@ const useBusinessStore = defineStore('business', () => {
         } finally { isSaving.value = false; }
     }
 
+    /** Finds an editable employee member by id. @param {string} id - Member id. @returns {Object} The member entity. */
     function getMember(id) {
         const member = members.value.find(item => String(item.id) === String(id));
         if (!member) throw new Error('business.errors.notFound');
@@ -90,6 +106,7 @@ const useBusinessStore = defineStore('business', () => {
         return member;
     }
 
+    /** Finds a pending invitation that still reserves a seat. @param {string} id - Invitation id. @returns {Object} The invitation entity. */
     function getPendingInvitation(id) {
         const invitation = invitations.value.find(item => String(item.id) === String(id));
         if (!invitation) throw new Error('business.errors.notFound');
@@ -97,11 +114,13 @@ const useBusinessStore = defineStore('business', () => {
         return invitation;
     }
 
+    /** Replaces a member in the local collection. @param {Object} resource - Updated member resource. @returns {void} */
     function replaceMember(resource) {
         const member = BusinessMemberAssembler.toEntityFromResource(resource);
         members.value = members.value.map(item => String(item.id) === String(member.id) ? member : item);
     }
 
+    /** Inserts or replaces an invitation in the local collection. @param {Object} resource - Updated invitation resource. @returns {void} */
     function replaceInvitation(resource) {
         const invitation = StaffInvitationAssembler.toEntityFromResource(resource);
         const index = invitations.value.findIndex(item => String(item.id) === String(invitation.id));
@@ -109,6 +128,7 @@ const useBusinessStore = defineStore('business', () => {
         else invitations.value[index] = invitation;
     }
 
+    /** Creates a staff invitation after quota and email checks. @param {Object} values - Invitation form values. @returns {Promise<boolean>} True when created. */
     function createInvitation(values) {
         return runCommand(async () => {
             const now = new Date().toISOString();
@@ -122,6 +142,7 @@ const useBusinessStore = defineStore('business', () => {
         }, 'business.messages.invitationCreated');
     }
 
+    /** Updates a pending invitation. @param {string} id - Invitation id. @param {Object} values - New values. @returns {Promise<boolean>} True when updated. */
     function updateInvitation(id, values) {
         return runCommand(async () => {
             const invitation = new StaffInvitation({ ...getPendingInvitation(id),
@@ -132,6 +153,7 @@ const useBusinessStore = defineStore('business', () => {
         }, 'business.messages.updated');
     }
 
+    /** Cancels a pending invitation. @param {string} id - Invitation id. @returns {Promise<boolean>} True when cancelled. */
     function cancelInvitation(id) {
         return runCommand(async () => {
             const invitation = new StaffInvitation({ ...getPendingInvitation(id),
@@ -141,6 +163,7 @@ const useBusinessStore = defineStore('business', () => {
         }, 'business.messages.invitationCancelled');
     }
 
+    /** Records an invitation resend with fresh timestamps. @param {string} id - Invitation id. @returns {Promise<boolean>} True when recorded. */
     function resendInvitation(id) {
         return runCommand(async () => {
             const now = new Date().toISOString();
@@ -150,6 +173,7 @@ const useBusinessStore = defineStore('business', () => {
         }, 'business.messages.resendRecorded');
     }
 
+    /** Updates an employee member. @param {string} id - Member id. @param {Object} values - New values. @returns {Promise<boolean>} True when updated. */
     function updateMember(id, values) {
         return runCommand(async () => {
             const member = new BusinessMember({ ...getMember(id), displayName: values.displayName,
@@ -160,6 +184,7 @@ const useBusinessStore = defineStore('business', () => {
         }, 'business.messages.updated');
     }
 
+    /** Activates or deactivates an employee membership. @param {string} id - Member id. @returns {Promise<boolean>} True when updated. */
     function toggleMembership(id) {
         return runCommand(async () => {
             const current = getMember(id);
@@ -174,6 +199,7 @@ const useBusinessStore = defineStore('business', () => {
         }, 'business.messages.membershipUpdated');
     }
 
+    /** Deletes an employee member. @param {string} id - Member id. @returns {Promise<boolean>} True when deleted. */
     function deleteMember(id) {
         return runCommand(async () => {
             getMember(id);
@@ -182,6 +208,7 @@ const useBusinessStore = defineStore('business', () => {
         }, 'business.messages.deleted');
     }
 
+    /** Deletes a cancelled invitation. @param {string} id - Invitation id. @returns {Promise<boolean>} True when deleted. */
     function deleteInvitation(id) {
         return runCommand(async () => {
             const invitation = invitations.value.find(item => String(item.id) === String(id));

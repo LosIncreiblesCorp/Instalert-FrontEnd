@@ -1,4 +1,5 @@
 <script setup>
+/** Personnel list view with employees and invitations management. */
 import { computed, nextTick, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -18,6 +19,7 @@ const tabs = computed(() => [
     { label: t('business.personnel.employees'), value: 'employees' },
     { label: t('business.personnel.invitations'), value: 'invitations' },
 ]);
+/** Checks whether a record matches the current search text. @param {Object} record - Member or invitation record. @returns {boolean} True when the record matches. */
 const matching = record => (record.displayName + ' ' + record.email).toLowerCase().includes(search.value.trim().toLowerCase());
 const visibleEmployees = computed(() => store.employees.filter(matching));
 const visibleInvitations = computed(() => store.invitations.filter(matching));
@@ -27,6 +29,7 @@ const overCapacity = computed(() => store.planLimits
 
 onMounted(() => store.loadPersonnel());
 
+/** Opens the inline editor for a member or invitation record. @param {Object} record - Record to edit. @param {string} kind - Record kind. @returns {Promise<void>} */
 async function editRecord(record, kind) {
     store.clearMessages();
     editor.value = { id: record.id, kind, displayName: record.displayName, email: record.email };
@@ -34,6 +37,7 @@ async function editRecord(record, kind) {
     editorName.value?.$el?.focus();
 }
 
+/** Persists the current inline edition through the store. @returns {Promise<void>} */
 async function saveEdition() {
     const draft = editor.value;
     if (!draft) return;
@@ -43,6 +47,7 @@ async function saveEdition() {
     if (success) editor.value = null;
 }
 
+/** Asks for confirmation before running a personnel command. @param {Object} record - Target record. @param {string} action - Confirmation message key. @param {Function} command - Store command to run. @param {string} kind - Record kind. @returns {void} */
 function requestConfirmation(record, action, command, kind) {
     confirm.require({
         header: t('business.actions.confirmTitle'),
