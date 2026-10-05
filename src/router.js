@@ -21,12 +21,17 @@ const employeeAlertRoutes = alertRoutes.map((route) => ({
 
 // Define lazy-loaded components
 const routes = [
-  { path: "/", redirect: { name: "admin-dashboard" } },
+  {
+    path: "/",
+    name: "profile-selection",
+    component: () => import("./shared/presentation/views/profile-selection.vue"),
+    meta: { standalone: true, title: "common.chooseProfile" },
+  },
   { path: "/admin", redirect: { name: "admin-dashboard" } },
   {
     path: "/admin/dashboard",
     name: "admin-dashboard",
-    component: EmptyRouteView,
+    component: () => import("./shared/presentation/views/admin-home.vue"),
     meta: { role: "administrator", menuKey: "dashboard", title: "navigation.adminDashboard" },
   },
   {
@@ -65,7 +70,7 @@ const routes = [
   {
     path: "/employee/dashboard",
     name: "employee-dashboard",
-    component: EmptyRouteView,
+    component: () => import("./shared/presentation/views/employee-home.vue"),
     meta: { role: "employee", menuKey: "dashboard", title: "navigation.employeeDashboard" },
   },
   {

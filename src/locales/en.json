@@ -8,6 +8,7 @@
     "demoView": "Demo view",
     "demoAccount": "Demo account",
     "profile": "Profile",
+    "chooseProfile": "Choose a profile",
     "notFoundCode": "ERROR 404",
     "notFoundTitle": "Page not found",
     "notFoundDescription": "The page you requested does not exist or may have moved.",
@@ -166,6 +167,35 @@
     "personnel": "Staff",
     "emergencyContacts": "Emergency contacts",
     "subscription": "Subscription"
+  },
+  "home": {
+    "quickAccess": "Quick access",
+    "admin": {
+      "title": "Your business, in one place",
+      "description": "Access your team's tools and manage the day-to-day from here.",
+      "shortcutsHelp": "Choose a section to view alerts, manage staff or review your subscription."
+    },
+    "employee": {
+      "title": "Your safety, one step away",
+      "description": "Access alerts, explore the risk map and keep your trusted contacts close at hand.",
+      "shortcutsHelp": "Everything you need to access your daily tools."
+    },
+    "descriptions": {
+      "map": "Explore risk zones and reported incidents on the map.",
+      "history": "View active alerts and review the incident history.",
+      "staff": "Manage your staff and their status in the business.",
+      "subscription": "Review your current plan and manage your subscription.",
+      "alerts": "Access the panic button, report an incident or view your history.",
+      "contacts": "Add and update the contact details of people you trust."
+    },
+    "actions": {
+      "map": "Open risk map",
+      "history": "View alert history",
+      "staff": "Manage staff",
+      "subscription": "View subscription",
+      "alerts": "Go to alerts",
+      "contacts": "View contacts"
+    }
   },
   "contacts": {
     "eyebrow": "Your trusted circle",
