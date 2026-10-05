@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 160 160" fill="none">
+  <!-- Transparent background -->
+
+  <!-- Outer shield -->
+  <path d="M80 8
+           L135 32
+           L135 84
+           C135 110 118 132 80 150
+           C42 132 25 110 25 84
+           L25 32
+           Z"
+        fill="#2B7DE9"/>
+
+  <!-- Inner shield -->
+  <path d="M80 20
+           L123 38
+           L123 82
+           C123 102 109 119 80 134
+           C51 119 37 102 37 82
+           L37 38
+           Z"
+        fill="#132B5C"/>
+
+  <!-- Accent segments on the shield edge -->
+  <rect x="43" y="24" width="8" height="5" rx="1.5" transform="rotate(-24 43 24)" fill="#58A8FF"/>
+  <rect x="56" y="18" width="8" height="5" rx="1.5" transform="rotate(-24 56 18)" fill="#58A8FF"/>
+  <rect x="69" y="13" width="8" height="5" rx="1.5" transform="rotate(-24 69 13)" fill="#58A8FF"/>
+  <rect x="83" y="13" width="8" height="5" rx="1.5" transform="rotate(24 83 13)" fill="#58A8FF"/>
+  <rect x="96" y="18" width="8" height="5" rx="1.5" transform="rotate(24 96 18)" fill="#58A8FF"/>
+  <rect x="109" y="24" width="8" height="5" rx="1.5" transform="rotate(24 109 24)" fill="#58A8FF"/>
+
+  <rect x="21" y="55" width="7" height="5" rx="1.5" transform="rotate(-90 21 55)" fill="#58A8FF"/>
+  <rect x="16" y="70" width="7" height="5" rx="1.5" transform="rotate(-90 16 70)" fill="#58A8FF"/>
+  <rect x="16" y="85" width="7" height="5" rx="1.5" transform="rotate(-90 16 85)" fill="#58A8FF"/>
+
+  <rect x="139" y="55" width="7" height="5" rx="1.5" transform="rotate(90 139 55)" fill="#58A8FF"/>
+  <rect x="144" y="70" width="7" height="5" rx="1.5" transform="rotate(90 144 70)" fill="#58A8FF"/>
+  <rect x="144" y="85" width="7" height="5" rx="1.5" transform="rotate(90 144 85)" fill="#58A8FF"/>
+
+  <rect x="43" y="124" width="8" height="5" rx="1.5" transform="rotate(24 43 124)" fill="#58A8FF"/>
+  <rect x="56" y="131" width="8" height="5" rx="1.5" transform="rotate(24 56 131)" fill="#58A8FF"/>
+  <rect x="69" y="137" width="8" height="5" rx="1.5" transform="rotate(24 69 137)" fill="#58A8FF"/>
+  <rect x="83" y="137" width="8" height="5" rx="1.5" transform="rotate(-24 83 137)" fill="#58A8FF"/>
+  <rect x="96" y="131" width="8" height="5" rx="1.5" transform="rotate(-24 96 131)" fill="#58A8FF"/>
+  <rect x="109" y="124" width="8" height="5" rx="1.5" transform="rotate(-24 109 124)" fill="#58A8FF"/>
+
+  <!-- Exclamation mark -->
+  <rect x="74" y="41" width="12" height="49" rx="6" fill="#F04A45"/>
+  <circle cx="80" cy="104" r="8" fill="#F04A45"/>
+</svg>
