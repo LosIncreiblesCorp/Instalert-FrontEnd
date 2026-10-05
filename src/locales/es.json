@@ -8,6 +8,7 @@
     "demoView": "Vista de demostración",
     "demoAccount": "Cuenta de demostración",
     "profile": "Perfil",
+    "chooseProfile": "Elegir perfil",
     "notFoundCode": "ERROR 404",
     "notFoundTitle": "Página no encontrada",
     "notFoundDescription": "La página solicitada no existe o pudo haber cambiado de dirección.",
@@ -166,6 +167,35 @@
     "personnel": "Personal",
     "emergencyContacts": "Contactos de emergencia",
     "subscription": "Suscripción"
+  },
+  "home": {
+    "quickAccess": "Accesos directos",
+    "admin": {
+      "title": "Tu comercio, en un solo lugar",
+      "description": "Accede a las herramientas de tu equipo y gestiona el día a día desde aquí.",
+      "shortcutsHelp": "Elige una sección para consultar alertas, gestionar personal o revisar tu suscripción."
+    },
+    "employee": {
+      "title": "Tu seguridad, a un paso",
+      "description": "Accede a las alertas, explora el mapa de riesgo y ten a mano tus contactos de confianza.",
+      "shortcutsHelp": "Todo lo que necesitas para acceder a tus herramientas del día a día."
+    },
+    "descriptions": {
+      "map": "Explora las zonas de riesgo y los incidentes reportados en el mapa.",
+      "history": "Consulta las alertas activas y revisa el historial de incidentes.",
+      "staff": "Gestiona a tu personal y su estado dentro del comercio.",
+      "subscription": "Revisa tu plan actual y gestiona tu suscripción.",
+      "alerts": "Accede al botón de pánico, reporta un incidente o consulta tu historial.",
+      "contacts": "Agrega y actualiza los datos de tus personas de confianza."
+    },
+    "actions": {
+      "map": "Ver mapa de riesgo",
+      "history": "Ver historial de alertas",
+      "staff": "Gestionar personal",
+      "subscription": "Ver suscripción",
+      "alerts": "Ir a alertas",
+      "contacts": "Ver contactos"
+    }
   },
   "contacts": {
     "eyebrow": "Tu círculo de confianza",
