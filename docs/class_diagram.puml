@@ -1,0 +1,659 @@
+@startuml InstAlert_Frontend_Complete
+title InstAlert — Complete Frontend Class Diagram
+top to bottom direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam packageBorderColor #55718B
+skinparam classBorderColor #55718B
+skinparam classBackgroundColor #FFFFFF
+
+package "Frontend composition" {
+  class ApplicationRouter <<Vue Router config>> {
+    +routes
+    +resolveRoute(path)
+    +beforeEach(route)
+  }
+}
+
+package "IAM" {
+  package "Domain" {
+    class User <<Entity>> {
+      +id: String
+      +firstName: String
+      +lastName: String
+      +email: String
+      +phone: String
+      +status: AccountStatus
+      +updatePersonalData(firstName, lastName, email, phone)
+    }
+    enum AccountStatus {
+      PENDING
+      ACTIVE
+      INACTIVE
+    }
+    class AuthenticationSession <<Entity>> {
+      +accessToken: String
+      +expiresAt: DateTime
+      +isExpired(): Boolean
+    }
+  }
+  package "Application" {
+    class IamStore <<Pinia Store>> {
+      +currentUser: User
+      +session: AuthenticationSession
+      +isAuthenticated: Boolean
+      +signIn(command)
+      +signUp(command)
+      +completeInvitedAccount(command)
+      +loadCurrentUser()
+      +updateProfile(command)
+      +restoreSession()
+      +signOut()
+    }
+    class SignInCommand <<Command>> {
+      +email: String
+      +password: String
+    }
+    class SignUpCommand <<Command>> {
+      +firstName: String
+      +lastName: String
+      +email: String
+      +phone: String
+      +password: String
+    }
+    class CompleteInvitedAccountCommand <<Command>> {
+      +email: String
+      +temporaryPassword: String
+      +newPassword: String
+    }
+    class ProfileUpdateCommand <<Command>> {
+      +firstName: String
+      +lastName: String
+      +email: String
+      +phone: String
+    }
+  }
+  package "Infrastructure" {
+    class IamApiClient <<HTTP adapter>> {
+      +signIn(command)
+      +signUp(command)
+      +completeInvitedAccount(command)
+      +getCurrentUser()
+      +updateProfile(command)
+    }
+    class UserAssembler <<Assembler>>
+    class AuthenticationAssembler <<Assembler>>
+    class SessionStorage <<Browser storage adapter>>
+    class IamHttpInterceptor <<HTTP interceptor>>
+  }
+  package "Presentation" {
+    class AuthenticationGuard <<Router guard>> {
+      +canActivate(route): Boolean
+    }
+    class IamRoutes <<Route configuration>>
+    class SignInView <<Vue view>>
+    class SignUpView <<Vue view>>
+    class CompleteInvitedAccountView <<Vue view>>
+    class UserProfileView <<Vue view>>
+    class SignInForm <<Vue component>>
+    class SignUpForm <<Vue component>>
+    class CompleteInvitedAccountForm <<Vue component>>
+    class ProfileForm <<Vue component>>
+  }
+}
+
+package "Business" {
+  package "Domain" {
+    class BusinessMember <<Entity>> {
+      +id: String
+      +businessId: String
+      +userId: String
+      +displayName: String
+      +email: String
+      +role: BusinessMemberRole
+      +status: BusinessMemberStatus
+      +isEmployee(): Boolean
+      +occupiesSeat(): Boolean
+      +validate()
+    }
+    enum BusinessMemberRole {
+      Administrator
+      Operative
+    }
+    enum BusinessMemberStatus {
+      active
+      inactive
+    }
+    class StaffInvitation <<Entity>> {
+      +id: String
+      +businessId: String
+      +displayName: String
+      +email: String
+      +status: StaffInvitationStatus
+      +lastResentAt: DateTime
+      +reservesSeat(): Boolean
+      +validate()
+    }
+    enum StaffInvitationStatus {
+      pending
+      cancelled
+      accepted
+    }
+    class PlanLimitsSnapshot <<API projection>> {
+      +maxEmployees: Number
+      +planName: String
+      +subscriptionActive: Boolean
+    }
+    class BusinessMemberResource <<REST resource shape>>
+    class StaffInvitationResource <<REST resource shape>>
+  }
+  package "Application" {
+    class BusinessStore <<Pinia Store>> {
+      +members: BusinessMember[]
+      +invitations: StaffInvitation[]
+      +planLimits: PlanLimitsSnapshot
+      +occupiedSeats: Number
+      +reservedSeats: Number
+      +availableSeats: Number
+      +loadPersonnel()
+      +createInvitation(data)
+      +updateInvitation(id, data)
+      +cancelInvitation(id)
+      +resendInvitation(id)
+      +updateMember(id, data)
+      +toggleMembership(id)
+      +deleteMember(id)
+      +deleteInvitation(id)
+    }
+  }
+  package "Infrastructure" {
+    class BusinessApi <<HTTP adapter>> {
+      +getMembers(businessId)
+      +getInvitations(businessId)
+      +createInvitation(resource)
+      +updateInvitation(resource)
+      +updateMember(resource)
+      +deleteMember(id)
+      +getPlanLimits(businessId)
+    }
+    class BusinessMemberAssembler <<Assembler>>
+    class StaffInvitationAssembler <<Assembler>>
+  }
+  package "Presentation" {
+    class BusinessRoutes <<Route configuration>>
+    class PersonnelListView <<Vue view>>
+    class InvitationFormView <<Vue view>>
+  }
+}
+
+package "Alert" {
+  package "Domain" {
+    class AlertRecord <<Entity>> {
+      +id: String
+      +employeeId: String
+      +kind: AlertRecordKind
+      +status: AlertRecordStatus
+      +category: String
+      +location: String
+      +latitude: Number
+      +longitude: Number
+      +moment: DateTime
+      +description: String
+      +finishPanic(endedAt)
+      +updatePanicReportDraft(fields)
+      +completePanicReport(completedAt)
+      +submitReport(submittedAt)
+    }
+    enum AlertRecordKind {
+      PANIC
+      PAST_INCIDENT
+      SUSPICIOUS_ACTIVITY
+      OTHER_SITUATION
+    }
+    enum AlertRecordStatus {
+      DRAFT
+      ACTIVE
+      PENDING_REPORT
+      COMPLETED
+      SUBMITTED
+      RESOLVED
+      FALSE_ALARM
+    }
+    class AlertPreferences <<Entity>> {
+      +id: String
+      +employeeId: String
+      +panicGracePeriodSeconds: Number
+      +validateGracePeriod(seconds)
+    }
+  }
+  package "Application" {
+    class AlertStore <<Pinia Store>> {
+      +alertRecords: AlertRecord[]
+      +preferences: AlertPreferences
+      +currentView: String
+      +remainingSeconds: Number
+      +activePanicRecord: AlertRecord
+      +initialize()
+      +startPanicCountdown(location)
+      +cancelPanicCountdown()
+      +retryPanicActivation()
+      +finishActivePanic()
+      +completePanicReport()
+      +submitReport()
+      +saveGracePeriod(seconds)
+      +showHistory()
+      +openRecord(id)
+    }
+  }
+  package "Infrastructure" {
+    class AlertApi <<HTTP adapter>> {
+      +getAlerts()
+      +createAlert(resource)
+      +updateAlert(resource)
+      +getAlertPreferences()
+      +createAlertPreferences(resource)
+      +updateAlertPreferences(resource)
+    }
+    class AlertRecordAssembler <<Assembler>>
+    class AlertPreferencesAssembler <<Assembler>>
+  }
+  package "Presentation" {
+    class AlertRoutes <<Route configuration>>
+    class EmployeeAlertsView <<Vue view>>
+  }
+}
+
+package "Contacts" {
+  package "Domain" {
+    class EmergencyContact <<Entity>> {
+      +id: String
+      +employeeId: String
+      +fullName: String
+      +relationship: String
+      +phone: String
+      +email: String
+      +notes: String
+      +createdAt: DateTime
+      +updatedAt: DateTime
+      +initials(): String
+      +validationErrors(): Object
+      +validate()
+    }
+  }
+  package "Application" {
+    class ContactsStore <<Pinia Store>> {
+      +contacts: EmergencyContact[]
+      +selectedContact: EmergencyContact
+      +loadContacts()
+      +loadContact(id)
+      +createContact(data)
+      +updateContact(id, data)
+      +deleteContact(id)
+    }
+  }
+  package "Infrastructure" {
+    class ContactsApi <<HTTP adapter>> {
+      +getContacts(employeeId)
+      +getContact(id)
+      +createContact(resource)
+      +updateContact(resource)
+      +deleteContact(id)
+    }
+    class EmergencyContactAssembler <<Assembler>>
+  }
+  package "Presentation" {
+    class ContactsRoutes <<Route configuration>>
+    class ContactsListView <<Vue view>>
+    class ContactFormView <<Vue view>>
+  }
+}
+
+package "Notifications" {
+  package "Domain" {
+    class NotificationPreference <<Entity>> {
+      +userId: String
+      +nearbyAlertsEnabled: Boolean
+      +nearbyRadiusMeters: Number
+      +update(nearbyAlertsEnabled, nearbyRadiusMeters)
+    }
+    class Notification <<Entity>> {
+      +id: String
+      +recipientUserId: String
+      +type: NotificationType
+      +title: String
+      +message: String
+      +sourceAlertId: String
+      +createdAt: DateTime
+      +readAt: DateTime
+      +markAsRead(readAt)
+    }
+    enum NotificationType {
+      GENERAL
+      NEARBY_ALERT
+    }
+  }
+  package "Application" {
+    class NotificationsStore <<Pinia Store>> {
+      +notifications: Notification[]
+      +preferences: NotificationPreference
+      +unreadCount: Number
+      +currentNotice: Notification
+      +loadNotifications()
+      +loadPreferences()
+      +savePreferences(data)
+      +markAsRead(notificationId)
+      +receive(notification)
+      +dismissCurrent()
+    }
+    interface NotificationDeliveryPort <<Port>> {
+      +onNotification(handler)
+      +removeListener()
+    }
+  }
+  package "Infrastructure" {
+    class NotificationsApi <<HTTP adapter>> {
+      +getNotifications()
+      +markAsRead(notificationId)
+      +getPreferences()
+      +updatePreferences(resource)
+    }
+    class NotificationAssembler <<Assembler>>
+    class NotificationPreferencesAssembler <<Assembler>>
+    class FirebaseMessagingAdapter <<Push adapter>> {
+      +startListening(handler)
+      +stopListening()
+    }
+  }
+  package "Presentation" {
+    class NotificationsRoutes <<Route configuration>>
+    class NotificationsView <<Vue view>>
+    class NotificationPreferencesView <<Vue view>>
+    class NotificationList <<Vue component>>
+    class NotificationItem <<Vue component>>
+    class NotificationPreferencesForm <<Vue component>>
+    class NearbyAlertToast <<Vue component>>
+    class UnreadNotificationBadge <<Vue component>>
+  }
+}
+
+package "Mapping" {
+  package "Domain" {
+    class BusinessLocation <<Read model>> {
+      +id: String
+      +name: String
+      +address: String
+      +isVerified: Boolean
+      +latitude: Number
+      +longitude: Number
+    }
+    class IncidentMarker <<Geographic projection>> {
+      +id: String
+      +title: String
+      +description: String
+      +type: IncidentCategory
+      +status: String
+      +latitude: Number
+      +longitude: Number
+      +reportedAt: DateTime
+    }
+    enum IncidentCategory {
+      robbery
+      attemptedRobbery
+      assault
+      extortion
+      vandalism
+      unusualBehavior
+      surveillance
+      lowLighting
+      roadBlockage
+      other
+    }
+    class RiskZone <<Entity>> {
+      +id: String
+      +name: String
+      +riskLevel: String
+      +bounds: Coordinate[]
+    }
+  }
+  package "Application" {
+    class MappingStore <<Pinia Store>> {
+      +riskZones: RiskZone[]
+      +incidents: IncidentMarker[]
+      +businesses: BusinessLocation[]
+      +selectedZone: RiskZone
+      +fetchMapData()
+      +selectRiskZone(zoneId)
+    }
+  }
+  package "Infrastructure" {
+    class MappingApi <<HTTP adapter>> {
+      +getAllRiskZones()
+      +getNearbyIncidents(latitude, longitude, radius)
+      +getNearbyVerifiedBusinesses(latitude, longitude, radius)
+    }
+    class RiskZoneAssembler <<Assembler>>
+    class IncidentMarkerAssembler <<Assembler>>
+    class BusinessLocationAssembler <<Assembler>>
+    class MapboxGL <<External library>>
+  }
+  package "Presentation" {
+    class RiskMapPage <<Vue view>>
+    class RiskMap <<Vue component>>
+    class TacticalInspector <<Vue component>>
+  }
+}
+
+package "Payments" {
+  package "Domain" {
+    class Plan <<Entity>> {
+      +id: String
+      +name: String
+      +price: Number
+      +priceUsd: Number
+      +currency: String
+      +billingCycle: String
+      +maxEmployees: Number
+      +features: String[]
+    }
+    class Subscription <<Entity>> {
+      +id: String
+      +businessId: String
+      +planId: String
+      +status: String
+      +currentPeriodEnd: DateTime
+      +cancelAtPeriodEnd: Boolean
+      +maxEmployees: Number
+      +isActive(): Boolean
+    }
+    class PaymentMethod <<Entity>> {
+      +brand: String
+      +last4: String
+      +holderName: String
+      +expiry: String
+    }
+    class Invoice <<Entity>> {
+      +id: String
+      +folio: String
+      +issuedAt: DateTime
+      +amount: Number
+      +currency: String
+      +status: String
+    }
+    class PlanResource <<REST resource shape>>
+    class SubscriptionResource <<REST resource shape>>
+  }
+  package "Application" {
+    class PaymentsStore <<Pinia Store>> {
+      +plans: Plan[]
+      +currentSubscription: Subscription
+      +paymentMethod: PaymentMethod
+      +invoices: Invoice[]
+      +activeEmployees: Number
+      +reservedSeats: Number
+      +fetchPlans()
+      +fetchSubscription(businessId)
+      +fetchBilling()
+      +fetchActiveEmployeeCount(businessId)
+      +selectPlan(planId)
+      +cancelSubscription()
+    }
+  }
+  package "Infrastructure" {
+    class PaymentsApi <<HTTP adapter>> {
+      +getPlans()
+      +getSubscriptions(businessId)
+      +getPaymentMethods()
+      +getInvoices()
+      +getSeatUsage(businessId)
+      +updateSubscription(id, resource)
+    }
+    class PlanAssembler <<Assembler>>
+    class SubscriptionAssembler <<Assembler>>
+    class PaymentMethodAssembler <<Assembler>>
+    class InvoiceAssembler <<Assembler>>
+  }
+  package "Presentation" {
+    class PaymentsRoutes <<Route configuration>>
+    class SubscriptionPage <<Vue view>>
+    class PlanCard <<Vue component>>
+    class SubscriptionSummary <<Vue component>>
+    class PaymentMethodCard <<Vue component>>
+    class BillingHistory <<Vue component>>
+  }
+}
+
+ApplicationRouter --> IamRoutes
+ApplicationRouter --> BusinessRoutes
+ApplicationRouter --> AlertRoutes
+ApplicationRouter --> ContactsRoutes
+ApplicationRouter --> NotificationsRoutes
+ApplicationRouter --> PaymentsRoutes
+ApplicationRouter --> RiskMapPage
+
+IamStore --> IamApiClient
+IamStore --> SessionStorage
+IamStore ..> User
+IamStore ..> AuthenticationSession
+IamStore ..> SignInCommand
+IamStore ..> SignUpCommand
+IamStore ..> CompleteInvitedAccountCommand
+IamStore ..> ProfileUpdateCommand
+IamApiClient --> UserAssembler
+IamApiClient --> AuthenticationAssembler
+UserAssembler ..> User
+AuthenticationAssembler ..> AuthenticationSession
+IamHttpInterceptor --> SessionStorage
+AuthenticationGuard --> IamStore
+IamRoutes --> SignInView
+IamRoutes --> SignUpView
+IamRoutes --> CompleteInvitedAccountView
+IamRoutes --> UserProfileView
+SignInView --> SignInForm
+SignUpView --> SignUpForm
+CompleteInvitedAccountView --> CompleteInvitedAccountForm
+UserProfileView --> ProfileForm
+
+BusinessStore --> BusinessApi
+BusinessStore ..> BusinessMember
+BusinessStore ..> StaffInvitation
+BusinessStore ..> PlanLimitsSnapshot
+BusinessApi --> BusinessMemberAssembler
+BusinessApi --> StaffInvitationAssembler
+BusinessMemberAssembler ..> BusinessMember
+StaffInvitationAssembler ..> StaffInvitation
+BusinessApi ..> PlanLimitsSnapshot : obtiene cupos por identificadores de plan y comercio
+BusinessRoutes --> PersonnelListView
+BusinessRoutes --> InvitationFormView
+PersonnelListView --> BusinessStore
+InvitationFormView --> BusinessStore
+
+AlertStore --> AlertApi
+AlertStore ..> AlertRecord
+AlertStore ..> AlertPreferences
+AlertApi --> AlertRecordAssembler
+AlertApi --> AlertPreferencesAssembler
+AlertRecordAssembler ..> AlertRecord
+AlertPreferencesAssembler ..> AlertPreferences
+AlertRoutes --> EmployeeAlertsView
+EmployeeAlertsView --> AlertStore
+
+ContactsStore --> ContactsApi
+ContactsStore ..> EmergencyContact
+ContactsApi --> EmergencyContactAssembler
+EmergencyContactAssembler ..> EmergencyContact
+ContactsRoutes --> ContactsListView
+ContactsRoutes --> ContactFormView
+ContactsListView --> ContactsStore
+ContactFormView --> ContactsStore
+
+NotificationsStore --> NotificationsApi
+NotificationsStore ..> Notification
+NotificationsStore ..> NotificationPreference
+NotificationsStore ..> NotificationDeliveryPort
+NotificationsApi --> NotificationAssembler
+NotificationsApi --> NotificationPreferencesAssembler
+NotificationAssembler ..> Notification
+NotificationPreferencesAssembler ..> NotificationPreference
+FirebaseMessagingAdapter ..|> NotificationDeliveryPort
+NotificationsRoutes --> NotificationsView
+NotificationsRoutes --> NotificationPreferencesView
+NotificationsView --> NotificationsStore
+NotificationPreferencesView --> NotificationsStore
+NotificationList --> NotificationsStore
+NotificationItem --> Notification
+NotificationPreferencesForm --> NotificationsStore
+NearbyAlertToast --> Notification
+UnreadNotificationBadge --> NotificationsStore
+
+MappingStore --> MappingApi
+MappingStore ..> RiskZone
+MappingStore ..> IncidentMarker
+MappingStore ..> BusinessLocation
+MappingApi --> RiskZoneAssembler
+MappingApi --> IncidentMarkerAssembler
+MappingApi --> BusinessLocationAssembler
+RiskZoneAssembler ..> RiskZone
+IncidentMarkerAssembler ..> IncidentMarker
+BusinessLocationAssembler ..> BusinessLocation
+RiskMapPage --> MappingStore
+RiskMapPage --> RiskMap
+RiskMapPage --> TacticalInspector
+RiskMap --> MapboxGL
+RiskMap ..> RiskZone : renderiza zonas de riesgo
+RiskMap ..> IncidentMarker : dibuja pins geolocalizados
+RiskMap ..> BusinessLocation : dibuja comercios
+TacticalInspector ..> RiskZone
+TacticalInspector ..> IncidentMarker
+
+PaymentsStore --> PaymentsApi
+PaymentsStore ..> Plan
+PaymentsStore ..> Subscription
+PaymentsStore ..> PaymentMethod
+PaymentsStore ..> Invoice
+PaymentsApi --> PlanAssembler
+PaymentsApi --> SubscriptionAssembler
+PaymentsApi --> PaymentMethodAssembler
+PaymentsApi --> InvoiceAssembler
+PlanAssembler ..> Plan
+SubscriptionAssembler ..> Subscription
+PaymentMethodAssembler ..> PaymentMethod
+InvoiceAssembler ..> Invoice
+PlanAssembler ..> PlanResource
+SubscriptionAssembler ..> SubscriptionResource
+Subscription ..> Plan : planId
+PaymentsRoutes --> SubscriptionPage
+SubscriptionPage --> PaymentsStore
+SubscriptionPage --> PlanCard
+SubscriptionPage --> SubscriptionSummary
+SubscriptionPage --> PaymentMethodCard
+SubscriptionPage --> BillingHistory
+
+BusinessMember ..> User : userId (referencia por ID)
+AlertRecord ..> User : employeeId (referencia por ID)
+EmergencyContact ..> User : employeeId (referencia por ID)
+Notification ..> User : recipientUserId (referencia por ID)
+Notification ..> AlertRecord : sourceAlertId (referencia por ID)
+IncidentMarker ..> AlertRecord : proyección geográfica por ID
+@enduml

@@ -1,6 +1,6 @@
 # User Stories
 
-## Sprint 1
+## Sprint 2
 
 ### Overview
 This document contains the Sprint 1 user stories and requirement traceability for the InstAlert application.
@@ -568,3 +568,36 @@ Cuando la aplicación solicita un cambio o su cancelación
 Entonces la API devuelve el estado de la operación y conserva activo el periodo pagado cuando la cancelación es para el siguiente cobro.
 
 **Note:** La aplicación no enviará ni almacenará el número completo de tarjeta.
+
+## Sprint 2
+
+### Requirement Traceability Matrix (RTM)
+
+Las historias de esta matriz están implementadas en la aplicación frontend y utilizan la API simulada del proyecto.
+
+| User Story | Bounded Context | Implemented Elements |
+|:-----------|:----------------|:---------------------|
+| **US06: Cancelar una invitación** | Business | `PersonnelList`, `BusinessStore`, `BusinessApi`, `StaffInvitationAssembler`, `StaffInvitation` |
+| **US07: Consultar empleados** | Business | `PersonnelList`, `BusinessStore`, `BusinessApi`, `BusinessMemberAssembler`, `BusinessMember` |
+| **US08: Activar o desactivar la membresía de un empleado** | Business | `PersonnelList`, `BusinessStore`, `BusinessApi`, `BusinessMemberAssembler`, `BusinessMember` |
+| **US09: Editar los datos de un empleado** | Business | `PersonnelList`, `BusinessStore`, `BusinessApi`, `BusinessMemberAssembler`, `BusinessMember` |
+| **US11: Consultar invitaciones** | Business | `PersonnelList`, `BusinessStore`, `BusinessApi`, `StaffInvitationAssembler`, `StaffInvitation` |
+| **US41: Consultar los cupos del plan** | Business | `PersonnelList`, `InvitationForm`, `BusinessStore`, `BusinessApi`, `Plan`, `Subscription` |
+| **US13: Activar el botón de pánico** | Alert | `EmployeeAlerts`, `AlertStore`, `AlertApi`, `AlertRecordAssembler`, `AlertRecord` |
+| **US14: Reportar una actividad sospechosa** | Alert | `EmployeeAlerts`, `AlertStore`, `AlertApi`, `AlertRecordAssembler`, `AlertRecord` |
+| **US15: Reportar un evento pasado** | Alert | `EmployeeAlerts`, `AlertStore`, `AlertApi`, `AlertRecordAssembler`, `AlertRecord` |
+| **US16: Reportar una condición de riesgo** | Alert | `EmployeeAlerts`, `AlertStore`, `AlertApi`, `AlertRecordAssembler`, `AlertRecord` |
+| **US19: Consultar el historial de alertas** | Alert | `EmployeeAlerts`, `AlertStore`, `AlertApi`, `AlertRecordAssembler`, `AlertRecord`, `router` |
+| **US44: Completar un reporte después de resolver una alerta** | Alert | `EmployeeAlerts`, `AlertStore`, `AlertApi`, `AlertRecordAssembler`, `AlertRecord` |
+| **US21: Consultar el mapa de calor** | Mapping | `RiskMapPage`, `RiskMap`, `MappingStore`, `MappingApi`, `RiskZoneAssembler`, `IncidentMarkerAssembler`, `RiskZone`, `IncidentMarker` |
+| **US22: Consultar incidentes por zona** | Mapping | `RiskMapPage`, `RiskMap`, `TacticalInspector`, `MappingStore`, `MappingApi`, `IncidentMarker` |
+| **US23: Consultar el detalle de un incidente** | Mapping | `TacticalInspector`, `MappingStore`, `IncidentMarker` |
+| **US24: Filtrar el mapa** | Mapping | `RiskMapPage`, `RiskMap`, `MappingStore`, `IncidentMarker` |
+| **US25: Consultar el detalle de una zona de riesgo** | Mapping | `RiskMapPage`, `RiskMap`, `TacticalInspector`, `ZoneDetail`, `RiskZone` |
+| **US42: Cambiar el plan de suscripción** | Payments | `SubscriptionPage`, `PlanCard`, `PaymentsStore`, `PaymentsApi`, `SubscriptionAssembler`, `Subscription`, `Plan` |
+| **US45: Consultar el estado de la suscripción** | Payments | `SubscriptionPage`, `SubscriptionSummary`, `PaymentsStore`, `PaymentsApi`, `SubscriptionAssembler`, `Subscription` |
+| **US30: Añadir un contacto de emergencia** | Contacts | `ContactForm`, `ContactsStore`, `ContactsApi`, `EmergencyContactAssembler`, `EmergencyContact` |
+| **US31: Editar un contacto de emergencia** | Contacts | `ContactForm`, `ContactsList`, `ContactsStore`, `ContactsApi`, `EmergencyContactAssembler`, `EmergencyContact` |
+| **US32: Eliminar un contacto de emergencia** | Contacts | `ContactsList`, `ContactsStore`, `ContactsApi`, `EmergencyContactAssembler`, `EmergencyContact` |
+
+**Note:** En US21, el mapa representa zonas de riesgo diferenciadas y muestra pins geolocalizados de incidentes. La tabla describe funcionalidades del frontend con API simulada; no implica integración con servicios externos de producción.
