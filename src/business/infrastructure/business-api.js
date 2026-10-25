@@ -1,15 +1,28 @@
 import { BaseApi } from '../../shared/infrastructure/base-api.js';
 import { BaseEndpoint } from '../../shared/infrastructure/base-endpoint.js';
 
+/**
+ * @typedef {Object} PlanLimitsSnapshot
+ * @property {number} maxEmployees - Employee capacity reported by Payments.
+ * @property {string|null} planName - Current plan name, or null without an active subscription.
+ * @property {boolean} subscriptionActive - Whether the subscription permits seat allocation.
+ */
+
 /** Replaceable HTTP adapter. Payments data is consumed as resources, not private entities. */
 export class BusinessApi extends BaseApi {
     constructor() {
         super();
-        this.membersEndpoint = new BaseEndpoint(this, import.meta.env.VITE_BUSINESS_MEMBERS_ENDPOINT_PATH || 'business-members');
-        this.invitationsEndpoint = new BaseEndpoint(this, import.meta.env.VITE_STAFF_INVITATIONS_ENDPOINT_PATH || 'staff-invitations');
-        this.plansEndpoint = new BaseEndpoint(this, 'plans');
-        this.subscriptionsEndpoint = new BaseEndpoint(this, 'subscriptions');
+        this.businessesEndpoint = new BaseEndpoint(this, import.meta.env.VITE_BUSINESSES_ENDPOINT_PATH);
+        this.membersEndpoint = new BaseEndpoint(this, import.meta.env.VITE_BUSINESS_MEMBERS_ENDPOINT_PATH);
+        this.invitationsEndpoint = new BaseEndpoint(this, import.meta.env.VITE_STAFF_INVITATIONS_ENDPOINT_PATH);
+        this.plansEndpoint = new BaseEndpoint(this, import.meta.env.VITE_PLANS_ENDPOINT_PATH);
+        this.subscriptionsEndpoint = new BaseEndpoint(this, import.meta.env.VITE_SUBSCRIPTIONS_ENDPOINT_PATH);
     }
+
+    getBusinessById(id) { return this.businessesEndpoint.getById(id); }
+    getBusinessesByTaxId(taxId) { return this.http.get(this.businessesEndpoint.endpointPath, { params: { taxId } }); }
+    createBusiness(resource) { return this.businessesEndpoint.create(resource); }
+    updateBusiness(id, changes) { return this.http.patch(`${this.businessesEndpoint.endpointPath}/${id}`, changes); }
 
     getMembers(businessId) { return this.http.get(this.membersEndpoint.endpointPath, { params: { businessId } }); }
     getInvitations(businessId) { return this.http.get(this.invitationsEndpoint.endpointPath, { params: { businessId } }); }
@@ -19,7 +32,11 @@ export class BusinessApi extends BaseApi {
     updateMember(resource) { return this.membersEndpoint.update(resource.id, resource); }
     deleteMember(id) { return this.membersEndpoint.delete(id); }
 
-    /** Proposed PlanLimits contract, backed by mock Payments resources for this delivery. */
+    /**
+     * Builds the frontend plan-limit projection from mock Payments resources.
+     * @param {string|number} businessId - Commerce identifier.
+     * @returns {Promise<PlanLimitsSnapshot>} Data consumed by Business without a Payments store dependency.
+     */
     async getPlanLimits(businessId) {
         const response = await this.http.get(this.subscriptionsEndpoint.endpointPath, { params: { businessId } });
         const subscriptions = Array.isArray(response.data) ? response.data : response.data?.subscriptions;
