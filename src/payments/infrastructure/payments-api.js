@@ -4,10 +4,12 @@ import { BaseEndpoint } from "../../shared/infrastructure/base-endpoint.js";
 export class PaymentsApi {
     constructor() {
         const baseApi = new BaseApi();
-        this.plansEndpoint = new BaseEndpoint(baseApi, "plans");
-        this.subscriptionsEndpoint = new BaseEndpoint(baseApi, "subscriptions");
-        this.paymentMethodsEndpoint = new BaseEndpoint(baseApi, "payment-methods");
-        this.invoicesEndpoint = new BaseEndpoint(baseApi, "invoices");
+        this.plansEndpoint = new BaseEndpoint(baseApi, import.meta.env.VITE_PLANS_ENDPOINT_PATH);
+        this.subscriptionsEndpoint = new BaseEndpoint(baseApi, import.meta.env.VITE_SUBSCRIPTIONS_ENDPOINT_PATH);
+        this.paymentMethodsEndpoint = new BaseEndpoint(baseApi, import.meta.env.VITE_PAYMENT_METHODS_ENDPOINT_PATH);
+        this.membersEndpoint = new BaseEndpoint(baseApi, import.meta.env.VITE_BUSINESS_MEMBERS_ENDPOINT_PATH);
+        this.invitationsEndpoint = new BaseEndpoint(baseApi, import.meta.env.VITE_STAFF_INVITATIONS_ENDPOINT_PATH);
+        this.invoicesEndpoint = new BaseEndpoint(baseApi, import.meta.env.VITE_INVOICES_ENDPOINT_PATH);
     }
 
     getPlans() {
@@ -26,8 +28,8 @@ export class PaymentsApi {
     async getSeatUsage(businessId) {
         const http = this.subscriptionsEndpoint.http;
         const [membersResponse, invitationsResponse] = await Promise.all([
-            http.get('business-members', { params: { businessId } }),
-            http.get('staff-invitations', { params: { businessId } })
+            http.get(this.membersEndpoint.endpointPath, { params: { businessId } }),
+            http.get(this.invitationsEndpoint.endpointPath, { params: { businessId } })
         ]);
         const members = Array.isArray(membersResponse.data) ? membersResponse.data : membersResponse.data?.members;
         const invitations = Array.isArray(invitationsResponse.data) ? invitationsResponse.data : invitationsResponse.data?.invitations;

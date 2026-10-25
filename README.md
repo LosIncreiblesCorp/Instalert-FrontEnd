@@ -165,7 +165,26 @@ Main variables:
 - `VITE_INSTALERT_PLATFORM_API_URL`
 - `VITE_MAPBOX_API_KEY`
 - `VITE_PRIME_UI_LICENSE_KEY`
-- `VITE_EMERGENCY_CONTACTS_ENDPOINT_PATH` (with fallback to `emergency-contacts` when unset)
+API resource paths are configured in both environment files:
+
+| Variable | Current mock resource |
+|---|---|
+| `VITE_ALERTS_ENDPOINT_PATH` | `alerts` |
+| `VITE_ALERT_PREFERENCES_ENDPOINT_PATH` | `alertPreferences` |
+| `VITE_BUSINESS_MEMBERS_ENDPOINT_PATH` | `business-members` |
+| `VITE_STAFF_INVITATIONS_ENDPOINT_PATH` | `staff-invitations` |
+| `VITE_BUSINESSES_ENDPOINT_PATH` | `businesses` |
+| `VITE_RISK_ZONES_ENDPOINT_PATH` | `risk_zones` |
+| `VITE_INCIDENTS_ENDPOINT_PATH` | `incidents` |
+| `VITE_PLANS_ENDPOINT_PATH` | `plans` |
+| `VITE_SUBSCRIPTIONS_ENDPOINT_PATH` | `subscriptions` |
+| `VITE_PAYMENT_METHODS_ENDPOINT_PATH` | `payment-methods` |
+| `VITE_INVOICES_ENDPOINT_PATH` | `invoices` |
+| `VITE_EMERGENCY_CONTACTS_ENDPOINT_PATH` | `emergency-contacts` |
+
+The API base URL includes the API prefix when required; resource paths are relative to it. Development uses the local JSON Server at `http://localhost:3000/api/v1`; production retains the hosted mock URL. These routes describe the current frontend adapters, not a finalized ASP.NET contract. The seed does not yet include `payment-methods` or `invoices`; configuring their paths does not implement these resources.
+
+Missing API configuration raises an error rather than falling back to hard-coded resource names. Restart Vite after changing environment variables, or rebuild for production. All `VITE_*` values are exposed to the browser.
 
 Tip: if your API is running on a different port, update `VITE_INSTALERT_PLATFORM_API_URL` in `.env.development`.
 

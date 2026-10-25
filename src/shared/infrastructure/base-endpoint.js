@@ -9,8 +9,11 @@ export class BaseEndpoint {
      * @param {string} endpointPath - Relative resource path.
      */
     constructor(baseApi, endpointPath) {
+        if (typeof endpointPath !== 'string' || !endpointPath.trim().replace(/^\/+|\/+$/g, '')) {
+            throw new Error('A relative API endpoint path must be configured in the environment.');
+        }
         this.http = baseApi.http;
-        this.endpointPath = endpointPath;
+        this.endpointPath = endpointPath.trim().replace(/^\/+|\/+$/g, '');
     }
 
     /** @returns {Promise<import('axios').AxiosResponse>} HTTP response with resource collection. */

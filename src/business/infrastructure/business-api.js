@@ -5,10 +5,10 @@ import { BaseEndpoint } from '../../shared/infrastructure/base-endpoint.js';
 export class BusinessApi extends BaseApi {
     constructor() {
         super();
-        this.membersEndpoint = new BaseEndpoint(this, import.meta.env.VITE_BUSINESS_MEMBERS_ENDPOINT_PATH || 'business-members');
-        this.invitationsEndpoint = new BaseEndpoint(this, import.meta.env.VITE_STAFF_INVITATIONS_ENDPOINT_PATH || 'staff-invitations');
-        this.plansEndpoint = new BaseEndpoint(this, 'plans');
-        this.subscriptionsEndpoint = new BaseEndpoint(this, 'subscriptions');
+        this.membersEndpoint = new BaseEndpoint(this, import.meta.env.VITE_BUSINESS_MEMBERS_ENDPOINT_PATH);
+        this.invitationsEndpoint = new BaseEndpoint(this, import.meta.env.VITE_STAFF_INVITATIONS_ENDPOINT_PATH);
+        this.plansEndpoint = new BaseEndpoint(this, import.meta.env.VITE_PLANS_ENDPOINT_PATH);
+        this.subscriptionsEndpoint = new BaseEndpoint(this, import.meta.env.VITE_SUBSCRIPTIONS_ENDPOINT_PATH);
     }
 
     getMembers(businessId) { return this.http.get(this.membersEndpoint.endpointPath, { params: { businessId } }); }

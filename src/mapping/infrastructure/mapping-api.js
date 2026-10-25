@@ -6,9 +6,9 @@ import { BaseApi } from "../../shared/infrastructure/base-api.js";
 export class MappingApi {
     constructor() {
         const baseApi = new BaseApi();
-        this.riskZonesEndpoint = new BaseEndpoint(baseApi, 'risk_zones');
-        this.incidentsEndpoint = new BaseEndpoint(baseApi, 'incidents');
-        this.businessesEndpoint = new BaseEndpoint(baseApi, 'businesses');
+        this.riskZonesEndpoint = new BaseEndpoint(baseApi, import.meta.env.VITE_RISK_ZONES_ENDPOINT_PATH);
+        this.incidentsEndpoint = new BaseEndpoint(baseApi, import.meta.env.VITE_INCIDENTS_ENDPOINT_PATH);
+        this.businessesEndpoint = new BaseEndpoint(baseApi, import.meta.env.VITE_BUSINESSES_ENDPOINT_PATH);
     }
 
 /** Fetches all risk zone resources.
