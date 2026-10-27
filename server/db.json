@@ -2892,6 +2892,7 @@
   "businesses": [
     {
       "id": "bus-1",
+      "taxId": "00000000000",
       "name": "Bodega San Isidro 587",
       "address": "Av. Principal 990",
       "isVerified": true,
@@ -3967,6 +3968,408 @@
       "status": "active",
       "currentPeriodEnd": "2026-11-04",
       "cancelAtPeriodEnd": false
+    }
+  ],
+  "user-profiles": [
+    {
+      "id": "demo-admin",
+      "userId": "demo-admin",
+      "firstName": "Alex",
+      "lastName": "Example",
+      "dni": "00000001",
+      "phone": null,
+      "updatedAt": "2026-10-23T12:00:00Z"
+    },
+    {
+      "id": "demo-employee",
+      "userId": "demo-employee",
+      "firstName": "Sam",
+      "lastName": "Example",
+      "dni": "00000002",
+      "phone": null,
+      "updatedAt": "2026-10-23T12:00:00Z"
+    }
+  ],
+  "user-preferences": [
+    {
+      "id": "demo-admin",
+      "userId": "demo-admin",
+      "locale": "en_US",
+      "updatedAt": "2026-10-23T12:00:00Z"
+    },
+    {
+      "id": "demo-employee",
+      "userId": "demo-employee",
+      "locale": "en_US",
+      "updatedAt": "2026-10-23T12:00:00Z"
+    }
+  ],
+  "notifications": [],
+  "notification-preferences": [
+    {
+      "id": "demo-admin",
+      "userId": "demo-admin",
+      "businessId": "bus-1",
+      "nearbyAlertsEnabled": true,
+      "nearbyRadiusMeters": 500,
+      "updatedAt": "2026-10-24T12:00:00Z"
+    },
+    {
+      "id": "demo-employee",
+      "userId": "demo-employee",
+      "businessId": "bus-1",
+      "nearbyAlertsEnabled": true,
+      "nearbyRadiusMeters": 500,
+      "updatedAt": "2026-10-24T12:00:00Z"
+    }
+  ],
+  "monthly-reports": [
+    {
+      "id": "synthetic-monthly-bus-1-2026-09",
+      "businessId": "bus-1",
+      "month": "2026-09",
+      "generatedAt": "2026-10-01T05:05:00.000Z",
+      "generationSource": "manual",
+      "generatedByUserId": "demo-admin",
+      "schemaVersion": 1,
+      "summary": {
+        "role": "administrator",
+        "businessId": "bus-1",
+        "userId": null,
+        "businessName": "Comercio de ejemplo",
+        "period": {
+          "kind": "month",
+          "month": "2026-09",
+          "year": null,
+          "start": "2026-09-01T05:00:00.000Z",
+          "end": "2026-10-01T05:00:00.000Z",
+          "previousStart": "2026-08-01T05:00:00.000Z",
+          "previousEnd": "2026-09-01T05:00:00.000Z",
+          "timeZone": "America/Lima"
+        },
+        "radiusMeters": 500,
+        "refreshedAt": "2026-10-01T05:05:00.000Z",
+        "metrics": {
+          "activeAlerts": 2,
+          "pendingReports": 3,
+          "reports": 12,
+          "previousReports": 8,
+          "nearbyIncidents": 9,
+          "unreadNotifications": null,
+          "invalidLocationReports": 1,
+          "undatedReports": 0,
+          "localRiskLevel": "high"
+        },
+        "staff": {
+          "active": 2,
+          "pending": 1,
+          "limit": 4,
+          "available": 1,
+          "overCapacity": false
+        },
+        "subscription": {
+          "name": "Essential",
+          "status": "active",
+          "currentPeriodEnd": "2026-10-15T05:00:00.000Z",
+          "cancelAtPeriodEnd": false
+        },
+        "daily": [
+          {
+            "key": "2026-09-01",
+            "value": 0
+          },
+          {
+            "key": "2026-09-02",
+            "value": 1
+          },
+          {
+            "key": "2026-09-03",
+            "value": 0
+          },
+          {
+            "key": "2026-09-04",
+            "value": 1
+          },
+          {
+            "key": "2026-09-05",
+            "value": 0
+          },
+          {
+            "key": "2026-09-06",
+            "value": 1
+          },
+          {
+            "key": "2026-09-07",
+            "value": 0
+          },
+          {
+            "key": "2026-09-08",
+            "value": 0
+          },
+          {
+            "key": "2026-09-09",
+            "value": 1
+          },
+          {
+            "key": "2026-09-10",
+            "value": 0
+          },
+          {
+            "key": "2026-09-11",
+            "value": 0
+          },
+          {
+            "key": "2026-09-12",
+            "value": 1
+          },
+          {
+            "key": "2026-09-13",
+            "value": 0
+          },
+          {
+            "key": "2026-09-14",
+            "value": 0
+          },
+          {
+            "key": "2026-09-15",
+            "value": 0
+          },
+          {
+            "key": "2026-09-16",
+            "value": 1
+          },
+          {
+            "key": "2026-09-17",
+            "value": 0
+          },
+          {
+            "key": "2026-09-18",
+            "value": 0
+          },
+          {
+            "key": "2026-09-19",
+            "value": 0
+          },
+          {
+            "key": "2026-09-20",
+            "value": 1
+          },
+          {
+            "key": "2026-09-21",
+            "value": 0
+          },
+          {
+            "key": "2026-09-22",
+            "value": 0
+          },
+          {
+            "key": "2026-09-23",
+            "value": 0
+          },
+          {
+            "key": "2026-09-24",
+            "value": 1
+          },
+          {
+            "key": "2026-09-25",
+            "value": 0
+          },
+          {
+            "key": "2026-09-26",
+            "value": 0
+          },
+          {
+            "key": "2026-09-27",
+            "value": 2
+          },
+          {
+            "key": "2026-09-28",
+            "value": 0
+          },
+          {
+            "key": "2026-09-29",
+            "value": 0
+          },
+          {
+            "key": "2026-09-30",
+            "value": 2
+          }
+        ],
+        "categories": [
+          {
+            "key": "robbery",
+            "value": 4
+          },
+          {
+            "key": "person",
+            "value": 3
+          },
+          {
+            "key": "vandalism",
+            "value": 2
+          },
+          {
+            "key": "other",
+            "value": 3
+          }
+        ],
+        "statuses": [
+          {
+            "key": "active",
+            "value": 2
+          },
+          {
+            "key": "pending-report",
+            "value": 3
+          },
+          {
+            "key": "completed",
+            "value": 4
+          },
+          {
+            "key": "submitted",
+            "value": 3
+          }
+        ],
+        "hourly": [
+          {
+            "key": "00",
+            "value": 0
+          },
+          {
+            "key": "01",
+            "value": 0
+          },
+          {
+            "key": "02",
+            "value": 0
+          },
+          {
+            "key": "03",
+            "value": 0
+          },
+          {
+            "key": "04",
+            "value": 0
+          },
+          {
+            "key": "05",
+            "value": 0
+          },
+          {
+            "key": "06",
+            "value": 0
+          },
+          {
+            "key": "07",
+            "value": 0
+          },
+          {
+            "key": "08",
+            "value": 0
+          },
+          {
+            "key": "09",
+            "value": 2
+          },
+          {
+            "key": "10",
+            "value": 0
+          },
+          {
+            "key": "11",
+            "value": 0
+          },
+          {
+            "key": "12",
+            "value": 3
+          },
+          {
+            "key": "13",
+            "value": 0
+          },
+          {
+            "key": "14",
+            "value": 0
+          },
+          {
+            "key": "15",
+            "value": 0
+          },
+          {
+            "key": "16",
+            "value": 4
+          },
+          {
+            "key": "17",
+            "value": 0
+          },
+          {
+            "key": "18",
+            "value": 0
+          },
+          {
+            "key": "19",
+            "value": 0
+          },
+          {
+            "key": "20",
+            "value": 3
+          },
+          {
+            "key": "21",
+            "value": 0
+          },
+          {
+            "key": "22",
+            "value": 0
+          },
+          {
+            "key": "23",
+            "value": 0
+          }
+        ],
+        "riskCounts": [
+          {
+            "key": "low",
+            "value": 2
+          },
+          {
+            "key": "medium",
+            "value": 3
+          },
+          {
+            "key": "high",
+            "value": 4
+          },
+          {
+            "key": "unknown",
+            "value": 0
+          }
+        ],
+        "riskZones": [
+          {
+            "id": "synthetic-zone-high",
+            "name": "Zona sintética A",
+            "riskLevel": "high",
+            "incidentCount": 4
+          },
+          {
+            "id": "synthetic-zone-medium",
+            "name": "Zona sintética B",
+            "riskLevel": "medium",
+            "incidentCount": 3
+          },
+          {
+            "id": "synthetic-zone-low",
+            "name": "Zona sintética C",
+            "riskLevel": "low",
+            "incidentCount": 2
+          }
+        ],
+        "activity": null,
+        "warnings": []
+      }
     }
   ]
 }

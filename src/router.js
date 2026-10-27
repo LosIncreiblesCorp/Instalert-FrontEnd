@@ -5,8 +5,10 @@ import { paymentsRoutes } from "./payments/presentation/payments-routes.js";
 import businessRoutes from "./business/presentation/business-routes.js";
 import alertRoutes from "./alert/presentation/alert-routes.js";
 import contactsRoutes from "./contacts/presentation/contacts-routes.js";
+import { profilesRoutes } from "./profiles/presentation/profiles-routes.js";
+import { notificationsRoutes } from "./notifications/presentation/notifications-routes.js";
+import { dashboardRoutes } from "./dashboard/presentation/dashboard-routes.js";
 
-const EmptyRouteView = { render: () => null };
 
 const employeeAlertRoutes = alertRoutes.map((route) => ({
   ...route,
@@ -29,12 +31,6 @@ const routes = [
   },
   { path: "/admin", redirect: { name: "admin-dashboard" } },
   {
-    path: "/admin/dashboard",
-    name: "admin-dashboard",
-    component: () => import("./shared/presentation/views/admin-home.vue"),
-    meta: { role: "administrator", menuKey: "dashboard", title: "navigation.adminDashboard" },
-  },
-  {
     path: "/admin/risk-map",
     name: "admin-risk-map",
     component: () => import('./mapping/presentation/views/risk-map-page.vue'),
@@ -52,14 +48,11 @@ const routes = [
     component: () => import("./alert/presentation/views/employee-alerts.vue"),
     meta: { role: "administrator", menuKey: "alerts", alertView: "history", historyOnly: true, title: "navigation.alertHistory" },
   },
+  ...dashboardRoutes,
   ...paymentsRoutes,
   ...businessRoutes,
-  {
-    path: "/admin/profile",
-    name: "admin-profile",
-    component: EmptyRouteView,
-    meta: { role: "administrator", title: "common.profile" },
-  },
+  ...profilesRoutes,
+  ...notificationsRoutes,
   {
     path: "/admin/:pathMatch(.*)*",
     name: "admin-not-found",
@@ -68,12 +61,6 @@ const routes = [
   },
   { path: "/employee", redirect: { name: "employee-dashboard" } },
   {
-    path: "/employee/dashboard",
-    name: "employee-dashboard",
-    component: () => import("./shared/presentation/views/employee-home.vue"),
-    meta: { role: "employee", menuKey: "dashboard", title: "navigation.employeeDashboard" },
-  },
-  {
     path: "/employee/risk-map",
     name: "employee-risk-map",
     component: () => import('./mapping/presentation/views/risk-map-page.vue'),
@@ -81,12 +68,6 @@ const routes = [
   },
   ...employeeAlertRoutes,
   ...contactsRoutes,
-  {
-    path: "/employee/profile",
-    name: "employee-profile",
-    component: EmptyRouteView,
-    meta: { role: "employee", title: "common.profile" },
-  },
   {
     path: "/employee/:pathMatch(.*)*",
     name: "employee-not-found",

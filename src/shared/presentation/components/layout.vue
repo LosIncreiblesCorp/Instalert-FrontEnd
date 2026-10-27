@@ -2,12 +2,14 @@
 import { computed, ref, watch } from "vue";
 import { RouterLink, RouterView, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
-import LanguageSwitcher from "./language-switcher.vue";
 import instalertLogo from "../../../assets/instalert-logo.svg";
+
+defineProps({ unreadNotifications: { type: Number, default: 0 } });
 
 const route = useRoute();
 const { locale, t } = useI18n();
 const mobileNavigationOpen = ref(false);
+const businessNavigationOpen = ref(false);
 
 const isAdministrator = computed(() => route.meta.role === "administrator");
 const currentRoleLabel = computed(() =>
@@ -19,12 +21,21 @@ const homeRouteName = computed(() =>
 const profileRouteName = computed(() =>
   isAdministrator.value ? "admin-profile" : "employee-profile",
 );
+const notificationsRouteName = computed(() =>
+  isAdministrator.value ? "admin-notifications" : "employee-notifications",
+);
 
 const administratorItems = [
   { key: "dashboard", label: "navigation.adminDashboard", icon: "pi pi-home", routeName: "admin-dashboard" },
   { key: "risk-map", label: "navigation.riskMap", icon: "pi pi-map", routeName: "admin-risk-map" },
   { key: "alerts", label: "navigation.alerts", icon: "pi pi-bell", routeName: "admin-alerts-history" },
-  { key: "personnel", label: "navigation.personnel", icon: "pi pi-users", routeName: "admin-personnel" },
+  {
+    key: "business", label: "navigation.business", icon: "pi pi-building",
+    children: [
+      { key: "business-profile", label: "navigation.businessProfile", icon: "pi pi-id-card", routeName: "admin-business-profile" },
+      { key: "personnel", label: "navigation.personnel", icon: "pi pi-users", routeName: "admin-personnel" },
+    ],
+  },
   { key: "subscription", label: "navigation.subscription", icon: "pi pi-credit-card", routeName: "admin-subscription" },
 ];
 
@@ -39,6 +50,11 @@ const navigationItems = computed(() =>
   isAdministrator.value ? administratorItems : employeeItems,
 );
 const activeMenuKey = computed(() => route.meta.menuKey);
+const businessSectionActive = computed(() => ["business-profile", "personnel"].includes(activeMenuKey.value));
+
+watch(activeMenuKey, () => {
+  businessNavigationOpen.value = businessSectionActive.value;
+}, { immediate: true });
 
 watch(
   () => route.fullPath,
@@ -86,6 +102,12 @@ function closeMobileNavigation() {
       </div>
 
       <div class="header-context">
+        <RouterLink class="notifications-link" :to="{ name: notificationsRouteName }"
+            :aria-label="t('notifications.bellLabel', { count: unreadNotifications })"
+            :title="t('notifications.title')">
+          <i class="pi pi-bell" aria-hidden="true"></i>
+          <span v-if="unreadNotifications > 0" class="notification-badge" aria-hidden="true">{{ unreadNotifications > 99 ? '99+' : unreadNotifications }}</span>
+        </RouterLink>
         <RouterLink class="profile-link" :to="{ name: profileRouteName }" :aria-label="t('common.profile')">
           <span class="role-mark" aria-hidden="true"><i class="pi pi-user"></i></span>
           <span class="role-copy">
@@ -93,7 +115,6 @@ function closeMobileNavigation() {
           </span>
           <span class="profile-label">{{ t("common.profile") }}</span>
         </RouterLink>
-        <LanguageSwitcher />
       </div>
     </header>
 
@@ -115,7 +136,35 @@ function closeMobileNavigation() {
 
         <ul class="navigation-list">
           <li v-for="item in navigationItems" :key="item.key" class="navigation-list-item">
+            <template v-if="item.children">
+              <button
+                type="button"
+                class="navigation-link navigation-group-toggle"
+                :class="{ 'navigation-link--group-active': businessSectionActive }"
+                :aria-expanded="businessNavigationOpen"
+                aria-controls="business-navigation-links"
+                @click="businessNavigationOpen = !businessNavigationOpen"
+              >
+                <i :class="item.icon" aria-hidden="true"></i>
+                <span class="navigation-link-label">{{ t(item.label) }}</span>
+                <i :class="businessNavigationOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" aria-hidden="true"></i>
+              </button>
+              <ul v-show="businessNavigationOpen" id="business-navigation-links" class="navigation-sublist" :aria-label="t(item.label)">
+                <li v-for="child in item.children" :key="child.key">
+                  <RouterLink
+                    class="navigation-link navigation-sublink"
+                    :class="{ 'navigation-link--active': activeMenuKey === child.key }"
+                    :to="{ name: child.routeName }"
+                    @click="closeMobileNavigation"
+                  >
+                    <i :class="child.icon" aria-hidden="true"></i>
+                    <span class="navigation-link-label">{{ t(child.label) }}</span>
+                  </RouterLink>
+                </li>
+              </ul>
+            </template>
             <RouterLink
+              v-else
               class="navigation-link"
               :class="{ 'navigation-link--active': activeMenuKey === item.key }"
               :to="{ name: item.routeName }"
@@ -219,6 +268,39 @@ function closeMobileNavigation() {
   gap: 11px;
 }
 
+.notifications-link {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 20px;
+}
+
+.notifications-link:hover, .notifications-link.router-link-active {
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 19px;
+  padding: 2px 4px;
+  border-radius: 12px;
+  color: #fff;
+  background: #b91c1c;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+}
+
 .profile-link {
   display: flex;
   min-height: 42px;
@@ -296,6 +378,8 @@ function closeMobileNavigation() {
   padding: 17px 12px 15px;
   border-right: 1px solid var(--line);
   background: #fff;
+  gap: 20px;
+  overflow-y: auto;
 }
 
 .primary-navigation {
@@ -378,6 +462,35 @@ function closeMobileNavigation() {
   flex: 1;
 }
 
+.navigation-group-toggle > i:last-child {
+  font-size: 11px;
+}
+
+.navigation-link--group-active {
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.navigation-link--group-active > i:first-child {
+  color: #1d4ed8;
+}
+
+.navigation-sublist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 6px 0 4px 17px;
+  padding: 0 0 0 10px;
+  border-left: 1px solid var(--line);
+  list-style: none;
+}
+
+.navigation-sublink {
+  min-height: 44px;
+  padding: 8px 10px;
+  line-height: 1.35;
+}
+
 .sidebar-role-note {
   display: flex;
   min-height: 39px;
@@ -389,6 +502,7 @@ function closeMobileNavigation() {
   background: #f4f7fb;
   font-size: 11px;
   font-weight: 600;
+  flex-shrink: 0;
 }
 
 .sidebar-role-note i {
@@ -506,8 +620,12 @@ select:focus-visible {
   }
 
   .role-mark {
-    display: none;
+    display: grid;
   }
+
+  .role-copy { display: none; }
+  .profile-label { display: none; }
+  .profile-link { min-width: 44px; justify-content: center; padding: 4px; }
 
   .role-name {
     max-width: 102px;
