@@ -8,7 +8,6 @@ const props = defineProps({
   plan: { type: Object, required: true },
   selected: { type: Boolean, default: false },
   selecting: { type: Boolean, default: false },
-  billingCycle: { type: String, default: "monthly" },
   currency: { type: String, default: "PEN" },
   accent: { type: Boolean, default: false },
   // UI-level guard only: the quota counts active employees.
@@ -38,20 +37,10 @@ const eyebrow = computed(() => (te(`${tierKey.value}.eyebrow`) ? t(`${tierKey.va
 const description = computed(() => (te(`${tierKey.value}.description`) ? t(`${tierKey.value}.description`) : ""));
 const tierIcon = computed(() => tierIcons[tierId.value] ?? "pi pi-shield");
 
-const rawPrice = computed(() => planPrice(props.plan, props.currency, props.billingCycle));
+const rawPrice = computed(() => planPrice(props.plan, props.currency));
 
 const displayPrice = computed(() =>
     formatMoney(rawPrice.value, props.currency, locale.value)
-);
-
-const suffix = computed(() =>
-    props.billingCycle === "annual" ? t("payments.perYear") : t("payments.perMonth")
-);
-
-const legend = computed(() =>
-    props.billingCycle === "annual"
-        ? t("payments.netBillingAnnual")
-        : t("payments.netBillingMonthly")
 );
 
 const isDisabled = computed(() => props.selected || props.selecting || props.blocked);
@@ -78,9 +67,9 @@ const ctaLabel = computed(() => {
                 <span class="plan-card__amount" :class="{ 'plan-card__amount--selected': selected }">
                     {{ displayPrice }}
                 </span>
-        <span class="plan-card__suffix">{{ suffix }}</span>
+        <span class="plan-card__suffix">{{ $t("payments.perMonth") }}</span>
       </p>
-      <p class="plan-card__legend">{{ legend }}</p>
+      <p class="plan-card__legend">{{ $t("payments.netBillingMonthly") }}</p>
       <pv-button
           class="plan-card__details-toggle"
           text
