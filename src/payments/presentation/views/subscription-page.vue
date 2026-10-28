@@ -3,35 +3,39 @@
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useConfirm } from "primevue/useconfirm";
+import Dialog from "primevue/dialog";
 import { usePaymentsStore } from "../../application/payments.store.js";
 import { planPrice, formatMoney } from "../payments-format.js";
 import PlanCard from "../components/plan-card.vue";
 import SubscriptionSummary from "../components/subscription-summary.vue";
-import PaymentMethodCard from "../components/payment-method-card.vue";
 import BillingHistory from "../components/billing-history.vue";
+import PayPalSubscriptionButton from "../components/paypal-subscription-button.vue";
 
 const paymentsStore = usePaymentsStore();
 const { locale, t } = useI18n();
 const confirm = useConfirm();
 
 const selectingPlanId = ref(null);
+const openingCheckout = ref(false);
 const cancelling = ref(false);
 const notice = ref("");
-// Simulated billing-cycle toggle: visual only, it just re-renders plan prices.
-const billingCycle = ref("monthly");
-const currency = ref("PEN");
-const currencyOptions = computed(() => [
-  { label: t("payments.currencySoles"), value: "PEN" },
-  { label: t("payments.currencyDollars"), value: "USD" }
-]);
+const currency = "USD";
+let checkoutTrigger = null;
+
+function restoreCheckoutFocus() {
+  if (checkoutTrigger instanceof HTMLElement && checkoutTrigger.isConnected) {
+    checkoutTrigger.focus({ preventScroll: true });
+  }
+  checkoutTrigger = null;
+}
 
 const currentPlan = computed(() => paymentsStore.currentPlan ?? null);
 const assignedOperators = computed(() => paymentsStore.assignedOperators);
-
-const billingOptions = computed(() => [
-  { label: t("payments.billingMonthly"), value: "monthly" },
-  { label: t("payments.billingAnnual"), value: "annual", hint: t("payments.billingAnnualDiscount") }
-]);
+const checkoutPlan = computed(() => paymentsStore.plans.find(plan => plan.id === selectingPlanId.value));
+const checkoutVisible = computed({
+  get: () => Boolean(selectingPlanId.value),
+  set: visible => { if (!visible && !paymentsStore.checkoutBusy) selectingPlanId.value = null; }
+});
 
 const topPlanId = computed(() => {
   if (paymentsStore.plans.length === 0) return null;
@@ -43,37 +47,28 @@ function isBlocked(plan) {
   return !paymentsStore.seatUsageAvailable || plan.maxEmployees < assignedOperators.value;
 }
 
-/** Formats a plan price for the selected cycle. @param {Object} plan - Plan entity. @param {string} cycle - Billing cycle. @returns {string} Formatted price. */
-function formatPlanPrice(plan, cycle) {
-  return formatMoney(planPrice(plan, currency.value, cycle), currency.value, locale.value);
+/** Formats a monthly plan price. @param {Object} plan - Plan entity. @returns {string} Formatted price. */
+function formatPlanPrice(plan) {
+  return formatMoney(planPrice(plan, currency), currency, locale.value);
 }
 
 onMounted(() => {
+  paymentsStore.resetPayPalCheckout();
   paymentsStore.fetchPaymentsData();
 });
 
-/** Asks for confirmation and applies a plan change. @param {string} planId - Plan identifier. @returns {void} */
-function handleSelectRequest(planId) {
+/** Opens checkout after checking plan availability. @param {string} planId - Plan identifier. */
+async function handleSelectRequest(planId) {
   const next = paymentsStore.plans.find((p) => p.id === planId);
-  if (!next || isBlocked(next)) return;
-  confirm.require({
-    message: t("payments.confirmPlanMessage", {
-      current: currentPlan.value?.name ?? "",
-      next: next.name,
-      price: formatPlanPrice(next, billingCycle.value)
-    }),
-    header: t("payments.confirmPlanTitle"),
-    icon: "pi pi-exclamation-triangle",
-    acceptLabel: t("payments.confirmAccept"),
-    rejectLabel: t("payments.confirmReject"),
-    accept: async () => {
-      selectingPlanId.value = planId;
-      notice.value = "";
-      const applied = await paymentsStore.selectPlan(planId);
-      if (applied) notice.value = t("payments.planUpdatedTo", { name: next.name });
-      selectingPlanId.value = null;
-    }
-  });
+  if (!next || isBlocked(next) || paymentsStore.checkoutBusy || openingCheckout.value) return;
+  checkoutTrigger = document.activeElement;
+  openingCheckout.value = true;
+  notice.value = "";
+  try {
+    if (await paymentsStore.preparePayPalCheckout(planId)) selectingPlanId.value = planId;
+  } finally {
+    openingCheckout.value = false;
+  }
 }
 
 /** Asks for confirmation and cancels the subscription. @returns {void} */
@@ -114,8 +109,13 @@ function handleCancelClick() {
       {{ $t("payments.empty") }}
     </p>
 
-    <template v-else>
+    <pv-message v-if="paymentsStore.checkoutOutcome" severity="info" :closable="true" role="status" @close="paymentsStore.checkoutOutcome = null">
+      {{ $t(`payments.paypal.${paymentsStore.checkoutOutcome}`) }}
+    </pv-message>
+
+    <template v-if="!paymentsStore.isLoading">
       <SubscriptionSummary
+          v-if="paymentsStore.currentSubscription"
           :subscription="paymentsStore.currentSubscription"
           :plan="currentPlan"
           :currency="currency"
@@ -129,33 +129,6 @@ function handleCancelClick() {
             <p class="plans-section__subtitle">{{ $t("payments.matrixSubtitle") }}</p>
           </div>
 
-          <div class="billing-toggle">
-            <span id="plan-currency-label" class="sr-only">{{ $t("payments.currencyLabel") }}</span>
-            <pv-select-button
-                v-model="currency"
-                :options="currencyOptions"
-                option-label="label"
-                option-value="value"
-                :allow-empty="false"
-                aria-labelledby="plan-currency-label"
-            />
-            <span id="billing-cycle-label" class="sr-only">
-              {{ $t("payments.billingToggleLabel") }}
-            </span>
-            <pv-select-button
-                v-model="billingCycle"
-                :options="billingOptions"
-                option-label="label"
-                option-value="value"
-                :allow-empty="false"
-                aria-labelledby="billing-cycle-label"
-            >
-              <template #option="{ option }">
-                <span>{{ option.label }}</span>
-                <span v-if="option.hint" class="billing-toggle__discount">{{ option.hint }}</span>
-              </template>
-            </pv-select-button>
-          </div>
         </div>
 
         <div class="plans-section__grid">
@@ -163,24 +136,49 @@ function handleCancelClick() {
               v-for="plan in paymentsStore.plans"
               :key="plan.id"
               :plan="plan"
-              :selected="plan.id === paymentsStore.currentSubscription.planId"
-              :selecting="selectingPlanId === plan.id"
-              :billing-cycle="billingCycle"
+              :selected="plan.id === paymentsStore.currentSubscription?.planId"
+              :selecting="paymentsStore.checkoutBusy || openingCheckout"
               :currency="currency"
               :accent="plan.id === topPlanId"
-              :blocked="plan.id !== paymentsStore.currentSubscription.planId && isBlocked(plan)"
+              :blocked="plan.id !== paymentsStore.currentSubscription?.planId && isBlocked(plan)"
               :assigned-operators="assignedOperators"
               @select="handleSelectRequest"
           />
         </div>
       </section>
 
-      <div class="billing-row">
-        <PaymentMethodCard :payment-method="paymentsStore.paymentMethod" />
-        <BillingHistory :invoices="paymentsStore.invoices" />
-      </div>
+      <Dialog
+          v-model:visible="checkoutVisible"
+          modal
+          block-scroll
+          :draggable="false"
+          :closable="!paymentsStore.checkoutBusy"
+          :close-on-escape="!paymentsStore.checkoutBusy"
+          :dismissable-mask="false"
+          :header="$t('payments.paypal.checkoutTitle')"
+          :style="{ width: '30rem', maxWidth: 'calc(100vw - 2rem)', maxHeight: 'calc(100dvh - 2rem)' }"
+          :pt="{ mask: { class: 'payments-checkout-mask', style: { backdropFilter: 'blur(3px)' } } }"
+          @after-hide="restoreCheckoutFocus"
+      >
+        <div v-if="checkoutPlan" class="checkout-summary">
+          <span class="checkout-summary__icon" aria-hidden="true"><i class="pi pi-wallet" /></span>
+          <div>
+            <p class="checkout-summary__label">{{ $t('payments.paypal.selectedPlan') }}</p>
+            <h2 class="checkout-summary__name">{{ checkoutPlan.name }}</h2>
+            <p class="checkout-summary__capacity">{{ $t('payments.upToEmployees', { count: checkoutPlan.maxEmployees }) }}</p>
+          </div>
+          <p class="checkout-summary__price">{{ formatPlanPrice(checkoutPlan) }}<span>{{ $t('payments.perMonth') }}</span></p>
+        </div>
+        <p class="checkout-help">{{ $t('payments.paypal.checkoutHelp') }}</p>
+        <PayPalSubscriptionButton v-if="selectingPlanId" :key="selectingPlanId" :plan-id="selectingPlanId" @approved="selectingPlanId = null" />
+        <template #footer>
+          <pv-button severity="secondary" outlined :label="$t('payments.confirmReject')" :disabled="paymentsStore.checkoutBusy" @click="selectingPlanId = null" />
+        </template>
+      </Dialog>
 
-      <section class="pause-banner" :aria-label="$t('payments.pauseTitle')">
+      <BillingHistory :payments="paymentsStore.paymentHistory" />
+
+      <section v-if="paymentsStore.currentSubscription" class="pause-banner" :aria-label="$t('payments.pauseTitle')">
                 <span class="pause-banner__icon" aria-hidden="true">
                     <i class="pi pi-shield"></i>
                 </span>
@@ -191,7 +189,7 @@ function handleCancelClick() {
         <pv-button
             class="pause-banner__action"
             type="button"
-            :disabled="paymentsStore.currentSubscription.cancelAtPeriodEnd || cancelling"
+            :disabled="paymentsStore.currentSubscription.cancelAtPeriodEnd || cancelling || paymentsStore.checkoutBusy"
             :label="$t('payments.cancelSubscription')"
             @click="handleCancelClick"
         />
@@ -210,15 +208,7 @@ function handleCancelClick() {
 </template>
 
 <style scoped>
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  clip-path: inset(50%);
-}
+:global(.payments-checkout-mask) { background: rgba(15, 23, 42, 0.65) !important; }
 .subscription-page :deep(.p-card) {
   --p-card-background: #fff;
   --p-card-color: #172033;
@@ -281,64 +271,6 @@ function handleCancelClick() {
   color: #68758a;
 }
 
-.billing-toggle {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.billing-toggle :deep(.p-selectbutton) {
-  display: inline-flex;
-  padding: 4px;
-  border: 1px solid #e6ebf2;
-  border-radius: 999px;
-  background: #fff;
-  gap: 2px;
-}
-
-.billing-toggle :deep(.p-togglebutton) {
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: #465267;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 8px 16px;
-  box-shadow: none;
-}
-
-.billing-toggle :deep([data-p-checked="true"]) {
-  background: #111c32;
-  border-color: #111c32;
-  color: #fff;
-}
-
-.billing-toggle :deep(.p-togglebutton:hover) {
-  background: #eaf1ff;
-  border-color: #eaf1ff;
-  color: #1d4ed8;
-}
-
-.billing-toggle :deep([data-p-checked="true"]:hover) {
-  background: #243357;
-  border-color: #243357;
-  color: #fff;
-}
-
-.billing-toggle :deep([data-p-checked="true"]) .billing-toggle__discount {
-  background: #10b981;
-  color: #fff;
-}
-
-.billing-toggle__discount {
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: #10b981;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 800;
-}
-
 .plans-section__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -347,12 +279,14 @@ function handleCancelClick() {
   margin-top: 16px;
 }
 
-.billing-row {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 16px;
-  align-items: start;
-}
+.checkout-summary { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; padding: 20px; border-radius: 14px; background: #eff6ff; color: #172033; }
+.checkout-summary__icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: #dbeafe; color: #1d4ed8; font-size: 22px; }
+.checkout-summary__label { margin: 0 0 4px; font-size: 12px; color: #475569; }
+.checkout-summary__name { margin: 0; font-size: 22px; }
+.checkout-summary__capacity { margin: 6px 0 0; font-size: 13px; color: #475569; }
+.checkout-summary__price { margin: 0 0 0 auto; font-size: 28px; font-weight: 700; }
+.checkout-summary__price span { display: block; text-align: right; font-size: 13px; font-weight: 400; color: #475569; }
+.checkout-help { margin: 20px 0 12px; line-height: 1.6; color: #475569; }
 
 .pause-banner {
   display: flex;
@@ -438,14 +372,6 @@ a:focus-visible {
   .plans-section__head {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .billing-toggle {
-    align-self: flex-start;
-  }
-
-  .billing-row {
-    grid-template-columns: 1fr;
   }
 
   .pause-banner__action {
