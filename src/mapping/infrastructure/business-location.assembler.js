@@ -7,6 +7,7 @@ export class BusinessLocationAssembler {
 * @param {Object} dto - Business resource.
 * @returns {BusinessLocation} Mapped entity. */
     static toDomain(dto) {
+        if (!dto || !['string', 'number'].includes(typeof dto.id) || String(dto.id).trim() === '' || (typeof dto.id === 'number' && !Number.isFinite(dto.id))) throw new Error('Invalid geographical resource.');
         return new BusinessLocation({
             id: dto.id,
             name: dto.name,
@@ -21,6 +22,7 @@ export class BusinessLocationAssembler {
 * @param {Array<Object>} dtos - Business resources.
 * @returns {BusinessLocation[]} Mapped entities. */
     static toDomainList(dtos) {
+        if (!Array.isArray(dtos)) throw new Error('Invalid geographical collection.');
         return dtos.map(dto => this.toDomain(dto));
     }
 }

@@ -29,6 +29,19 @@ export class IncidentMarker {
         this.status = status;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.reportedAt = new Date(reportedAt);
+        this.reportedAt = reportedAt == null ? null : new Date(reportedAt);
+    }
+
+    get hasLocation() {
+        return Number.isFinite(this.latitude) && Math.abs(this.latitude) <= 90
+            && Number.isFinite(this.longitude) && Math.abs(this.longitude) <= 180;
+    }
+
+    matchesFilters({ category = 'all', since = null, until = null } = {}) {
+        if (category !== 'all' && this.type !== category) return false;
+        const timestamp = this.reportedAt?.getTime();
+        if (since !== null && (!Number.isFinite(timestamp) || timestamp < since)) return false;
+        if (until !== null && (!Number.isFinite(timestamp) || timestamp > until)) return false;
+        return true;
     }
 }
