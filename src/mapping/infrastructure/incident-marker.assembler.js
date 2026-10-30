@@ -14,6 +14,7 @@ export class IncidentMarkerAssembler {
 * @param {Object} dto - Incident resource.
 * @returns {IncidentMarker} Mapped entity. */
     static toDomain(dto) {
+        if (!dto || !['string', 'number'].includes(typeof dto.id) || String(dto.id).trim() === '' || (typeof dto.id === 'number' && !Number.isFinite(dto.id))) throw new Error('Invalid geographical resource.');
         const category = dto.category ?? dto.type;
         return new IncidentMarker({
             id: dto.id,
@@ -31,6 +32,7 @@ export class IncidentMarkerAssembler {
 * @param {Array<Object>} dtos - Incident resources.
 * @returns {IncidentMarker[]} Mapped entities. */
     static toDomainList(dtos) {
+        if (!Array.isArray(dtos)) throw new Error('Invalid geographical collection.');
         return dtos.map(dto => this.toDomain(dto));
     }
 }
