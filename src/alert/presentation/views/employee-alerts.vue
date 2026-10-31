@@ -6,7 +6,7 @@ import { storeToRefs } from 'pinia';
 import { useConfirm } from 'primevue';
 import { useI18n } from 'vue-i18n';
 import useAlertStore from '../../application/alert.store.js';
-import { AlertRecordKind, AlertRecordStatus } from '../../domain/model/alert-record.entity.js';
+import { AlertRecordKind, AlertRecordStatus, PanicReportStatus } from '../../domain/model/alert-record.entity.js';
 import {
   MAX_PANIC_GRACE_PERIOD_SECONDS,
   MIN_PANIC_GRACE_PERIOD_SECONDS,
@@ -36,6 +36,7 @@ const {
   isInitialized,
   isActivatingPanic,
   errorMessage,
+  noticeMessage,
   hasUnsavedReportDraft,
 } = storeToRefs(store);
 
@@ -175,7 +176,10 @@ const reportDescription = computed({
 const filteredRecords = computed(() => {
   const query = historySearch.value.trim().toLocaleLowerCase();
   return alertRecords.value.filter((record) => {
-    const matchesStatus = historyStatus.value === 'all' || record.status === historyStatus.value;
+    const matchesStatus = historyStatus.value === 'all'
+      || (historyStatus.value === AlertRecordStatus.PENDING_REPORT ? record.hasPendingPanicReport
+        : historyStatus.value === AlertRecordStatus.COMPLETED ? record.kind === AlertRecordKind.PANIC
+          && record.reportStatus === PanicReportStatus.COMPLETED : record.status === historyStatus.value);
     const matchesKind = historyKind.value === 'all' || record.kind === historyKind.value;
     const searchableText = [record.id, record.category, record.description, record.location]
       .filter(Boolean)
@@ -245,6 +249,10 @@ function titleForCategory(category) {
 /** Resolves the localized label for a record status. @param {string} status - Record status. @returns {string} The localized label. */
 function statusLabel(status) {
   return t(`alerts.workflow.statuses.${status}`);
+}
+
+function reportStatusLabel(status) {
+  return t(`alerts.workflow.reportStatuses.${status}`);
 }
 
 /** Requests geolocation and stores it in the given form target. @param {string} target - Form target key. @returns {void} */
@@ -460,6 +468,7 @@ onBeforeRouteUpdate(canLeaveCurrentView);
         @click="retryLoading"
       />
     </div>
+    <p v-if="noticeMessage && !isHistoryOnly" class="page-subtitle" role="status">{{ t(noticeMessage) }}</p>
 
     <section v-if="isLoading && (isHistoryOnly || !isInitialized)" class="loading-card" aria-live="polite">
       <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
@@ -638,7 +647,8 @@ onBeforeRouteUpdate(canLeaveCurrentView);
             <h2 id="panic-report-title">{{ t('alerts.workflow.panicReport.title') }}</h2>
             <p>{{ t('alerts.workflow.panicReport.subtitle') }}</p>
           </div>
-          <span class="status-badge status-badge--pending-report">{{ statusLabel(AlertRecordStatus.PENDING_REPORT) }}</span>
+          <span class="status-badge status-badge--resolved">{{ statusLabel(AlertRecordStatus.RESOLVED) }}</span>
+          <span class="status-badge status-badge--pending-report">{{ reportStatusLabel(PanicReportStatus.PENDING) }}</span>
         </div>
 
         <section class="form-card">
@@ -778,6 +788,7 @@ onBeforeRouteUpdate(canLeaveCurrentView);
         <span v-if="submittedRecord" class="status-badge" :class="`status-badge--${submittedRecord.status}`">
           {{ statusLabel(submittedRecord.status) }}
         </span>
+        <span v-if="submittedRecord?.reportStatus" class="status-badge status-badge--completed">{{ reportStatusLabel(submittedRecord.reportStatus) }}</span>
         <div class="form-actions form-actions--center">
           <pv-button :label="t('alerts.workflow.home.back')" severity="secondary" text @click="store.openHome" />
           <pv-button :label="t('alerts.workflow.history.open')" icon="pi pi-history" @click="store.showHistory" />
@@ -814,6 +825,7 @@ onBeforeRouteUpdate(canLeaveCurrentView);
               <div class="history-record-heading">
                 <h3>{{ titleForKind(record.kind) }}</h3>
                 <span class="status-badge" :class="`status-badge--${record.status}`">{{ statusLabel(record.status) }}</span>
+                <span v-if="record.reportStatus" class="status-badge" :class="record.hasPendingPanicReport ? 'status-badge--pending-report' : 'status-badge--completed'">{{ reportStatusLabel(record.reportStatus) }}</span>
               </div>
               <p>{{ titleForCategory(record.category) }}<span v-if="record.location"> · {{ record.location }}</span></p>
               <small>{{ formatDate(record.createdAt) }}<span v-if="record.id"> · #{{ record.id }}</span></small>
@@ -841,13 +853,16 @@ onBeforeRouteUpdate(canLeaveCurrentView);
           <div><dt>{{ t('alerts.workflow.form.location') }}</dt><dd>{{ selectedRecord.location || t('alerts.workflow.location.notAvailable') }}</dd></div>
           <div><dt>{{ t('alerts.workflow.form.moment') }}</dt><dd>{{ formatReportMoment(selectedRecord.moment) }}</dd></div>
           <div><dt>{{ t('alerts.workflow.history.createdAt') }}</dt><dd>{{ formatDate(selectedRecord.createdAt) }}</dd></div>
+          <div v-if="selectedRecord.resolvedAt"><dt>{{ t('alerts.workflow.history.resolvedAt') }}</dt><dd>{{ formatDate(selectedRecord.resolvedAt) }}</dd></div>
+          <div v-if="selectedRecord.reportStatus"><dt>{{ t('alerts.workflow.history.reportStatus') }}</dt><dd>{{ reportStatusLabel(selectedRecord.reportStatus) }}</dd></div>
+          <div v-if="selectedRecord.completedAt"><dt>{{ t('alerts.workflow.history.completedAt') }}</dt><dd>{{ formatDate(selectedRecord.completedAt) }}</dd></div>
           <div class="record-description"><dt>{{ t('alerts.workflow.form.description') }}</dt><dd>{{ selectedRecord.description || t('alerts.workflow.notRecorded') }}</dd></div>
         </dl>
         <p class="read-only-note"><i class="pi pi-lock" aria-hidden="true"></i>{{ t('alerts.workflow.history.readOnly') }}</p>
         <div class="form-actions">
           <pv-button :label="t('alerts.workflow.history.back')" icon="pi pi-arrow-left" severity="secondary" text @click="closeHistoryRecord" />
           <pv-button
-            v-if="!isHistoryOnly && selectedRecord.kind === AlertRecordKind.PANIC && selectedRecord.status === AlertRecordStatus.PENDING_REPORT"
+            v-if="!isHistoryOnly && selectedRecord.hasPendingPanicReport"
             :label="t('alerts.workflow.pending.action')"
             icon="pi pi-file-edit"
             @click="store.resumePanicReport(selectedRecord.id)"
