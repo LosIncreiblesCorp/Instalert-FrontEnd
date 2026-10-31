@@ -15,6 +15,11 @@ export const AlertRecordStatus = Object.freeze({
     FALSE_ALARM: 'false-alarm',
 });
 
+export const PanicReportStatus = Object.freeze({
+    PENDING: 'pending',
+    COMPLETED: 'completed',
+});
+
 /**
  * Alert aggregate projection used by the Alert bounded context.
  * It contains no Vue, PrimeVue, or HTTP dependencies.
@@ -25,6 +30,7 @@ export class AlertRecord {
         employeeId = '',
         kind = AlertRecordKind.PANIC,
         status = AlertRecordStatus.ACTIVE,
+        reportStatus = null,
         category = '',
         location = '',
         latitude = null,
@@ -35,6 +41,7 @@ export class AlertRecord {
         createdAt = null,
         activatedAt = null,
         endedAt = null,
+        resolvedAt = null,
         submittedAt = null,
         completedAt = null,
         updatedAt = null,
@@ -42,7 +49,12 @@ export class AlertRecord {
         this.id = id;
         this.employeeId = employeeId;
         this.kind = kind;
-        this.status = status;
+        const legacyPanicReport = kind === AlertRecordKind.PANIC
+            && [AlertRecordStatus.PENDING_REPORT, AlertRecordStatus.COMPLETED].includes(status);
+        this.status = legacyPanicReport ? AlertRecordStatus.RESOLVED : status;
+        this.reportStatus = legacyPanicReport
+            ? status === AlertRecordStatus.COMPLETED ? PanicReportStatus.COMPLETED : PanicReportStatus.PENDING
+            : reportStatus;
         this.category = category;
         this.location = location;
         this.latitude = latitude;
@@ -52,21 +64,29 @@ export class AlertRecord {
         this.createdAt = createdAt;
         this.activatedAt = activatedAt;
         this.endedAt = endedAt;
+        this.resolvedAt = resolvedAt ?? (legacyPanicReport ? endedAt : null);
         this.submittedAt = submittedAt;
         this.completedAt = completedAt;
         this.updatedAt = updatedAt;
     }
 
-    finishPanic(endedAt = new Date().toISOString()) {
+    get hasPendingPanicReport() {
+        return this.kind === AlertRecordKind.PANIC && this.status === AlertRecordStatus.RESOLVED
+            && this.reportStatus === PanicReportStatus.PENDING;
+    }
+
+    finishPanic(resolvedAt = new Date().toISOString()) {
         if (this.kind !== AlertRecordKind.PANIC || this.status !== AlertRecordStatus.ACTIVE) return false;
-        this.status = AlertRecordStatus.PENDING_REPORT;
-        this.endedAt = endedAt;
-        this.updatedAt = endedAt;
+        this.status = AlertRecordStatus.RESOLVED;
+        this.reportStatus = PanicReportStatus.PENDING;
+        this.resolvedAt = resolvedAt;
+        this.endedAt = resolvedAt;
+        this.updatedAt = resolvedAt;
         return true;
     }
 
     updatePanicReportDraft(fields = {}) {
-        if (this.kind !== AlertRecordKind.PANIC || this.status !== AlertRecordStatus.PENDING_REPORT) return false;
+        if (!this.hasPendingPanicReport) return false;
 
         for (const field of ['category', 'location', 'latitude', 'longitude', 'moment', 'description']) {
             if (Object.hasOwn(fields, field)) this[field] = fields[field];
@@ -78,11 +98,11 @@ export class AlertRecord {
 
     completePanicReport(completedAt = new Date().toISOString()) {
         const hasRequiredInformation = Boolean(this.category?.trim() && this.description?.trim());
-        if (this.kind !== AlertRecordKind.PANIC || this.status !== AlertRecordStatus.PENDING_REPORT || !hasRequiredInformation) {
+        if (!this.hasPendingPanicReport || !hasRequiredInformation) {
             return false;
         }
 
-        this.status = AlertRecordStatus.COMPLETED;
+        this.reportStatus = PanicReportStatus.COMPLETED;
         this.completedAt = completedAt;
         this.updatedAt = completedAt;
         return true;

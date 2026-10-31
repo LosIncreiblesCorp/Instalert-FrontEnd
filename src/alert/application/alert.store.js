@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
 import { AlertPreferences, DEFAULT_PANIC_GRACE_PERIOD_SECONDS } from '../domain/model/alert-preferences.entity.js';
-import { AlertRecord, AlertRecordKind, AlertRecordStatus } from '../domain/model/alert-record.entity.js';
+import { AlertRecord, AlertRecordKind, AlertRecordStatus, PanicReportStatus } from '../domain/model/alert-record.entity.js';
 import { AlertApi } from '../infrastructure/alert-api.js';
 import { AlertPreferencesAssembler } from '../infrastructure/alert-preferences.assembler.js';
 import { AlertRecordAssembler } from '../infrastructure/alert-record.assembler.js';
@@ -47,6 +47,8 @@ const useAlertStore = defineStore('alert', () => {
     const isActivatingPanic = ref(false);
     /** @type {import('vue').Ref<string|null>} */
     const errorMessage = ref(null);
+    const noticeMessage = ref(null);
+    const isCompletingReport = ref(false);
 
     const countdownProgress = computed(() => countdownDurationSeconds.value > 0
         ? remainingSeconds.value / countdownDurationSeconds.value
@@ -59,14 +61,15 @@ const useAlertStore = defineStore('alert', () => {
         String(record.id) === String(selectedRecordId.value)) ?? null);
     const pendingPanicRecord = computed(() => alertRecords.value.find((record) =>
         record.employeeId === demoEmployeeId
-        && record.kind === AlertRecordKind.PANIC
-        && record.status === AlertRecordStatus.PENDING_REPORT));
+        && record.hasPendingPanicReport));
     const hasUnsavedReportDraft = computed(() => currentView.value === 'report-form');
 
     let initializationPromise = null;
     let countdownTimer = null;
     let draftSaveTimer = null;
     let pendingDraftSave = Promise.resolve(true);
+    const draftRevisions = new Map();
+    const savedDraftRevisions = new Map();
 
     /** Creates an empty incident report draft. @returns {Object} The blank draft. */
     function createEmptyReportDraft() {
@@ -347,6 +350,7 @@ const useAlertStore = defineStore('alert', () => {
         };
         currentView.value = 'countdown';
         errorMessage.value = null;
+        noticeMessage.value = null;
         saveCountdownSnapshot();
         runCountdownTimer();
         return true;
@@ -354,12 +358,17 @@ const useAlertStore = defineStore('alert', () => {
 
     /** Cancels the running panic countdown. @returns {boolean} True when cancelled. */
     function cancelPanicCountdown() {
-        if (!countdownDeadline.value || currentView.value !== 'countdown') return false;
+        if (!countdownDeadline.value || currentView.value !== 'countdown' || isActivatingPanic.value) return false;
+        if (Date.now() >= countdownDeadline.value) {
+            updateCountdown();
+            return false;
+        }
         stopCountdownTimer();
         countdownDeadline.value = null;
         remainingSeconds.value = countdownDurationSeconds.value;
         countdownLocation.value = { location: '', latitude: null, longitude: null };
         currentView.value = 'home';
+        noticeMessage.value = 'alerts.workflow.countdown.cancelled';
         clearCountdownSnapshot();
         return true;
     }
@@ -373,6 +382,7 @@ const useAlertStore = defineStore('alert', () => {
 
     /** Finishes the active panic and opens its report form. @returns {Promise<boolean>} True when finished. */
     async function finishActivePanic() {
+        if (isSaving.value) return false;
         const activeRecord = activePanicRecord.value;
         if (!activeRecord) return false;
 
@@ -383,6 +393,7 @@ const useAlertStore = defineStore('alert', () => {
 
         isSaving.value = true;
         errorMessage.value = null;
+        noticeMessage.value = null;
         try {
             const response = await alertApi.updateAlert(AlertRecordAssembler.toResourceFromEntity(updatedRecord));
             const savedRecord = AlertRecordAssembler.toEntityFromResponse(response);
@@ -400,35 +411,48 @@ const useAlertStore = defineStore('alert', () => {
 
     /** Updates the panic report draft with autosave debounce. @param {Object} [fields] - Draft fields. @returns {boolean} True when applied. */
     function updatePanicReportDraft(fields = {}) {
+        if (isCompletingReport.value) return false;
         const record = alertRecords.value.find((item) =>
             String(item.id) === String(selectedRecordId.value)
-            && item.kind === AlertRecordKind.PANIC
-            && item.status === AlertRecordStatus.PENDING_REPORT);
+            && item.hasPendingPanicReport);
         if (!record) return false;
 
         const updatedRecord = AlertRecordAssembler.toEntityFromResource(
             AlertRecordAssembler.toResourceFromEntity(record),
         );
         if (!updatedRecord.updatePanicReportDraft(fields)) return false;
+        draftRevisions.set(String(updatedRecord.id), (draftRevisions.get(String(updatedRecord.id)) ?? 0) + 1);
         replaceRecord(updatedRecord);
         errorMessage.value = null;
 
         if (draftSaveTimer) window.clearTimeout(draftSaveTimer);
         draftSaveTimer = window.setTimeout(() => {
-            pendingDraftSave = persistPanicReportDraft(updatedRecord.id);
+            draftSaveTimer = null;
+            persistPanicReportDraft(updatedRecord.id);
         }, 350);
         return true;
     }
 
     /** Persists a pending panic report draft to the API. @param {string} recordId - Record id. @returns {Promise<boolean>} True when saved. */
-    async function persistPanicReportDraft(recordId) {
+    function persistPanicReportDraft(recordId) {
+        pendingDraftSave = pendingDraftSave.then(() => savePanicReportDraft(recordId));
+        return pendingDraftSave;
+    }
+
+    async function savePanicReportDraft(recordId) {
         const record = alertRecords.value.find((item) => String(item.id) === String(recordId));
-        if (!record || record.status !== AlertRecordStatus.PENDING_REPORT) return true;
+        if (!record?.hasPendingPanicReport) return true;
+        const revision = draftRevisions.get(String(recordId));
+        if (savedDraftRevisions.has(String(recordId)) && savedDraftRevisions.get(String(recordId)) === revision) return true;
 
         isSaving.value = true;
         try {
             const response = await alertApi.updateAlert(AlertRecordAssembler.toResourceFromEntity(record));
-            replaceRecord(AlertRecordAssembler.toEntityFromResponse(response));
+            const savedRecord = AlertRecordAssembler.toEntityFromResponse(response);
+            savedDraftRevisions.set(String(recordId), revision);
+            if (draftRevisions.get(String(recordId)) === revision) {
+                replaceRecord(savedRecord);
+            }
             errorMessage.value = null;
             return true;
         } catch (error) {
@@ -441,11 +465,11 @@ const useAlertStore = defineStore('alert', () => {
 
     /** Flushes any debounced panic draft save immediately. @returns {Promise<boolean>} True when saved. */
     async function flushPanicReportDraft() {
-        if (draftSaveTimer) {
+        const id = selectedRecordId.value;
+        if (draftSaveTimer || draftRevisions.get(String(id)) !== savedDraftRevisions.get(String(id))) {
             window.clearTimeout(draftSaveTimer);
             draftSaveTimer = null;
-            const id = selectedRecordId.value;
-            pendingDraftSave = persistPanicReportDraft(id);
+            persistPanicReportDraft(id);
         }
         return pendingDraftSave;
     }
@@ -454,9 +478,9 @@ const useAlertStore = defineStore('alert', () => {
     function resumePanicReport(recordId) {
         const record = alertRecords.value.find((item) =>
             String(item.id) === String(recordId)
-            && item.kind === AlertRecordKind.PANIC
-            && item.status === AlertRecordStatus.PENDING_REPORT);
+            && item.hasPendingPanicReport);
         if (!record) return false;
+        noticeMessage.value = null;
         selectedRecordId.value = record.id;
         currentView.value = 'panic-report';
         return true;
@@ -472,22 +496,29 @@ const useAlertStore = defineStore('alert', () => {
 
     /** Completes the selected panic report after flushing drafts. @returns {Promise<boolean>} True when completed. */
     async function completePanicReport() {
-        if (!await flushPanicReportDraft()) return false;
-        const record = alertRecords.value.find((item) => String(item.id) === String(selectedRecordId.value));
-        if (!record) return false;
-
-        const completedRecord = AlertRecordAssembler.toEntityFromResource(
-            AlertRecordAssembler.toResourceFromEntity(record),
-        );
-        if (!completedRecord.completePanicReport()) return false;
-
-        isSaving.value = true;
-        errorMessage.value = null;
+        if (isCompletingReport.value) return false;
+        isCompletingReport.value = true;
         try {
+            if (!await flushPanicReportDraft()) return false;
+            const record = alertRecords.value.find((item) => String(item.id) === String(selectedRecordId.value));
+            if (!record) return false;
+            if (record.kind === AlertRecordKind.PANIC && record.reportStatus === PanicReportStatus.COMPLETED) {
+                noticeMessage.value = 'alerts.workflow.results.alreadyCompleted';
+                return false;
+            }
+
+            const completedRecord = AlertRecordAssembler.toEntityFromResource(
+                AlertRecordAssembler.toResourceFromEntity(record),
+            );
+            if (!completedRecord.completePanicReport()) return false;
+
+            isSaving.value = true;
+            errorMessage.value = null;
             const response = await alertApi.updateAlert(AlertRecordAssembler.toResourceFromEntity(completedRecord));
             const savedRecord = AlertRecordAssembler.toEntityFromResponse(response);
             replaceRecord(savedRecord);
             selectedRecordId.value = savedRecord.id;
+            lastSubmittedRecordId.value = savedRecord.id;
             currentView.value = 'report-completed';
             return true;
         } catch (error) {
@@ -495,6 +526,7 @@ const useAlertStore = defineStore('alert', () => {
             return false;
         } finally {
             isSaving.value = false;
+            isCompletingReport.value = false;
         }
     }
 
@@ -505,6 +537,7 @@ const useAlertStore = defineStore('alert', () => {
         reportDraft.value = createEmptyReportDraft();
         errorMessage.value = null;
         currentView.value = 'report-form';
+        noticeMessage.value = null;
         return true;
     }
 
@@ -557,6 +590,7 @@ const useAlertStore = defineStore('alert', () => {
     /** Flushes drafts and navigates to the history view. @returns {Promise<boolean>} True when shown. */
     async function showHistory() {
         if (currentView.value === 'panic-report' && !await flushPanicReportDraft()) return false;
+        noticeMessage.value = null;
         return refreshHistory();
     }
 
@@ -601,10 +635,11 @@ const useAlertStore = defineStore('alert', () => {
         activePanicRecord,
         pendingPanicRecord,
         isLoading,
-        isSaving,
+        isSaving: computed(() => isSaving.value || isCompletingReport.value),
         isInitialized,
         isActivatingPanic,
         errorMessage,
+        noticeMessage,
         hasUnsavedReportDraft,
         initialize,
         retryInitialization,
