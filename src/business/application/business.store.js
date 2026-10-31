@@ -1,6 +1,8 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
 import { BusinessMember } from '../domain/model/business-member.entity.js';
+import { Business } from '../domain/model/business.entity.js';
+import { BusinessAssembler } from '../infrastructure/business.assembler.js';
 import { StaffInvitation, StaffInvitationStatus } from '../domain/model/staff-invitation.entity.js';
 import { BusinessApi } from '../infrastructure/business-api.js';
 import { BusinessMemberAssembler } from '../infrastructure/business-member.assembler.js';
@@ -11,6 +13,76 @@ const demoBusinessId = 'bus-1'; // Existing fictitious business. Demo scope, not
 
 /** Application service store for the business bounded context. @returns {Object} The business store. */
 const useBusinessStore = defineStore('business', () => {
+    const profile = ref(null);
+    const profileLoaded = ref(false);
+    const isProfileLoading = ref(false);
+    const isProfileSaving = ref(false);
+    const profileError = ref(null);
+    const profileNotice = ref(null);
+
+    /** Loads the current demo commerce. Only a 404 enables initial registration. */
+    async function loadProfile() {
+        if (isProfileLoading.value || isProfileSaving.value) return false;
+        isProfileLoading.value = true;
+        profileLoaded.value = false;
+        profileError.value = null;
+        profileNotice.value = null;
+        try {
+            const response = await businessApi.getBusinessById(demoBusinessId);
+            profile.value = BusinessAssembler.toEntityFromResource(response.data);
+            profileLoaded.value = true;
+            return true;
+        } catch (error) {
+            if (error.response?.status === 404) {
+                profile.value = null;
+                profileLoaded.value = true;
+                return true;
+            }
+            profileError.value = 'business.profile.loadError';
+            return false;
+        } finally { isProfileLoading.value = false; }
+    }
+
+    /** Saves the profile through the mock adapter; server authorization remains pending. */
+    async function saveProfile(values) {
+        if (!profileLoaded.value || isProfileLoading.value || isProfileSaving.value) return false;
+        isProfileSaving.value = true;
+        profileError.value = null;
+        profileNotice.value = null;
+        const registering = profile.value == null;
+        try {
+            const now = new Date().toISOString();
+            const business = new Business({ ...profile.value, id: demoBusinessId,
+                taxId: registering ? values.taxId : profile.value.taxId,
+                name: values.name, address: values.address,
+                latitude: values.latitude, longitude: values.longitude,
+                createdAt: profile.value?.createdAt ?? now, updatedAt: now }).validate();
+            let response;
+            if (registering) {
+                try {
+                    await businessApi.getBusinessById(demoBusinessId);
+                    throw new Error('business.profile.alreadyRegistered');
+                } catch (error) {
+                    if (error.response?.status !== 404) throw error;
+                }
+                const matching = await businessApi.getBusinessesByTaxId(business.taxId);
+                if (!Array.isArray(matching.data)) throw new Error('business.profile.saveError');
+                if (matching.data.some(item => item.taxId === business.taxId)) {
+                    throw new Error('business.profile.duplicateTaxId');
+                }
+                response = await businessApi.createBusiness(BusinessAssembler.toResourceFromEntity(business));
+            } else {
+                response = await businessApi.updateBusiness(demoBusinessId, BusinessAssembler.toProfileChanges(business));
+            }
+            profile.value = BusinessAssembler.toEntityFromResource(response.data);
+            profileNotice.value = registering ? 'business.profile.created' : 'business.profile.saved';
+            return true;
+        } catch (error) {
+            profileError.value = error.message?.startsWith('business.profile.')
+                ? error.message : 'business.profile.saveError';
+            return false;
+        } finally { isProfileSaving.value = false; }
+    }
     /** @type {import('vue').Ref<import('../domain/model/business-member.entity.js').BusinessMember[]>} */
     const members = ref([]);
     /** @type {import('vue').Ref<import('../domain/model/staff-invitation.entity.js').StaffInvitation[]>} */
@@ -219,7 +291,8 @@ const useBusinessStore = defineStore('business', () => {
         }, 'business.messages.deleted');
     }
 
-    return { members, employees, invitations, planLimits, occupiedSeats, reservedSeats, availableSeats,
+    return { profile, profileLoaded, isProfileLoading, isProfileSaving, profileError, profileNotice,
+        loadProfile, saveProfile, members, employees, invitations, planLimits, occupiedSeats, reservedSeats, availableSeats,
         isLoading, isSaving, errorMessage, noticeMessage, clearMessages, loadPersonnel,
         createInvitation, updateInvitation, cancelInvitation, resendInvitation,
         updateMember, toggleMembership, deleteMember, deleteInvitation };

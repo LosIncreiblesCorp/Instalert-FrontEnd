@@ -7,7 +7,7 @@ import { BaseEndpoint } from '../../shared/infrastructure/base-endpoint.js';
 export class ContactsApi extends BaseApi {
     constructor() {
         super();
-        this.contactsEndpoint = new BaseEndpoint(this, import.meta.env.VITE_EMERGENCY_CONTACTS_ENDPOINT_PATH || 'emergency-contacts');
+        this.contactsEndpoint = new BaseEndpoint(this, import.meta.env.VITE_EMERGENCY_CONTACTS_ENDPOINT_PATH);
     }
 
 /** Fetches contacts owned by one employee.

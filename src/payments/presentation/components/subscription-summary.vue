@@ -53,9 +53,6 @@ const daysLeft = computed(() => {
                     :value="$t('payments.currentPlanBadge')"
                 />
               </div>
-              <p class="current-sub__license">
-                {{ $t("payments.licenseLabel") }} {{ $t("payments.licenseIdValue") }}
-              </p>
               <p class="current-sub__status">
                 {{ $t(`payments.status.${subscription.status}`) }}
               </p>

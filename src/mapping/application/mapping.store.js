@@ -4,48 +4,41 @@ import { RiskZoneAssembler } from '../infrastructure/risk-zone.assembler.js';
 import { IncidentMarkerAssembler } from '../infrastructure/incident-marker.assembler.js';
 import { BusinessLocationAssembler } from '../infrastructure/business-location.assembler.js';
 
-/** Application service store for risk map data and selection.
-* @returns {Object} Mapping store state and actions. */
+/** Application service for the geographical read projection. */
 export const useMappingStore = defineStore('mapping', {
     state: () => ({
-        riskZones: [],
-        incidents: [],
-        businesses: [],
-        isLoading: false,
-        error: null,
-        selectedZone: null
+        riskZones: [], incidents: [], businesses: [],
+        isLoading: false, hasLoaded: false, error: null, selectedZone: null,
     }),
     actions: {
-/** Loads risk zones, incidents and verified businesses.
-* @returns {Promise<void>} Resolves after map data is refreshed. */
+        /** Replaces one complete snapshot; a failed refresh preserves the previous data. */
         async fetchMapData() {
+            if (this.isLoading) return false;
             this.isLoading = true;
             this.error = null;
-            const api = new MappingApi();
             try {
-
-                const zonesResponse = await api.getAllRiskZones();
-                this.riskZones = RiskZoneAssembler.toDomainList(zonesResponse.data);
-
-                const incidentsResponse = await api.getNearbyIncidents();
-                this.incidents = IncidentMarkerAssembler.toDomainList(incidentsResponse.data);
-
-                const businessesResponse = await api.getNearbyVerifiedBusinesses();
-                this.businesses = BusinessLocationAssembler.toDomainList(
-                    businessesResponse.data.filter(b => b.isVerified)
-                );
-            } catch (err) {
-                this.error = 'Failed to load map data.';
-                console.error(err);
+                const api = new MappingApi();
+                const [zonesResponse, incidentsResponse, businessesResponse] = await Promise.all([
+                    api.getAllRiskZones(), api.getNearbyIncidents(), api.getNearbyBusinesses(),
+                ]);
+                const riskZones = RiskZoneAssembler.toDomainList(zonesResponse.data);
+                const incidents = IncidentMarkerAssembler.toDomainList(incidentsResponse.data);
+                const businesses = BusinessLocationAssembler.toDomainList(businessesResponse.data);
+                this.riskZones = riskZones;
+                this.incidents = incidents;
+                this.businesses = businesses;
+                if (this.selectedZone) this.selectRiskZone(this.selectedZone.id);
+                this.hasLoaded = true;
+                return true;
+            } catch {
+                this.error = 'mapping.feedback.loadError';
+                return false;
             } finally {
                 this.isLoading = false;
             }
         },
-/** Selects one risk zone by id.
-* @param {string|number} zoneId - Risk zone identifier.
-* @returns {void} No return value. */
         selectRiskZone(zoneId) {
-            this.selectedZone = this.riskZones.find(z => z.id === zoneId) || null;
-        }
-    }
+            this.selectedZone = this.riskZones.find(zone => String(zone.id) === String(zoneId)) ?? null;
+        },
+    },
 });

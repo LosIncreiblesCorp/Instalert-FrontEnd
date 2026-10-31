@@ -1,6 +1,12 @@
 // Lazy-loaded components
 const businessRoutes = [
   {
+    path: "/admin/business",
+    name: "admin-business-profile",
+    component: () => import("./views/business-profile.vue"),
+    meta: { role: "administrator", menuKey: "business-profile", title: "business.profile.title" },
+  },
+  {
     path: "/admin/personnel",
     name: "admin-personnel",
     component: () => import("./views/personnel-list.vue"),

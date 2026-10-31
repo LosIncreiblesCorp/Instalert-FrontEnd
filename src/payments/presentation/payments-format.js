@@ -3,21 +3,13 @@
 
 export const PEN_CURRENCY = "PEN";
 
-const ANNUAL_MONTHS = 12;
-const ANNUAL_DISCOUNT = 0.8;
 const CATALOG_USD_PER_SOL = 15 / 50;
 
-/** Computes the discounted annual price from a monthly amount. @param {number} monthly - Monthly price. @returns {number} Annual price. */
-export function annualPrice(monthly) {
-    return Math.round((monthly ?? 0) * ANNUAL_MONTHS * ANNUAL_DISCOUNT);
-}
-
-/** Resolves the display price for a plan and billing cycle. @param {Object} plan - Plan entity. @param {string} currency - Currency code. @param {string} billingCycle - Billing cycle. @returns {number} Display price. */
-export function planPrice(plan, currency = PEN_CURRENCY, billingCycle = "monthly") {
-    const monthly = currency === "USD"
+/** Resolves the monthly display price for a plan. @param {Object} plan - Plan entity. @param {string} currency - Currency code. @returns {number} Display price. */
+export function planPrice(plan, currency = PEN_CURRENCY) {
+    return currency === "USD"
         ? (plan.priceUsd ?? (plan.price ?? 0) * CATALOG_USD_PER_SOL)
         : (plan.price ?? 0);
-    return billingCycle === "annual" ? annualPrice(monthly) : monthly;
 }
 
 function localeTag(locale) {

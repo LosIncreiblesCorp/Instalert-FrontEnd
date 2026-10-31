@@ -1,27 +1,25 @@
 ﻿<script setup>
-/** Billing history table with simulated invoices. */
+/** Payment history table. Rows are supplied by the Payments application projection. */
 import { useI18n } from "vue-i18n";
 import { formatDate, formatMoney } from "../payments-format.js";
 
-// Simulated invoices: fictitious folios with no tax validity.
-// Downloads are disabled until the backend provides real documents.
 defineProps({
-  invoices: { type: Array, default: () => [] }
+  payments: { type: Array, default: () => [] }
 });
 
 const { locale, t } = useI18n();
 
-/** Formats an invoice issue date. @param {string} iso - ISO date string. @returns {string} Formatted date. */
-function formatIssuedAt(iso) {
+/** Formats the payment date. @param {string} iso - ISO date string. @returns {string} Formatted date. */
+function formatPaymentDate(iso) {
   return formatDate(iso, locale.value);
 }
 
-/** Formats an invoice amount. @param {Object} invoice - Invoice entity. @returns {string} Formatted amount. */
-function formatInvoiceAmount(invoice) {
-  return formatMoney(invoice.amount, invoice.currency, locale.value);
+/** Formats the payment amount. @param {Object} payment - Payment row. @returns {string} Formatted amount. */
+function formatPaymentAmount(payment) {
+  return formatMoney(payment.amount, payment.currency, locale.value);
 }
 
-/** Resolves the localized invoice status label. @param {string} status - Invoice status. @returns {string} Status label. */
+/** Resolves the localized payment status label. @param {string} status - Payment status. @returns {string} Status label. */
 function statusLabel(status) {
   return status === "paid" ? t("payments.statusPaid") : t(`payments.status.${status}`);
 }
@@ -36,19 +34,20 @@ function statusLabel(status) {
         <div class="billing-history__scroll">
           <pv-data-table
               class="billing-history__table"
-              :value="invoices"
+              :value="payments"
               :aria-label="$t('payments.historyCaption')"
               table-style="min-width: 36rem"
           >
-            <pv-column field="folio" :header="$t('payments.colFolio')" />
-            <pv-column field="issuedAt" :header="$t('payments.colDate')">
+            <template #empty>{{ $t('payments.historyEmpty') }}</template>
+            <pv-column field="reference" :header="$t('payments.colReference')" />
+            <pv-column field="occurredAt" :header="$t('payments.colDate')">
               <template #body="slotProps">
-                {{ formatIssuedAt(slotProps.data.issuedAt) }}
+                {{ formatPaymentDate(slotProps.data.occurredAt) }}
               </template>
             </pv-column>
             <pv-column field="amount" :header="$t('payments.colAmount')">
               <template #body="slotProps">
-                {{ formatInvoiceAmount(slotProps.data) }}
+                {{ formatPaymentAmount(slotProps.data) }}
               </template>
             </pv-column>
             <pv-column field="status" :header="$t('payments.colStatus')">
@@ -59,31 +58,9 @@ function statusLabel(status) {
                 />
               </template>
             </pv-column>
-            <pv-column :header="$t('payments.colDownload')">
-              <template #body>
-                                <span class="billing-history__downloads">
-                                    <pv-button
-                                        type="button"
-                                        severity="secondary"
-                                        text
-                                        icon="pi pi-file-pdf"
-                                        :aria-label="$t('payments.downloadPdf')"
-                                        disabled
-                                    />
-                                    <pv-button
-                                        type="button"
-                                        severity="secondary"
-                                        text
-                                        icon="pi pi-file"
-                                        :aria-label="$t('payments.downloadXml')"
-                                        disabled
-                                    />
-                                </span>
-              </template>
-            </pv-column>
           </pv-data-table>
         </div>
-        <p class="billing-history__foot">{{ $t("payments.showingRecent", { count: invoices.length }) }}</p>
+        <p class="billing-history__foot">{{ $t("payments.showingRecent", { count: payments.length }) }}</p>
       </template>
     </pv-card>
   </section>
@@ -167,11 +144,6 @@ function statusLabel(status) {
   background: #dcfce7 !important;
   border: 0 !important;
   color: #15803d !important;
-}
-
-.billing-history__downloads {
-  display: inline-flex;
-  gap: 4px;
 }
 
 .billing-history__foot {
