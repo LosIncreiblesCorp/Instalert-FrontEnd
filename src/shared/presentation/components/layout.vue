@@ -186,8 +186,8 @@ function closeMobileNavigation() {
     </aside>
 
     <main id="main-content" class="workspace-main" tabindex="-1">
-      <ApiConnectionState />
-      <RouterView v-if="apiContext.status === 'ready' || (apiContext.status === 'missing' && route.name === 'admin-business-profile')" />
+      <ApiConnectionState v-if="!(apiContext.status === 'missing' && route.name === 'admin-business-profile')" />
+      <RouterView v-if="apiContext.status === 'ready' || ['admin-profile', 'employee-profile', 'admin-business-profile'].includes(route.name)" />
     </main>
   </div>
 </template>

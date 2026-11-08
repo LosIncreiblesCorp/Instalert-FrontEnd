@@ -25,14 +25,14 @@ export async function prepareBusinessContext(http, { refresh = false } = {}) {
     if (pending?.revision === revision) return pending.request;
     const requestRevision = revision;
     const current = () => revision === requestRevision;
-    Object.assign(state, { status: 'loading', error: null, businessId: null, businessLocation: null });
+    if (state.status !== 'ready') Object.assign(state, { status: 'loading', error: null, businessId: null, businessLocation: null });
     const request = (async () => {
         try {
             const { data } = await http.get('businesses');
             if (!current()) return null;
             if (!Array.isArray(data) || data.some(item => typeof item?.id !== 'string' || !item.id)) throw new Error('Invalid business context response.');
             if (data.length > 1) {
-                Object.assign(state, { status: 'ambiguous', error: 'api.connection.ambiguous' });
+                Object.assign(state, { businessId: null, businessLocation: null, status: 'ambiguous', error: 'api.connection.ambiguous' });
                 return null;
             }
             const business = data[0];
@@ -52,10 +52,10 @@ export async function prepareBusinessContext(http, { refresh = false } = {}) {
                 if (memberships.length > 1) status = 'ambiguous';
                 else if (memberships[0]?.status === 'inactive') status = 'inactive';
             }
-            Object.assign(state, { status, error: 'api.connection.' + status });
+            Object.assign(state, { businessId: null, businessLocation: null, status, error: 'api.connection.' + status });
             return null;
         } catch (error) {
-            if (current()) Object.assign(state, { status: 'unavailable', error: error.apiError?.messageKey ?? 'api.errors.unavailable' });
+            if (current()) Object.assign(state, { businessId: null, businessLocation: null, status: 'unavailable', error: error.apiError?.messageKey ?? 'api.errors.unavailable' });
             return null;
         } finally {
             if (pending?.revision === requestRevision) pending = null;

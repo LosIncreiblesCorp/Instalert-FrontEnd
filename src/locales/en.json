@@ -102,7 +102,8 @@
       "limitsUnavailable": "Plan information unavailable",
       "emptyEmployees": "No employees to display",
       "emptyInvitations": "No invitations to display",
-      "emptyHelp": "Try a different search or refresh the list."
+      "emptyHelp": "Try a different search or refresh the list.",
+      "subscriptionActive": "Active subscription"
     },
     "invitation": {
       "title": "New invitation",
@@ -129,7 +130,6 @@
       "confirmTitle": "Confirm action",
       "activate": "Activate",
       "deactivate": "Deactivate",
-      "delete": "Delete",
       "resend": "Resend",
       "cancelInvitation": "Cancel invitation",
       "refresh": "Refresh"
@@ -137,20 +137,17 @@
     "confirmations": {
       "activate": "Activate the membership of {name}? This will occupy one seat.",
       "deactivate": "Deactivate the membership of {name}? This will free one seat.",
-      "deleteMember": "Delete the membership of {name}? This removes their association with the business.",
-      "cancelInvitation": "Cancel the pending invitation for {name}? This will release its reserved seat.",
-      "deleteInvitation": "Delete the cancelled invitation for {name}?"
+      "cancelInvitation": "Cancel the pending invitation for {name}? This will release its reserved seat."
     },
     "messages": {
       "invitationCreated": "Invitation created. It is listed under Invitations.",
       "invitationCancelled": "Invitation cancelled. Its reserved seat is now available.",
       "updated": "Changes saved.",
       "membershipUpdated": "Membership updated.",
-      "deleted": "Record deleted.",
-      "resendRecorded": "Resend request recorded."
+      "resendRecorded": "Resend requested. Delivery will be processed by the email service."
     },
     "errors": {
-      "businessRequired": "A business must be selected.",
+      "businessRequired": "Your business could not be resolved. Refresh and try again.",
       "nameInvalid": "Enter a name between 1 and 100 characters.",
       "emailInvalid": "Enter a valid email address.",
       "invalidState": "The record has an invalid state.",
@@ -161,10 +158,10 @@
       "notFound": "The record is no longer available. Refresh the list.",
       "administratorProtected": "This action is available only for employees.",
       "invitationNotPending": "Only pending invitations can be edited, cancelled or resent.",
-      "cancelBeforeDelete": "Cancel the invitation before deleting it. Accepted invitations cannot be deleted here.",
       "load": "Unable to load staff or plan information. Please refresh and try again.",
       "save": "Unable to save the change. Please try again.",
-      "overCapacity": "Occupied and reserved seats exceed the current plan limit. Free seats before adding more."
+      "overCapacity": "Occupied and reserved seats exceed the current plan limit. Free seats before adding more.",
+      "refreshAfterSave": "The change was saved, but the list could not be refreshed. Refresh before making another change."
     }
   },
   "roles": {

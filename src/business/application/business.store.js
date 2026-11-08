@@ -1,301 +1,218 @@
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { defineStore } from 'pinia';
-import { BusinessMember } from '../domain/model/business-member.entity.js';
 import { Business } from '../domain/model/business.entity.js';
-import { BusinessAssembler } from '../infrastructure/business.assembler.js';
-import { StaffInvitation, StaffInvitationStatus } from '../domain/model/staff-invitation.entity.js';
+import { BusinessMember } from '../domain/model/business-member.entity.js';
+import { StaffInvitation } from '../domain/model/staff-invitation.entity.js';
 import { BusinessApi } from '../infrastructure/business-api.js';
+import { BusinessAssembler } from '../infrastructure/business.assembler.js';
 import { BusinessMemberAssembler } from '../infrastructure/business-member.assembler.js';
 import { StaffInvitationAssembler } from '../infrastructure/staff-invitation.assembler.js';
+import { apiContext, currentContextRevision, prepareBusinessContext, requireBusinessId } from '../../shared/infrastructure/api-context.js';
 
-const businessApi = new BusinessApi();
-const demoBusinessId = 'bus-1'; // Existing fictitious business. Demo scope, not an authorization boundary.
+const api = new BusinessApi();
 
-/** Application service store for the business bounded context. @returns {Object} The business store. */
-const useBusinessStore = defineStore('business', () => {
+/** Commerce and personnel state scoped to the selected demonstration account. */
+export default defineStore('business', () => {
     const profile = ref(null);
     const profileLoaded = ref(false);
     const isProfileLoading = ref(false);
     const isProfileSaving = ref(false);
     const profileError = ref(null);
     const profileNotice = ref(null);
-
-    /** Loads the current demo commerce. Only a 404 enables initial registration. */
-    async function loadProfile() {
-        if (isProfileLoading.value || isProfileSaving.value) return false;
-        isProfileLoading.value = true;
-        profileLoaded.value = false;
-        profileError.value = null;
-        profileNotice.value = null;
-        try {
-            const response = await businessApi.getBusinessById(demoBusinessId);
-            profile.value = BusinessAssembler.toEntityFromResource(response.data);
-            profileLoaded.value = true;
-            return true;
-        } catch (error) {
-            if (error.response?.status === 404) {
-                profile.value = null;
-                profileLoaded.value = true;
-                return true;
-            }
-            profileError.value = 'business.profile.loadError';
-            return false;
-        } finally { isProfileLoading.value = false; }
-    }
-
-    /** Saves the profile through the mock adapter; server authorization remains pending. */
-    async function saveProfile(values) {
-        if (!profileLoaded.value || isProfileLoading.value || isProfileSaving.value) return false;
-        isProfileSaving.value = true;
-        profileError.value = null;
-        profileNotice.value = null;
-        const registering = profile.value == null;
-        try {
-            const now = new Date().toISOString();
-            const business = new Business({ ...profile.value, id: demoBusinessId,
-                taxId: registering ? values.taxId : profile.value.taxId,
-                name: values.name, address: values.address,
-                latitude: values.latitude, longitude: values.longitude,
-                createdAt: profile.value?.createdAt ?? now, updatedAt: now }).validate();
-            let response;
-            if (registering) {
-                try {
-                    await businessApi.getBusinessById(demoBusinessId);
-                    throw new Error('business.profile.alreadyRegistered');
-                } catch (error) {
-                    if (error.response?.status !== 404) throw error;
-                }
-                const matching = await businessApi.getBusinessesByTaxId(business.taxId);
-                if (!Array.isArray(matching.data)) throw new Error('business.profile.saveError');
-                if (matching.data.some(item => item.taxId === business.taxId)) {
-                    throw new Error('business.profile.duplicateTaxId');
-                }
-                response = await businessApi.createBusiness(BusinessAssembler.toResourceFromEntity(business));
-            } else {
-                response = await businessApi.updateBusiness(demoBusinessId, BusinessAssembler.toProfileChanges(business));
-            }
-            profile.value = BusinessAssembler.toEntityFromResource(response.data);
-            profileNotice.value = registering ? 'business.profile.created' : 'business.profile.saved';
-            return true;
-        } catch (error) {
-            profileError.value = error.message?.startsWith('business.profile.')
-                ? error.message : 'business.profile.saveError';
-            return false;
-        } finally { isProfileSaving.value = false; }
-    }
-    /** @type {import('vue').Ref<import('../domain/model/business-member.entity.js').BusinessMember[]>} */
     const members = ref([]);
-    /** @type {import('vue').Ref<import('../domain/model/staff-invitation.entity.js').StaffInvitation[]>} */
     const invitations = ref([]);
-    /** @type {import('vue').Ref<Object|null>} */
     const planLimits = ref(null);
-    /** @type {import('vue').Ref<boolean>} */
+    const personnelLoaded = ref(false);
     const isLoading = ref(false);
-    /** @type {import('vue').Ref<boolean>} */
     const isSaving = ref(false);
-    /** @type {import('vue').Ref<string|null>} */
     const errorMessage = ref(null);
-    /** @type {import('vue').Ref<string|null>} */
     const noticeMessage = ref(null);
+    const seats = ref(null);
     const employees = computed(() => members.value.filter(member => member.isEmployee));
-    const occupiedSeats = computed(() => members.value.filter(member => member.occupiesSeat).length);
-    const reservedSeats = computed(() => invitations.value.filter(invitation => invitation.reservesSeat).length);
-    const availableSeats = computed(() => planLimits.value == null ? null
-        : Math.max(0, planLimits.value.maxEmployees - occupiedSeats.value - reservedSeats.value));
+    const occupiedSeats = computed(() => seats.value?.activeEmployees ?? null);
+    const reservedSeats = computed(() => seats.value?.reservedSeats ?? null);
+    const availableSeats = computed(() => seats.value?.availableSeats ?? null);
 
-    /** Clears store feedback messages. @returns {void} */
+    watch(() => apiContext.userId, () => {
+        profile.value = null; profileLoaded.value = false;
+        isProfileLoading.value = false; isProfileSaving.value = false;
+        profileError.value = null; profileNotice.value = null;
+        members.value = []; invitations.value = []; seats.value = null; planLimits.value = null;
+        personnelLoaded.value = false; isLoading.value = false; isSaving.value = false;
+        clearMessages();
+    }, { flush: 'sync' });
+
+    const current = revision => revision === currentContextRevision();
+    function requireAdministrator() {
+        if (apiContext.role !== 'administrator') throw new Error('api.errors.forbidden');
+    }
+    function feedback(error, fallback) {
+        const problem = error.apiError;
+        if (problem?.code === 'capacity') return 'business.errors.noSeats';
+        if (problem?.code === 'transition') return 'business.errors.invitationNotPending';
+        if (problem?.status === 404) return 'business.errors.notFound';
+        if (problem?.status === 409 && problem.field === 'email') return 'business.errors.duplicateEmail';
+        if (problem?.status === 409 && problem.field === 'ownerUserId') return 'business.profile.alreadyRegistered';
+        if (problem?.status === 409 && problem.field === 'taxId') return 'business.profile.duplicateTaxId';
+        return problem?.messageKey ?? (/^(business\.|api\.)/.test(error.message) ? error.message : fallback);
+    }
     function clearMessages() { errorMessage.value = null; noticeMessage.value = null; }
 
-    /** Reloads members and invitations scoped to the demo business. @returns {Promise<void>} */
-    async function refreshRecords() {
-        const [memberResponse, invitationResponse] = await Promise.all([
-            businessApi.getMembers(demoBusinessId), businessApi.getInvitations(demoBusinessId),
-        ]);
-        // Scope defensively even if a mock/server ignores the query parameter.
-        members.value = BusinessMemberAssembler.toEntitiesFromResponse(memberResponse)
-            .filter(member => member.businessId === demoBusinessId);
-        invitations.value = StaffInvitationAssembler.toEntitiesFromResponse(invitationResponse)
-            .filter(invitation => invitation.businessId === demoBusinessId);
-    }
-
-    /** Reloads the subscription plan limits. @returns {Promise<void>} */
-    async function refreshLimits() {
-        planLimits.value = null;
-        planLimits.value = await businessApi.getPlanLimits(demoBusinessId);
-    }
-
-    /** Loads personnel records and plan limits into the store. @returns {Promise<void>} */
-    async function loadPersonnel() {
-        if (isLoading.value || isSaving.value) return;
-        isLoading.value = true;
-        errorMessage.value = null;
+    async function loadProfile() {
+        if (isProfileLoading.value || isProfileSaving.value) return false;
+        const revision = currentContextRevision();
+        isProfileLoading.value = true; profileLoaded.value = false;
+        profileError.value = null; profileNotice.value = null;
         try {
-            await refreshRecords();
-            await refreshLimits();
-        } catch {
-            errorMessage.value = 'business.errors.load';
-        } finally { isLoading.value = false; }
-    }
-
-    /** Ensures a seat is available for a new employee or invitation. @returns {void} */
-    function assertAvailableSeat() {
-        if (availableSeats.value == null) throw new Error('business.errors.limitsUnavailable');
-        if (!planLimits.value.subscriptionActive) throw new Error('business.errors.subscriptionInactive');
-        if (availableSeats.value <= 0) throw new Error('business.errors.noSeats');
-    }
-
-    /** Ensures an email is not already used by a member or invitation. @param {string} email - Email to check. @param {string|null} [memberId] - Member id to exclude. @param {string|null} [invitationId] - Invitation id to exclude. @returns {void} */
-    function assertUniqueEmail(email, memberId = null, invitationId = null) {
-        const memberExists = members.value.some(member => member.email === email
-            && String(member.id) !== String(memberId));
-        const invitationExists = invitations.value.some(invitation => invitation.reservesSeat
-            && invitation.email === email && String(invitation.id) !== String(invitationId));
-        if (memberExists || invitationExists) throw new Error('business.errors.duplicateEmail');
-    }
-
-    /** Runs a mutating command with shared loading and feedback handling. @param {Function} command - Command to execute. @param {string} successKey - Success message key. @returns {Promise<boolean>} True when the command succeeds. */
-    async function runCommand(command, successKey) {
-        if (isSaving.value || isLoading.value) return false;
-        clearMessages();
-        isSaving.value = true;
-        try {
-            // Fresh state reduces stale quota decisions; JSON Server is not transactional.
-            await refreshRecords();
-            await command();
-            noticeMessage.value = successKey;
+            requireAdministrator();
+            await prepareBusinessContext(api.http);
+            if (!current(revision)) return false;
+            if (apiContext.status === 'missing') {
+                profile.value = null; profileLoaded.value = true;
+                return true;
+            }
+            const response = await api.getBusinessById(requireBusinessId());
+            if (!current(revision)) return false;
+            const business = BusinessAssembler.toEntityFromResource(response.data);
+            if (business.id !== apiContext.businessId) throw new Error('business.profile.loadError');
+            profile.value = business; profileLoaded.value = true;
             return true;
         } catch (error) {
-            errorMessage.value = error.message?.startsWith('business.errors.') ? error.message : 'business.errors.save';
+            if (current(revision)) profileError.value = feedback(error, 'business.profile.loadError');
             return false;
-        } finally { isSaving.value = false; }
+        } finally { if (current(revision)) isProfileLoading.value = false; }
     }
 
-    /** Finds an editable employee member by id. @param {string} id - Member id. @returns {Object} The member entity. */
+    async function saveProfile(values) {
+        if (!profileLoaded.value || isProfileLoading.value || isProfileSaving.value) return false;
+        const revision = currentContextRevision();
+        const registering = !profile.value;
+        isProfileSaving.value = true; profileError.value = null; profileNotice.value = null;
+        try {
+            requireAdministrator();
+            const business = new Business({ ...values, taxId: profile.value?.taxId ?? values.taxId }).validate();
+            const response = registering
+                ? await api.createBusiness(BusinessAssembler.toResourceFromEntity(business))
+                : await api.updateBusiness(requireBusinessId(), BusinessAssembler.toProfileChanges(business));
+            if (!current(revision)) return false;
+            profile.value = BusinessAssembler.toEntityFromResource(response.data);
+            profileNotice.value = registering ? 'business.profile.created' : 'business.profile.saved';
+            await prepareBusinessContext(api.http, { refresh: true });
+            return current(revision);
+        } catch (error) {
+            if (current(revision)) profileError.value = feedback(error, 'business.profile.saveError');
+            return false;
+        } finally { if (current(revision)) isProfileSaving.value = false; }
+    }
+
+    async function refreshPersonnel(revision) {
+        requireAdministrator();
+        const businessId = requireBusinessId();
+        const [memberResponse, invitationResponse, seatResponse] = await Promise.all([
+            api.getMembers(businessId), api.getInvitations(businessId), api.getSeats(businessId),
+        ]);
+        if (!current(revision)) return false;
+        const loadedMembers = BusinessMemberAssembler.toEntitiesFromResponse(memberResponse);
+        const loadedInvitations = StaffInvitationAssembler.toEntitiesFromResponse(invitationResponse);
+        const limits = seatResponse.data;
+        if ([...loadedMembers, ...loadedInvitations].some(record => record.businessId !== businessId)
+            || !['limit', 'activeEmployees', 'reservedSeats', 'availableSeats'].every(key => Number.isInteger(limits?.[key]) && limits[key] >= 0)
+            || typeof limits.subscriptionActive !== 'boolean') throw new Error('business.errors.load');
+        members.value = loadedMembers; invitations.value = loadedInvitations; seats.value = limits;
+        planLimits.value = { maxEmployees: limits.limit, subscriptionActive: limits.subscriptionActive };
+        personnelLoaded.value = true;
+        return true;
+    }
+    async function loadPersonnel() {
+        if (isLoading.value || isSaving.value) return false;
+        const revision = currentContextRevision();
+        isLoading.value = true; personnelLoaded.value = false; errorMessage.value = null;
+        try { return await refreshPersonnel(revision); }
+        catch (error) {
+            if (current(revision)) errorMessage.value = feedback(error, 'business.errors.load');
+            return false;
+        } finally { if (current(revision)) isLoading.value = false; }
+    }
+    function assertAvailableSeat() {
+        if (!seats.value) throw new Error('business.errors.limitsUnavailable');
+        if (!seats.value.subscriptionActive) throw new Error('business.errors.subscriptionInactive');
+        if (seats.value.availableSeats <= 0) throw new Error('business.errors.noSeats');
+    }
+    function assertUniqueEmail(email, memberId = null, invitationId = null) {
+        if (members.value.some(item => item.email === email && item.id !== memberId)
+            || invitations.value.some(item => item.reservesSeat && item.email === email && item.id !== invitationId)) {
+            throw new Error('business.errors.duplicateEmail');
+        }
+    }
+    async function runCommand(command, successKey) {
+        if (isSaving.value || isLoading.value || !personnelLoaded.value) return false;
+        const revision = currentContextRevision();
+        isSaving.value = true; clearMessages();
+        let persisted = false;
+        try {
+            if (!await refreshPersonnel(revision)) return false;
+            await command(requireBusinessId());
+            persisted = true;
+            if (!current(revision)) return false;
+            noticeMessage.value = successKey;
+            await refreshPersonnel(revision);
+            return current(revision);
+        } catch (error) {
+            if (current(revision)) {
+                errorMessage.value = persisted ? 'business.errors.refreshAfterSave' : feedback(error, 'business.errors.save');
+                if (persisted) personnelLoaded.value = false;
+            }
+            return persisted && current(revision);
+        } finally { if (current(revision)) isSaving.value = false; }
+    }
     function getMember(id) {
-        const member = members.value.find(item => String(item.id) === String(id));
+        const member = members.value.find(item => item.id === id);
         if (!member) throw new Error('business.errors.notFound');
         if (!member.isEmployee) throw new Error('business.errors.administratorProtected');
         return member;
     }
-
-    /** Finds a pending invitation that still reserves a seat. @param {string} id - Invitation id. @returns {Object} The invitation entity. */
     function getPendingInvitation(id) {
-        const invitation = invitations.value.find(item => String(item.id) === String(id));
+        const invitation = invitations.value.find(item => item.id === id);
         if (!invitation) throw new Error('business.errors.notFound');
         if (!invitation.reservesSeat) throw new Error('business.errors.invitationNotPending');
         return invitation;
     }
-
-    /** Replaces a member in the local collection. @param {Object} resource - Updated member resource. @returns {void} */
-    function replaceMember(resource) {
-        const member = BusinessMemberAssembler.toEntityFromResource(resource);
-        members.value = members.value.map(item => String(item.id) === String(member.id) ? member : item);
-    }
-
-    /** Inserts or replaces an invitation in the local collection. @param {Object} resource - Updated invitation resource. @returns {void} */
-    function replaceInvitation(resource) {
-        const invitation = StaffInvitationAssembler.toEntityFromResource(resource);
-        const index = invitations.value.findIndex(item => String(item.id) === String(invitation.id));
-        if (index === -1) invitations.value.unshift(invitation);
-        else invitations.value[index] = invitation;
-    }
-
-    /** Creates a staff invitation after quota and email checks. @param {Object} values - Invitation form values. @returns {Promise<boolean>} True when created. */
     function createInvitation(values) {
-        return runCommand(async () => {
-            const now = new Date().toISOString();
-            const invitation = new StaffInvitation({ businessId: demoBusinessId,
-                displayName: values.displayName, email: values.email, createdAt: now, updatedAt: now }).validate();
-            assertUniqueEmail(invitation.email);
-            await refreshLimits();
-            assertAvailableSeat();
-            const response = await businessApi.createInvitation(StaffInvitationAssembler.toResourceFromEntity(invitation));
-            replaceInvitation(response.data);
+        return runCommand(async businessId => {
+            const invitation = new StaffInvitation({ ...values, businessId }).validate();
+            assertUniqueEmail(invitation.email); assertAvailableSeat();
+            await api.createInvitation(businessId, StaffInvitationAssembler.toResourceFromEntity(invitation));
         }, 'business.messages.invitationCreated');
     }
-
-    /** Updates a pending invitation. @param {string} id - Invitation id. @param {Object} values - New values. @returns {Promise<boolean>} True when updated. */
     function updateInvitation(id, values) {
         return runCommand(async () => {
-            const invitation = new StaffInvitation({ ...getPendingInvitation(id),
-                displayName: values.displayName, email: values.email, updatedAt: new Date().toISOString() }).validate();
+            const invitation = new StaffInvitation({ ...getPendingInvitation(id), ...values }).validate();
             assertUniqueEmail(invitation.email, null, id);
-            const response = await businessApi.updateInvitation(StaffInvitationAssembler.toResourceFromEntity(invitation));
-            replaceInvitation(response.data);
+            await api.updateInvitation(id, StaffInvitationAssembler.toResourceFromEntity(invitation));
         }, 'business.messages.updated');
     }
-
-    /** Cancels a pending invitation. @param {string} id - Invitation id. @returns {Promise<boolean>} True when cancelled. */
     function cancelInvitation(id) {
-        return runCommand(async () => {
-            const invitation = new StaffInvitation({ ...getPendingInvitation(id),
-                status: StaffInvitationStatus.CANCELLED, updatedAt: new Date().toISOString() });
-            const response = await businessApi.updateInvitation(StaffInvitationAssembler.toResourceFromEntity(invitation));
-            replaceInvitation(response.data);
-        }, 'business.messages.invitationCancelled');
+        return runCommand(async () => { getPendingInvitation(id); await api.cancelInvitation(id); }, 'business.messages.invitationCancelled');
     }
-
-    /** Records an invitation resend with fresh timestamps. @param {string} id - Invitation id. @returns {Promise<boolean>} True when recorded. */
     function resendInvitation(id) {
-        return runCommand(async () => {
-            const now = new Date().toISOString();
-            const invitation = new StaffInvitation({ ...getPendingInvitation(id), lastResentAt: now, updatedAt: now });
-            const response = await businessApi.updateInvitation(StaffInvitationAssembler.toResourceFromEntity(invitation));
-            replaceInvitation(response.data);
-        }, 'business.messages.resendRecorded');
+        return runCommand(async () => { getPendingInvitation(id); await api.resendInvitation(id); }, 'business.messages.resendRecorded');
     }
-
-    /** Updates an employee member. @param {string} id - Member id. @param {Object} values - New values. @returns {Promise<boolean>} True when updated. */
     function updateMember(id, values) {
         return runCommand(async () => {
-            const member = new BusinessMember({ ...getMember(id), displayName: values.displayName,
-                email: values.email, updatedAt: new Date().toISOString() }).validate();
+            const member = new BusinessMember({ ...getMember(id), ...values }).validate();
             assertUniqueEmail(member.email, id);
-            const response = await businessApi.updateMember(BusinessMemberAssembler.toResourceFromEntity(member));
-            replaceMember(response.data);
+            await api.updateMember(id, BusinessMemberAssembler.toResourceFromEntity(member));
         }, 'business.messages.updated');
     }
-
-    /** Activates or deactivates an employee membership. @param {string} id - Member id. @returns {Promise<boolean>} True when updated. */
     function toggleMembership(id) {
         return runCommand(async () => {
-            const current = getMember(id);
-            if (!current.occupiesSeat) {
-                await refreshLimits();
-                assertAvailableSeat();
-            }
-            const member = new BusinessMember({ ...current, status: current.occupiesSeat ? 'inactive' : 'active',
-                updatedAt: new Date().toISOString() }).validate();
-            const response = await businessApi.updateMember(BusinessMemberAssembler.toResourceFromEntity(member));
-            replaceMember(response.data);
+            const member = getMember(id);
+            if (!member.occupiesSeat) assertAvailableSeat();
+            await api.setMemberActive(id, !member.occupiesSeat);
         }, 'business.messages.membershipUpdated');
     }
-
-    /** Deletes an employee member. @param {string} id - Member id. @returns {Promise<boolean>} True when deleted. */
-    function deleteMember(id) {
-        return runCommand(async () => {
-            getMember(id);
-            await businessApi.deleteMember(id);
-            members.value = members.value.filter(member => String(member.id) !== String(id));
-        }, 'business.messages.deleted');
-    }
-
-    /** Deletes a cancelled invitation. @param {string} id - Invitation id. @returns {Promise<boolean>} True when deleted. */
-    function deleteInvitation(id) {
-        return runCommand(async () => {
-            const invitation = invitations.value.find(item => String(item.id) === String(id));
-            if (!invitation) throw new Error('business.errors.notFound');
-            if (invitation.status !== StaffInvitationStatus.CANCELLED) throw new Error('business.errors.cancelBeforeDelete');
-            await businessApi.deleteInvitation(id);
-            invitations.value = invitations.value.filter(item => String(item.id) !== String(id));
-        }, 'business.messages.deleted');
-    }
-
-    return { profile, profileLoaded, isProfileLoading, isProfileSaving, profileError, profileNotice,
-        loadProfile, saveProfile, members, employees, invitations, planLimits, occupiedSeats, reservedSeats, availableSeats,
+    return { profile, profileLoaded, isProfileLoading, isProfileSaving, profileError, profileNotice, loadProfile, saveProfile,
+        members, employees, invitations, planLimits, personnelLoaded, occupiedSeats, reservedSeats, availableSeats,
         isLoading, isSaving, errorMessage, noticeMessage, clearMessages, loadPersonnel,
-        createInvitation, updateInvitation, cancelInvitation, resendInvitation,
-        updateMember, toggleMembership, deleteMember, deleteInvitation };
+        createInvitation, updateInvitation, cancelInvitation, resendInvitation, updateMember, toggleMembership };
 });
-
-export default useBusinessStore;
