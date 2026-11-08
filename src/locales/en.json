@@ -982,7 +982,7 @@
       "firstName": "Enter a first name of up to 100 characters.",
       "lastName": "Enter a last name of up to 100 characters.",
       "dni": "Enter exactly eight digits.",
-      "phone": "Use digits, spaces, +, parentheses or hyphens, up to 30 characters."
+      "phone": "Enter 7 to 15 digits, optionally starting with +. Spaces, parentheses and hyphens are allowed."
     },
     "errors": {
       "profileMissing": "No personal profile is available for this account.",

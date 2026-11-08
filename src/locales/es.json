@@ -982,7 +982,7 @@
       "firstName": "Ingresa tus nombres con un máximo de 100 caracteres.",
       "lastName": "Ingresa tus apellidos con un máximo de 100 caracteres.",
       "dni": "Ingresa exactamente ocho dígitos.",
-      "phone": "Usa dígitos, espacios, +, paréntesis o guiones, con un máximo de 30 caracteres."
+      "phone": "Ingresa de 7 a 15 dígitos, opcionalmente con + al inicio. Puedes usar espacios, paréntesis y guiones."
     },
     "errors": {
       "profileMissing": "No hay un perfil personal disponible para esta cuenta.",
