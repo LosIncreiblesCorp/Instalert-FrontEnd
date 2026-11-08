@@ -14,7 +14,7 @@ export class UserProfile {
         if (!this.firstName || this.firstName.length > 100) errors.firstName = 'profiles.validation.firstName';
         if (!this.lastName || this.lastName.length > 100) errors.lastName = 'profiles.validation.lastName';
         if (!/^\d{8}$/.test(this.dni)) errors.dni = 'profiles.validation.dni';
-        if (this.phone && (this.phone.length > 30 || !/^[+\d\s().-]+$/.test(this.phone) || !/\d/.test(this.phone))) {
+        if (this.phone && (this.phone.length > 30 || !/^\+?[1-9][0-9]{6,14}$/.test(this.phone.replace(/[\s()-]/g, '')))) {
             errors.phone = 'profiles.validation.phone';
         }
         return errors;

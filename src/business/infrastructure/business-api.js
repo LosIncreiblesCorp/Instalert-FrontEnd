@@ -1,53 +1,17 @@
 import { BaseApi } from '../../shared/infrastructure/base-api.js';
-import { BaseEndpoint } from '../../shared/infrastructure/base-endpoint.js';
 
-/**
- * @typedef {Object} PlanLimitsSnapshot
- * @property {number} maxEmployees - Employee capacity reported by Payments.
- * @property {string|null} planName - Current plan name, or null without an active subscription.
- * @property {boolean} subscriptionActive - Whether the subscription permits seat allocation.
- */
-
-/** Replaceable HTTP adapter. Payments data is consumed as resources, not private entities. */
+/** Business resources and commands exposed by the platform API. */
 export class BusinessApi extends BaseApi {
-    constructor() {
-        super();
-        this.businessesEndpoint = new BaseEndpoint(this, import.meta.env.VITE_BUSINESSES_ENDPOINT_PATH);
-        this.membersEndpoint = new BaseEndpoint(this, import.meta.env.VITE_BUSINESS_MEMBERS_ENDPOINT_PATH);
-        this.invitationsEndpoint = new BaseEndpoint(this, import.meta.env.VITE_STAFF_INVITATIONS_ENDPOINT_PATH);
-        this.plansEndpoint = new BaseEndpoint(this, import.meta.env.VITE_PLANS_ENDPOINT_PATH);
-        this.subscriptionsEndpoint = new BaseEndpoint(this, import.meta.env.VITE_SUBSCRIPTIONS_ENDPOINT_PATH);
-    }
-
-    getBusinessById(id) { return this.businessesEndpoint.getById(id); }
-    getBusinessesByTaxId(taxId) { return this.http.get(this.businessesEndpoint.endpointPath, { params: { taxId } }); }
-    createBusiness(resource) { return this.businessesEndpoint.create(resource); }
-    updateBusiness(id, changes) { return this.http.patch(`${this.businessesEndpoint.endpointPath}/${id}`, changes); }
-
-    getMembers(businessId) { return this.http.get(this.membersEndpoint.endpointPath, { params: { businessId } }); }
-    getInvitations(businessId) { return this.http.get(this.invitationsEndpoint.endpointPath, { params: { businessId } }); }
-    createInvitation(resource) { return this.invitationsEndpoint.create(resource); }
-    updateInvitation(resource) { return this.invitationsEndpoint.update(resource.id, resource); }
-    deleteInvitation(id) { return this.invitationsEndpoint.delete(id); }
-    updateMember(resource) { return this.membersEndpoint.update(resource.id, resource); }
-    deleteMember(id) { return this.membersEndpoint.delete(id); }
-
-    /**
-     * Builds the frontend plan-limit projection from mock Payments resources.
-     * @param {string|number} businessId - Commerce identifier.
-     * @returns {Promise<PlanLimitsSnapshot>} Data consumed by Business without a Payments store dependency.
-     */
-    async getPlanLimits(businessId) {
-        const response = await this.http.get(this.subscriptionsEndpoint.endpointPath, { params: { businessId } });
-        const subscriptions = Array.isArray(response.data) ? response.data : response.data?.subscriptions;
-        if (!Array.isArray(subscriptions)) throw new Error('business.errors.limitsUnavailable');
-        const active = subscriptions.filter(subscription => String(subscription.businessId) === String(businessId)
-            && subscription.status === 'active');
-        if (active.length > 1) throw new Error('business.errors.limitsUnavailable');
-        if (!active.length) return { maxEmployees: 0, planName: null, subscriptionActive: false };
-        const planResponse = await this.plansEndpoint.getById(active[0].planId);
-        const plan = planResponse.data;
-        if (!Number.isInteger(plan.maxEmployees) || plan.maxEmployees < 0) throw new Error('business.errors.limitsUnavailable');
-        return { maxEmployees: plan.maxEmployees, planName: plan.name, subscriptionActive: true };
-    }
+    getBusinessById(id) { return this.http.get(`businesses/${encodeURIComponent(id)}`); }
+    createBusiness(resource) { return this.http.post('businesses', resource); }
+    updateBusiness(id, changes) { return this.http.put(`businesses/${encodeURIComponent(id)}`, changes); }
+    getMembers(businessId) { return this.http.get(`businesses/${encodeURIComponent(businessId)}/members`); }
+    getInvitations(businessId) { return this.http.get(`businesses/${encodeURIComponent(businessId)}/invitations`); }
+    getSeats(businessId) { return this.http.get(`businesses/${encodeURIComponent(businessId)}/seats`); }
+    createInvitation(businessId, resource) { return this.http.post(`businesses/${encodeURIComponent(businessId)}/invitations`, resource); }
+    updateInvitation(id, resource) { return this.http.put(`staff-invitations/${encodeURIComponent(id)}`, resource); }
+    cancelInvitation(id) { return this.http.post(`staff-invitations/${encodeURIComponent(id)}/cancellation`); }
+    resendInvitation(id) { return this.http.post(`staff-invitations/${encodeURIComponent(id)}/resend`); }
+    updateMember(id, resource) { return this.http.put(`business-members/${encodeURIComponent(id)}`, resource); }
+    setMemberActive(id, active) { return this.http.post(`business-members/${encodeURIComponent(id)}/${active ? 'activation' : 'deactivation'}`); }
 }

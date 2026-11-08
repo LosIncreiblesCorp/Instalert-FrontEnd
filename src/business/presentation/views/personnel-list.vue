@@ -71,7 +71,7 @@ function requestConfirmation(record, action, command, kind) {
                 <h1 id="personnel-title">{{ t('business.personnel.title') }}</h1>
                 <p class="subtitle">{{ t('business.personnel.description') }}</p>
             </div>
-            <pv-button icon="pi pi-user-plus" :label="t('business.invitation.title')" :disabled="busy"
+            <pv-button icon="pi pi-user-plus" :label="t('business.invitation.title')" :disabled="busy || !store.personnelLoaded || !store.planLimits?.subscriptionActive || store.availableSeats === 0"
                 @click="router.push({ name: 'business-invitation-new' })" />
         </header>
 
@@ -81,10 +81,10 @@ function requestConfirmation(record, action, command, kind) {
         <div class="quota-grid" :aria-label="t('business.personnel.quota')">
             <div class="quota-card"><span>{{ t('business.personnel.planLimit') }}</span>
                 <strong>{{ store.planLimits?.maxEmployees ?? '—' }}</strong>
-                <small>{{ store.planLimits?.planName ?? t('business.personnel.limitsUnavailable') }}</small></div>
-            <div class="quota-card"><span>{{ t('business.personnel.occupied') }}</span><strong>{{ store.occupiedSeats }}</strong>
+                <small>{{ store.planLimits ? t(store.planLimits.subscriptionActive ? 'business.personnel.subscriptionActive' : 'business.errors.subscriptionInactive') : t('business.personnel.limitsUnavailable') }}</small></div>
+            <div class="quota-card"><span>{{ t('business.personnel.occupied') }}</span><strong>{{ store.occupiedSeats ?? '—' }}</strong>
                 <small>{{ t('business.personnel.activeEmployees') }}</small></div>
-            <div class="quota-card"><span>{{ t('business.personnel.reserved') }}</span><strong>{{ store.reservedSeats }}</strong>
+            <div class="quota-card"><span>{{ t('business.personnel.reserved') }}</span><strong>{{ store.reservedSeats ?? '—' }}</strong>
                 <small>{{ t('business.personnel.pendingInvitations') }}</small></div>
             <div class="quota-card quota-card--available"><span>{{ t('business.personnel.available') }}</span>
                 <strong>{{ store.availableSeats ?? '—' }}</strong><small>{{ t('business.personnel.adminExcluded') }}</small></div>
@@ -125,11 +125,9 @@ function requestConfirmation(record, action, command, kind) {
                 </pv-column>
                 <pv-column :header="t('business.personnel.actions')">
                     <template #body="{ data }"><div class="row-actions">
-                        <pv-button text size="small" :label="t('business.actions.edit')" :disabled="busy" @click="editRecord(data, 'member')" />
-                        <pv-button text size="small" :label="t(data.occupiesSeat ? 'business.actions.deactivate' : 'business.actions.activate')" :disabled="busy"
+                        <pv-button text size="small" :label="t('business.actions.edit')" :disabled="busy || !store.personnelLoaded" @click="editRecord(data, 'member')" />
+                        <pv-button text size="small" :label="t(data.occupiesSeat ? 'business.actions.deactivate' : 'business.actions.activate')" :disabled="busy || !store.personnelLoaded"
                             @click="requestConfirmation(data, data.occupiesSeat ? 'deactivate' : 'activate', store.toggleMembership, 'member')" />
-                        <pv-button text size="small" severity="danger" :label="t('business.actions.delete')" :disabled="busy"
-                            @click="requestConfirmation(data, 'deleteMember', store.deleteMember, 'member')" />
                     </div></template>
                 </pv-column>
                 <template #empty><div class="empty-state"><i class="pi pi-users" aria-hidden="true" />
@@ -146,13 +144,11 @@ function requestConfirmation(record, action, command, kind) {
                 <pv-column :header="t('business.personnel.actions')">
                     <template #body="{ data }"><div class="row-actions">
                         <template v-if="data.reservesSeat">
-                            <pv-button text size="small" :label="t('business.actions.edit')" :disabled="busy" @click="editRecord(data, 'invitation')" />
-                            <pv-button text size="small" :label="t('business.actions.resend')" :disabled="busy" @click="store.resendInvitation(data.id)" />
-                            <pv-button text size="small" severity="danger" :label="t('business.actions.cancelInvitation')" :disabled="busy"
+                            <pv-button text size="small" :label="t('business.actions.edit')" :disabled="busy || !store.personnelLoaded" @click="editRecord(data, 'invitation')" />
+                            <pv-button text size="small" :label="t('business.actions.resend')" :disabled="busy || !store.personnelLoaded" @click="store.resendInvitation(data.id)" />
+                            <pv-button text size="small" severity="danger" :label="t('business.actions.cancelInvitation')" :disabled="busy || !store.personnelLoaded"
                                 @click="requestConfirmation(data, 'cancelInvitation', store.cancelInvitation, 'invitation')" />
                         </template>
-                        <pv-button v-else-if="data.status === 'cancelled'" text size="small" severity="danger" :label="t('business.actions.delete')"
-                            :disabled="busy" @click="requestConfirmation(data, 'deleteInvitation', store.deleteInvitation, 'invitation')" />
                     </div></template>
                 </pv-column>
                 <template #empty><div class="empty-state"><i class="pi pi-envelope" aria-hidden="true" />

@@ -14,7 +14,7 @@ export class BusinessMemberAssembler {
 
     /** Builds a plain resource from a member entity. @param {BusinessMember} entity - Member entity. @returns {Object} The plain member resource. */
     static toResourceFromEntity(entity) {
-        const { id, businessId, userId, displayName, email, role, status, createdAt, updatedAt } = entity;
-        return { ...(id == null ? {} : { id }), businessId, userId, displayName, email, role, status, createdAt, updatedAt };
+        const { displayName, email } = entity;
+        return { displayName, email };
     }
 }

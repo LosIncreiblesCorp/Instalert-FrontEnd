@@ -14,7 +14,7 @@ export class StaffInvitationAssembler {
 
     /** Builds a plain resource from an invitation entity. @param {StaffInvitation} entity - Invitation entity. @returns {Object} The plain invitation resource. */
     static toResourceFromEntity(entity) {
-        const { id, businessId, displayName, email, status, createdAt, updatedAt, lastResentAt } = entity;
-        return { ...(id == null ? {} : { id }), businessId, displayName, email, status, createdAt, updatedAt, lastResentAt };
+        const { displayName, email } = entity;
+        return { displayName, email };
     }
 }

@@ -102,7 +102,8 @@
       "limitsUnavailable": "Información del plan no disponible",
       "emptyEmployees": "No hay empleados para mostrar",
       "emptyInvitations": "No hay invitaciones para mostrar",
-      "emptyHelp": "Prueba otra búsqueda o actualiza la lista."
+      "emptyHelp": "Prueba otra búsqueda o actualiza la lista.",
+      "subscriptionActive": "Suscripción activa"
     },
     "invitation": {
       "title": "Nueva invitación",
@@ -129,7 +130,6 @@
       "confirmTitle": "Confirmar acción",
       "activate": "Activar",
       "deactivate": "Desactivar",
-      "delete": "Eliminar",
       "resend": "Reenviar",
       "cancelInvitation": "Cancelar invitación",
       "refresh": "Actualizar"
@@ -137,20 +137,17 @@
     "confirmations": {
       "activate": "¿Activar la membresía de {name}? Ocupará un cupo.",
       "deactivate": "¿Desactivar la membresía de {name}? Liberará un cupo.",
-      "deleteMember": "¿Eliminar la membresía de {name}? Se eliminará su relación con el comercio.",
-      "cancelInvitation": "¿Cancelar la invitación pendiente de {name}? Se liberará su cupo reservado.",
-      "deleteInvitation": "¿Eliminar la invitación cancelada de {name}?"
+      "cancelInvitation": "¿Cancelar la invitación pendiente de {name}? Se liberará su cupo reservado."
     },
     "messages": {
       "invitationCreated": "Invitación creada. Aparece en la pestaña Invitaciones.",
       "invitationCancelled": "Invitación cancelada. Su cupo reservado está disponible.",
       "updated": "Cambios guardados.",
       "membershipUpdated": "Membresía actualizada.",
-      "deleted": "Registro eliminado.",
-      "resendRecorded": "Solicitud de reenvío registrada."
+      "resendRecorded": "Reenvío solicitado. El servicio de correo procesará la entrega."
     },
     "errors": {
-      "businessRequired": "Debes seleccionar un comercio.",
+      "businessRequired": "No se pudo identificar tu comercio. Actualiza e inténtalo nuevamente.",
       "nameInvalid": "Ingresa un nombre de entre 1 y 100 caracteres.",
       "emailInvalid": "Ingresa un correo electrónico válido.",
       "invalidState": "El registro tiene un estado inválido.",
@@ -161,10 +158,10 @@
       "notFound": "El registro ya no está disponible. Actualiza la lista.",
       "administratorProtected": "Esta acción está disponible solo para empleados.",
       "invitationNotPending": "Solo se pueden editar, cancelar o reenviar invitaciones pendientes.",
-      "cancelBeforeDelete": "Cancela la invitación antes de eliminarla. No se pueden eliminar invitaciones aceptadas aquí.",
       "load": "No se pudo cargar el personal o el plan. Actualiza e inténtalo nuevamente.",
       "save": "No se pudo guardar el cambio. Inténtalo nuevamente.",
-      "overCapacity": "Los cupos ocupados y reservados superan el límite del plan. Libera cupos antes de agregar más."
+      "overCapacity": "Los cupos ocupados y reservados superan el límite del plan. Libera cupos antes de agregar más.",
+      "refreshAfterSave": "El cambio se guardó, pero no se pudo actualizar la lista. Actualízala antes de hacer otro cambio."
     }
   },
   "roles": {
@@ -985,7 +982,7 @@
       "firstName": "Ingresa tus nombres con un máximo de 100 caracteres.",
       "lastName": "Ingresa tus apellidos con un máximo de 100 caracteres.",
       "dni": "Ingresa exactamente ocho dígitos.",
-      "phone": "Usa dígitos, espacios, +, paréntesis o guiones, con un máximo de 30 caracteres."
+      "phone": "Ingresa de 7 a 15 dígitos, opcionalmente con + al inicio. Puedes usar espacios, paréntesis y guiones."
     },
     "errors": {
       "profileMissing": "No hay un perfil personal disponible para esta cuenta.",

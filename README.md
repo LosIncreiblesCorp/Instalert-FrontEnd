@@ -89,7 +89,7 @@ src/
 ### Business Context
 - Owns the business profile, operational memberships and staff invitations.
 - Uses `Business`, `BusinessMember` and `StaffInvitation` entities.
-- Uses `useBusinessStore` for invitation create/delete and membership toggle use cases.
+- Uses `useBusinessStore` for commerce updates, invitations, employee details and membership activation/deactivation.
 - Routes in `business-routes.js`: `/admin/business`, `/admin/personnel`, `/admin/personnel/invitations/new`.
 
 ### Contacts Context
@@ -172,7 +172,7 @@ Vite defaults to port 5173. The API connection is configured in `.env.developmen
 
 For a production build, supply the future ASP.NET API URL through `VITE_INSTALERT_PLATFORM_API_URL`, including `/api/v1`, then run `npm run build`. See the deployment configuration below. `npm run preview` serves the resulting build.
 
-The `server/` directory and JSON Server dependency remain for the module adapters that have not yet been integrated. They are not used by the new shared commerce connection. Those adapters will be adapted in separate features.
+The `server/` directory and JSON Server dependency remain for the module adapters that have not yet been integrated. They are not used by Shared, Business or Profiles. Those adapters will be adapted in separate features.
 
 ## Environment Variables
 Environment files included:
@@ -199,8 +199,6 @@ API resource paths are configured in both environment files:
 | `VITE_SUBSCRIPTIONS_ENDPOINT_PATH` | `subscriptions` |
 | `VITE_PAYMENT_METHODS_ENDPOINT_PATH` | `payment-methods` |
 | `VITE_INVOICES_ENDPOINT_PATH` | `invoices` |
-| `VITE_USER_PROFILES_ENDPOINT_PATH` | `user-profiles` |
-| `VITE_USER_PREFERENCES_ENDPOINT_PATH` | `user-preferences` |
 | `VITE_NOTIFICATIONS_ENDPOINT_PATH` | `notifications` |
 | `VITE_NOTIFICATION_PREFERENCES_ENDPOINT_PATH` | `notification-preferences` |
 | `VITE_DASHBOARD_ENDPOINT_PATH` | `dashboard` |
@@ -230,21 +228,17 @@ The current frontend consumes the following adapter projections. HTTP access and
 
 | Consumer | Source owner | Adapter result consumed by the frontend |
 |---|---|---|
-| Business | Payments | `BusinessApi.getPlanLimits(businessId)` returns `{ maxEmployees, planName, subscriptionActive }`. |
+| Business | Business API | `GET businesses/{id}/seats` returns the server-calculated limit, active employees, reservations, available seats and subscription status. |
 | Payments | Business | `PaymentsApi.getSeatUsage(businessId)` returns `{ activeEmployees, reservedSeats }`; administrators are excluded and pending invitations reserve seats. |
 | Mapping | Business | Business location assemblers map `{ id, name, address, isVerified, latitude, longitude }` into Mapping's own location model. |
 
 JSON Server supplies raw collections; infrastructure adapters compose the snapshots consumed by their contexts. These frontend data shapes describe the current mock integration.
 
-The Business profile currently uses the following mock operations through `VITE_BUSINESSES_ENDPOINT_PATH`:
+Business and Profiles use the ASP.NET contracts directly. The commerce ID is resolved from the caller's context; registration sends no synthetic ID or audit metadata. Business updates use `PUT businesses/{id}`, and personal data uses `GET/PUT profiles/{userId}`. Preferences use `GET/PUT profiles/{userId}/preferences`.
 
-| Operation | Current mock contract |
-|---|---|
-| Load profile | `GET businesses/:id` returns a business resource. Only a `404` enables registration; connection/server failures show an error. |
-| Register | `POST businesses` sends the synthetic commerce ID, `taxId` as text, name, address, numeric coordinates and mock metadata. |
-| Edit | `PATCH businesses/:id` sends name, address, coordinates and `updatedAt`; it preserves the registered RUC, verification flag and unrelated stored fields. |
+Staff and invitations are queried under `businesses/{id}/members` and `businesses/{id}/invitations`. Invitation creation uses `POST businesses/{id}/invitations`; edits use `PUT staff-invitations/{id}`, while cancellation and resend use their dedicated POST commands. Membership edits use `PUT business-members/{id}`; activation/deactivation use dedicated POST commands. Memberships and invitation history are retained, with no deletion actions.
 
-The demonstration context uses `bus-1` and `demo-employee` as identifiers, which do not provide authentication or authorization. Address entry does not perform geocoding: the user selects the map point, and Business stores its coordinates for geographic projections.
+Only the fixed demonstration accounts are available in this delivery. Staff invitations reserve seats and request delivery, but they do not create access credentials or IAM accounts. Address entry does not perform geocoding: the user selects the map point, and Business stores its coordinates.
 
 ## Documentation
 - Domain and architecture references:
@@ -262,7 +256,7 @@ The demonstration context uses `bus-1` and `demo-employee` as identifiers, which
 
 ## ASP.NET shared connection
 
-The shared HTTP client now uses the ASP.NET API. Development defaults to `http://localhost:5221/api/v1`, matching its HTTP launch profile; Vite uses port 5173. Starting JSON Server is not required for this connection. The module-specific adapters documented above remain pending their respective integration features.
+The shared HTTP client now uses the ASP.NET API. Development defaults to `http://localhost:5221/api/v1`, matching its HTTP launch profile; Vite uses port 5173. Starting JSON Server is not required for this connection. Business and Profiles use this connection; the other module adapters remain pending their respective integration features.
 
 The profile selector retains two fixed demonstration actors: administrator → `synthetic-admin`, employee → `synthetic-employee`. Every request reads the current actor and sends `User-Id` plus `Accept-Language` (`en-US` or `es-419`). This is a demonstration selector, without registration, passwords or IAM. Switching profiles clears the shared commerce context and rejects responses belonging to the previous actor.
 
@@ -282,4 +276,4 @@ npm run build
 On the demonstration backend, configure `Demo__Enabled=true` and `Cors__AllowedOrigins__0` with the exact frontend origin. Keep provider credentials on the server. These settings do not deploy either application.
 
 
-These changes establish the shared connection. Business, Profiles, Alert, Contacts, Notifications, Payments, Mapping and Dashboard adapters retain their own pending integration work; no checkout, alert lifecycle or invitation flow is completed by this feature alone.
+Shared, Business and Profiles are connected to the ASP.NET API. Alert, Contacts, Notifications, Payments, Mapping and Dashboard retain their pending integration work. IAM and employee account provisioning are outside this delivery; no checkout or alert lifecycle is completed by these changes.

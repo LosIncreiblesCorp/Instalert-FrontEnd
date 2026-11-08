@@ -9,6 +9,6 @@ export class UserPreferencesAssembler {
     }
 
     static toChanges(preferences) {
-        return { locale: preferences.locale, updatedAt: new Date().toISOString() };
+        return { locale: preferences.locale };
     }
 }
