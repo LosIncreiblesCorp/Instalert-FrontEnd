@@ -8,6 +8,8 @@ import contactsRoutes from "./contacts/presentation/contacts-routes.js";
 import { profilesRoutes } from "./profiles/presentation/profiles-routes.js";
 import { notificationsRoutes } from "./notifications/presentation/notifications-routes.js";
 import { dashboardRoutes } from "./dashboard/presentation/dashboard-routes.js";
+import { configureRole, prepareBusinessContext } from './shared/infrastructure/api-context.js';
+import { BaseApi } from './shared/infrastructure/base-api.js';
 
 
 const employeeAlertRoutes = alertRoutes.map((route) => ({
@@ -88,9 +90,11 @@ const router = createRouter({
 });
 
 /** Updates the document title on each navigation. @param {import('vue-router').RouteLocationNormalized} to - Target route. @param {import('vue-router').RouteLocationNormalized} from - Current route. @returns {void} */
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   // Set the page title
   document.title = `InstAlert | ${i18n.global.t(to.meta.title ?? "common.appName")}`;
+  configureRole(to.meta.role);
+  if (to.meta.role) await prepareBusinessContext(new BaseApi().http);
 });
 
 export default router;

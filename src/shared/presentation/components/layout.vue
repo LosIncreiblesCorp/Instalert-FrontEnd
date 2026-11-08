@@ -3,6 +3,8 @@ import { computed, ref, watch } from "vue";
 import { RouterLink, RouterView, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import instalertLogo from "../../../assets/instalert-logo.svg";
+import { apiContext } from '../../infrastructure/api-context.js';
+import ApiConnectionState from './api-connection-state.vue';
 
 defineProps({ unreadNotifications: { type: Number, default: 0 } });
 
@@ -184,7 +186,8 @@ function closeMobileNavigation() {
     </aside>
 
     <main id="main-content" class="workspace-main" tabindex="-1">
-      <RouterView />
+      <ApiConnectionState />
+      <RouterView v-if="apiContext.status === 'ready' || (apiContext.status === 'missing' && route.name === 'admin-business-profile')" />
     </main>
   </div>
 </template>

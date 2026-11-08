@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 
 const router = useRouter();
 const { t } = useI18n();
-// This choice only opens a view; it does not authenticate or assign a user role.
+// This choice selects a fixed demo actor; it does not authenticate an account.
 </script>
 
 <template>

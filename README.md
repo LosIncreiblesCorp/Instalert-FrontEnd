@@ -160,43 +160,19 @@ Provides reusable infrastructure and presentation utilities.
 ## Running the Project
 
 ### Prerequisites
-- Node.js + npm installed (use versions compatible with Vite 8).
 
-### 1) Install dependencies
-```bash
+Node.js/npm and the ASP.NET backend running with its HTTP launch profile on port 5221. The two demonstration actors and their commerce must be available in the backend database.
+
+```powershell
 npm install
-```
-
-### 2) Start mock API server (`json-server`)
-From the project root:
-```bash
-npm run dev:api
-```
-
-This command works in PowerShell and starts JSON Server with the resource routes required by the frontend. Stop any existing JSON Server on port 3000 before running it. Starting with only `--watch db.json` omits the `/api/v1/*` rewrite and makes individual resource URLs fail.
-
-The server reads:
-- `server/db.json`
-- `server/routes.json` (maps `/api/v1/*` to root resources)
-
-Default local API base used by development env:
-- `http://localhost:3000/api/v1`
-
-### 3) Start the Vue app
-In a separate terminal, from the project root:
-```bash
 npm run dev
 ```
 
-### 4) Build for production
-```bash
-npm run build
-```
+Vite defaults to port 5173. The API connection is configured in `.env.development` as `http://localhost:5221/api/v1`.
 
-### 5) Preview production build
-```bash
-npm run preview
-```
+For a production build, supply the future ASP.NET API URL through `VITE_INSTALERT_PLATFORM_API_URL`, including `/api/v1`, then run `npm run build`. See the deployment configuration below. `npm run preview` serves the resulting build.
+
+The `server/` directory and JSON Server dependency remain for the module adapters that have not yet been integrated. They are not used by the new shared commerce connection. Those adapters will be adapted in separate features.
 
 ## Environment Variables
 Environment files included:
@@ -231,7 +207,7 @@ API resource paths are configured in both environment files:
 | `VITE_MONTHLY_REPORTS_ENDPOINT_PATH` | `monthly-reports` |
 | `VITE_EMERGENCY_CONTACTS_ENDPOINT_PATH` | `emergency-contacts` |
 
-The API base URL includes the API prefix when required; resource paths are relative to it. Development uses the local JSON Server at `http://localhost:3000/api/v1`; production uses the configured hosted mock URL.
+The API base URL includes `/api/v1`; resource paths are relative to it. Development uses the ASP.NET backend on port 5221. Production requires an explicit build-time API URL; the former hosted mock is not the deployment default.
 
 Missing API configuration raises an error rather than falling back to hard-coded resource names. Restart Vite after changing environment variables, or rebuild for production. All `VITE_*` values are exposed to the browser.
 
@@ -282,3 +258,28 @@ The demonstration context uses `bus-1` and `demo-employee` as identifiers, which
 - Preserve layer boundaries (presentation does not call raw HTTP clients directly).
 - Prefer explicit domain language in naming and docs.
 - Add or update docs when introducing new entities or use cases.
+
+
+## ASP.NET shared connection
+
+The shared HTTP client now uses the ASP.NET API. Development defaults to `http://localhost:5221/api/v1`, matching its HTTP launch profile; Vite uses port 5173. Starting JSON Server is not required for this connection. The module-specific adapters documented above remain pending their respective integration features.
+
+The profile selector retains two fixed demonstration actors: administrator → `synthetic-admin`, employee → `synthetic-employee`. Every request reads the current actor and sends `User-Id` plus `Accept-Language` (`en-US` or `es-419`). This is a demonstration selector, without registration, passwords or IAM. Switching profiles clears the shared commerce context and rejects responses belonging to the previous actor.
+
+Before opening a role view, the router resolves its commerce through `GET businesses`. The context stores the returned ID and location; it does not assume `bus-1`. An empty employee result is checked against `GET business-members/me` to distinguish an inactive membership. Connection failures, missing/ambiguous assignments and inactive membership have localized messages and a retry action. `currentApiContext()` and `requireBusinessId()` are available to module adapters as they are integrated.
+
+Shared error normalization preserves the original HTTP response and adds `apiError` with status, domain code, field validation and a translation key; `getApiErrorMessage()` produces the localized message.
+
+### Deployment configuration
+
+No public ASP.NET URL is configured yet. Supply `VITE_INSTALERT_PLATFORM_API_URL` when building, including `/api/v1`. A production build without this value fails with a configuration message instead of silently targeting the hosted JSON mock. For a same-origin reverse proxy, set `/api/v1` only if that proxy has been configured.
+
+```powershell
+$env:VITE_INSTALERT_PLATFORM_API_URL = 'https://YOUR-BACKEND-HOST/api/v1'
+npm run build
+```
+
+On the demonstration backend, configure `Demo__Enabled=true` and `Cors__AllowedOrigins__0` with the exact frontend origin. Keep provider credentials on the server. These settings do not deploy either application.
+
+
+These changes establish the shared connection. Business, Profiles, Alert, Contacts, Notifications, Payments, Mapping and Dashboard adapters retain their own pending integration work; no checkout, alert lifecycle or invitation flow is completed by this feature alone.
