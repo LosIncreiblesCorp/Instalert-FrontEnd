@@ -1217,5 +1217,25 @@
     },
     "summaryNearby": "Mes actual · a 500 metros",
     "thisMonth": "Este mes"
+  },
+  "api": {
+    "connection": {
+      "loading": "Conectando con tu comercio…",
+      "retry": "Reintentar conexión",
+      "missing": "Esta cuenta de demostración no tiene un comercio asignado. Revisa los datos de demostración.",
+      "inactive": "Tu membresía está inactiva. Pide a tu administrador que la reactive.",
+      "ambiguous": "Esta cuenta de demostración está asociada a más de un comercio. Revisa los datos de demostración."
+    },
+    "errors": {
+      "validation": "Revisa la información ingresada.",
+      "unauthenticated": "La API no reconoció la cuenta de demostración seleccionada.",
+      "forbidden": "Esta cuenta de demostración no puede realizar esa operación.",
+      "notFound": "El recurso o la operación solicitada no está disponible.",
+      "conflict": "Los datos cambiaron o la operación no corresponde a su estado actual. Actualiza e inténtalo nuevamente.",
+      "busy": "Hay demasiadas solicitudes. Espera un momento e inténtalo nuevamente.",
+      "unavailable": "No se pudo conectar con la API o está temporalmente indisponible. Inténtalo nuevamente.",
+      "timeout": "La API tardó demasiado en responder. Inténtalo nuevamente.",
+      "unexpected": "No se pudo completar la solicitud. Inténtalo nuevamente."
+    }
   }
 }

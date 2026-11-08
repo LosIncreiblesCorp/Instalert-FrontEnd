@@ -1217,5 +1217,25 @@
     },
     "summaryNearby": "Current month · within 500 meters",
     "thisMonth": "This month"
+  },
+  "api": {
+    "connection": {
+      "loading": "Connecting to your business…",
+      "retry": "Retry connection",
+      "missing": "No business is assigned to this demo account. Check the demonstration data.",
+      "inactive": "Your membership is inactive. Ask your administrator to reactivate it.",
+      "ambiguous": "This demo account is associated with more than one business. Check the demonstration data."
+    },
+    "errors": {
+      "validation": "Check the information you entered.",
+      "unauthenticated": "The selected demo account was not recognized by the API.",
+      "forbidden": "This demo account cannot perform that operation.",
+      "notFound": "The requested resource or operation is unavailable.",
+      "conflict": "The data changed or the operation conflicts with its current state. Refresh and try again.",
+      "busy": "Too many requests. Wait a moment and try again.",
+      "unavailable": "The API could not be reached or is temporarily unavailable. Try again.",
+      "timeout": "The API took too long to respond. Try again.",
+      "unexpected": "The request could not be completed. Try again."
+    }
   }
 }
