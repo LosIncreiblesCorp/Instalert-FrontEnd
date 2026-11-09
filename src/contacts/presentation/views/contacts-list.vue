@@ -1,9 +1,10 @@
 <script setup>
 /** Searchable list of employee emergency contacts. */
 import { computed, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useConfirm } from 'primevue/useconfirm';
+import { apiContext, currentContextRevision } from '../../../shared/infrastructure/api-context.js';
 import useContactsStore from '../../application/contacts.store.js';
 
 const store = useContactsStore();
@@ -24,15 +25,20 @@ onMounted(() => store.loadContacts());
 * @param {import('../../domain/model/emergency-contact.entity.js').EmergencyContact} contact - Contact to delete.
 * @returns {void} No return value. */
 function confirmDeletion(contact) {
+    const revision = currentContextRevision();
+    const userId = apiContext.userId;
     confirm.require({
         header: t('contacts.actions.deleteTitle'),
         message: t('contacts.actions.deleteMessage', { name: contact.fullName }),
         icon: 'pi pi-exclamation-triangle',
         acceptLabel: t('contacts.actions.delete'),
         rejectLabel: t('contacts.actions.cancel'),
-        accept: () => store.deleteContact(contact.id),
+        accept: () => {
+            if (revision === currentContextRevision() && userId === apiContext.userId) return store.deleteContact(contact.id);
+        },
     });
 }
+onBeforeRouteLeave(() => !store.isSaving);
 </script>
 
 <template>
@@ -62,12 +68,12 @@ function confirmDeletion(contact) {
         </div>
 
         <p v-if="store.isLoading" class="loading-state" role="status">{{ t('contacts.loading') }}</p>
-        <div v-else-if="!visibleContacts.length" class="empty-state">
+        <div v-else-if="store.loaded && !visibleContacts.length" class="empty-state">
             <span class="empty-icon"><i class="pi pi-address-book" aria-hidden="true" /></span>
             <h2>{{ t(search.trim() ? 'contacts.noResults' : 'contacts.emptyTitle') }}</h2>
             <p>{{ t(search.trim() ? 'contacts.noResultsHelp' : 'contacts.emptyHelp') }}</p>
         </div>
-        <ul v-else class="contact-list" :aria-label="t('contacts.title')">
+        <ul v-else-if="visibleContacts.length" class="contact-list" :aria-label="t('contacts.title')">
             <li v-for="contact in visibleContacts" :key="contact.id" class="contact-card">
                 <span class="contact-avatar" aria-hidden="true">{{ contact.initials }}</span>
                 <div class="contact-content">

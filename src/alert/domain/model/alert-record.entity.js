@@ -28,7 +28,6 @@ export class AlertRecord {
         id = null,
         employeeId = '',
         businessId = '',
-        revision = 0,
         kind = AlertRecordKind.PANIC,
         status = AlertRecordStatus.ACTIVE,
         reportStatus = null,
@@ -50,7 +49,6 @@ export class AlertRecord {
         this.id = id;
         this.employeeId = employeeId;
         this.businessId = businessId;
-        this.revision = revision;
         this.kind = kind;
         const legacyPanicReport = kind === AlertRecordKind.PANIC
             && [AlertRecordStatus.PENDING_REPORT, AlertRecordStatus.COMPLETED].includes(status);

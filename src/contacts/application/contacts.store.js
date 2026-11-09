@@ -1,136 +1,127 @@
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { EmergencyContact } from '../domain/model/emergency-contact.entity.js';
 import { EmergencyContactAssembler } from '../infrastructure/emergency-contact.assembler.js';
 import { ContactsApi } from '../infrastructure/contacts-api.js';
+import { apiContext, currentContextRevision, requireBusinessId } from '../../shared/infrastructure/api-context.js';
 
-const contactsApi = new ContactsApi();
-// Same employee used by Alert preferences; not an authentication or authorization boundary.
-const demoEmployeeId = 'demo-employee';
+const api = new ContactsApi();
 const editableFields = values => ({ fullName: values.fullName, relationship: values.relationship,
     phone: values.phone, email: values.email, notes: values.notes });
+const validationKeys = { fullName: 'nameInvalid', relationship: 'relationshipInvalid', phone: 'phoneInvalid', email: 'emailInvalid', notes: 'notesInvalid' };
 
-/** Application service store for employee emergency contacts.
-* @returns {Object} Contacts store state and actions. */
-const useContactsStore = defineStore('contacts', () => {
-/** @type {import('vue').Ref<Array<import('../domain/model/emergency-contact.entity.js').EmergencyContact>>} Contact list. */
+/** Personal contacts scoped to the selected operational employee. */
+export default defineStore('contacts', () => {
     const contacts = ref([]);
-/** @type {import('vue').Ref<import('../domain/model/emergency-contact.entity.js').EmergencyContact|null>} Selected contact. */
     const selectedContact = ref(null);
-/** @type {import('vue').Ref<boolean>} List/detail loading flag. */
     const isLoading = ref(false);
-/** @type {import('vue').Ref<boolean>} Create/update/delete saving flag. */
     const isSaving = ref(false);
-/** @type {import('vue').Ref<string|null>} Localized error key. */
+    const loaded = ref(false);
     const errorMessage = ref(null);
-/** @type {import('vue').Ref<string|null>} Localized notice key. */
     const noticeMessage = ref(null);
-
-/** Clears store feedback messages. */
-    function clearMessages() { errorMessage.value = null; noticeMessage.value = null; }
-    const errorKey = (error, fallback) => error.message?.startsWith('contacts.errors.') ? error.message : fallback;
-
-/** Fetches one owned contact or rejects foreign records.
-* @param {string|number} id - Contact identifier.
-* @returns {Promise<import('../domain/model/emergency-contact.entity.js').EmergencyContact>} Owned contact. */
-    async function getOwnContact(id) {
-        const response = await contactsApi.getContact(id);
-        const contact = EmergencyContactAssembler.toEntityFromResource(response.data);
-        if (contact.employeeId !== demoEmployeeId) throw new Error('contacts.errors.notFound');
+    const fieldErrors = ref({});
+    let generation = 0;
+    let readRequest = 0;
+    const scope = () => ({ generation, revision: currentContextRevision(), userId: apiContext.userId, businessId: apiContext.businessId });
+    const current = value => value.generation === generation && value.revision === currentContextRevision()
+        && value.userId === apiContext.userId && value.businessId === apiContext.businessId;
+    function clearValidation() { fieldErrors.value = {}; }
+    function clearMessages() { errorMessage.value = null; noticeMessage.value = null; clearValidation(); }
+    function resetContext() {
+        generation++; readRequest++; contacts.value = []; selectedContact.value = null;
+        isLoading.value = false; isSaving.value = false; loaded.value = false; clearMessages();
+    }
+    watch(() => [apiContext.userId, apiContext.businessId], resetContext, { flush: 'sync' });
+    function requireEmployee() {
+        if (apiContext.role !== 'employee' || !apiContext.userId) throw new Error('api.errors.forbidden');
+        requireBusinessId();
+    }
+    function owned(resource, captured) {
+        const contact = EmergencyContactAssembler.toEntityFromResource(resource);
+        if (contact.employeeId !== captured.userId) throw new Error('contacts.errors.invalidResponse');
         return contact;
     }
-
-/** Loads demo employee contacts into the store.
-* @returns {Promise<boolean>} True when loading succeeds. */
+    function errorKey(error, fallback) {
+        if (error.response?.status === 404) return 'contacts.errors.notFound';
+        if (error.response?.status === 409) return 'contacts.errors.conflict';
+        if (error.response?.status === 400) {
+            const fields = [error.apiError?.field, ...Object.keys(error.apiError?.fieldErrors ?? {})];
+            fieldErrors.value = Object.fromEntries(fields.filter(field => typeof field === 'string')
+                .map(field => field.charAt(0).toLowerCase() + field.slice(1))
+                .filter(field => validationKeys[field]).map(field => [field, 'contacts.errors.' + validationKeys[field]]));
+            return 'api.errors.validation';
+        }
+        return error.apiError?.messageKey ?? (/^(contacts\.errors\.|api\.)/.test(error.message) ? error.message : fallback);
+    }
     async function loadContacts() {
-        isLoading.value = true;
-        errorMessage.value = null;
+        if (isSaving.value) return false;
+        const captured = scope(); const request = ++readRequest;
+        isLoading.value = true; errorMessage.value = null; clearValidation();
         try {
-            const response = await contactsApi.getContacts(demoEmployeeId);
-            contacts.value = EmergencyContactAssembler.toEntitiesFromResponse(response)
-                .filter(contact => contact.employeeId === demoEmployeeId);
-            return true;
+            requireEmployee();
+            const response = await api.getContacts();
+            if (!current(captured) || request !== readRequest) return false;
+            const records = EmergencyContactAssembler.toEntitiesFromResponse(response);
+            if (records.some(contact => contact.employeeId !== captured.userId)) throw new Error('contacts.errors.invalidResponse');
+            contacts.value = records; loaded.value = true; return true;
         } catch (error) {
-            errorMessage.value = errorKey(error, 'contacts.errors.load');
+            if (current(captured) && request === readRequest) errorMessage.value = errorKey(error, 'contacts.errors.load');
             return false;
-        } finally { isLoading.value = false; }
+        } finally { if (current(captured) && request === readRequest) isLoading.value = false; }
     }
-
-/** Loads one owned contact into the selection.
-* @param {string|number} id - Contact identifier.
-* @returns {Promise<boolean>} True when loading succeeds. */
     async function loadContact(id) {
-        isLoading.value = true;
-        selectedContact.value = null;
-        errorMessage.value = null;
+        if (isSaving.value) return false;
+        const captured = scope(); const request = ++readRequest;
+        isLoading.value = true; selectedContact.value = null; errorMessage.value = null; clearValidation();
         try {
-            selectedContact.value = await getOwnContact(id);
-            return true;
+            requireEmployee();
+            const response = await api.getContact(id);
+            if (!current(captured) || request !== readRequest) return false;
+            const contact = owned(response.data, captured);
+            if (contact.id !== String(id)) throw new Error('contacts.errors.invalidResponse');
+            selectedContact.value = contact; return true;
         } catch (error) {
-            errorMessage.value = error.response?.status === 404 ? 'contacts.errors.notFound' : errorKey(error, 'contacts.errors.load');
+            if (current(captured) && request === readRequest) errorMessage.value = errorKey(error, 'contacts.errors.load');
             return false;
-        } finally { isLoading.value = false; }
+        } finally { if (current(captured) && request === readRequest) isLoading.value = false; }
     }
-
-/** Runs a write command with shared saving and feedback state.
-* @param {Function} command - Async mutation to execute.
-* @param {string} successKey - Localized success message key.
-* @returns {Promise<boolean>} True when the command succeeds. */
     async function runCommand(command, successKey) {
         if (isLoading.value || isSaving.value) return false;
-        clearMessages();
-        isSaving.value = true;
+        const captured = scope(); clearMessages(); isSaving.value = true;
         try {
-            await command();
-            noticeMessage.value = successKey;
-            return true;
+            requireEmployee();
+            const result = await command(captured);
+            if (!current(captured)) return false;
+            result(); noticeMessage.value = successKey; return true;
         } catch (error) {
-            errorMessage.value = error.response?.status === 404 ? 'contacts.errors.notFound' : errorKey(error, 'contacts.errors.save');
+            if (current(captured)) errorMessage.value = errorKey(error, 'contacts.errors.save');
             return false;
-        } finally { isSaving.value = false; }
+        } finally { if (current(captured)) isSaving.value = false; }
     }
-
-/** Creates one contact for the demo employee.
-* @param {Object} values - Editable contact fields.
-* @returns {Promise<boolean>} True when creation succeeds. */
     function createContact(values) {
-        return runCommand(async () => {
-            const now = new Date().toISOString();
-            const contact = new EmergencyContact({ ...editableFields(values), employeeId: demoEmployeeId,
-                createdAt: now, updatedAt: now }).validate();
-            const response = await contactsApi.createContact(EmergencyContactAssembler.toResourceFromEntity(contact));
-            contacts.value.unshift(EmergencyContactAssembler.toEntityFromResource(response.data));
+        return runCommand(async captured => {
+            const draft = new EmergencyContact(editableFields(values)).validate();
+            const response = await api.createContact(EmergencyContactAssembler.toResourceFromEntity(draft));
+            const saved = owned(response.data, captured);
+            return () => { contacts.value.unshift(saved); selectedContact.value = saved; };
         }, 'contacts.messages.created');
     }
-
-/** Updates one owned contact with editable fields.
-* @param {string|number} id - Contact identifier.
-* @param {Object} values - Editable contact fields.
-* @returns {Promise<boolean>} True when update succeeds. */
     function updateContact(id, values) {
-        return runCommand(async () => {
-            const current = await getOwnContact(id);
-            const contact = new EmergencyContact({ ...current, ...editableFields(values), updatedAt: new Date().toISOString() }).validate();
-            const response = await contactsApi.updateContact(EmergencyContactAssembler.toResourceFromEntity(contact));
-            selectedContact.value = EmergencyContactAssembler.toEntityFromResource(response.data);
-            contacts.value = contacts.value.map(item => String(item.id) === String(id) ? selectedContact.value : item);
+        return runCommand(async captured => {
+            const draft = new EmergencyContact(editableFields(values)).validate();
+            const response = await api.updateContact(id, EmergencyContactAssembler.toResourceFromEntity(draft));
+            const saved = owned(response.data, captured);
+            if (saved.id !== String(id)) throw new Error('contacts.errors.invalidResponse');
+            return () => { selectedContact.value = saved; contacts.value = contacts.value.map(item => item.id === saved.id ? saved : item); };
         }, 'contacts.messages.updated');
     }
-
-/** Deletes one owned contact and clears its selection.
-* @param {string|number} id - Contact identifier.
-* @returns {Promise<boolean>} True when deletion succeeds. */
     function deleteContact(id) {
         return runCommand(async () => {
-            await getOwnContact(id);
-            await contactsApi.deleteContact(id);
-            contacts.value = contacts.value.filter(contact => String(contact.id) !== String(id));
-            if (String(selectedContact.value?.id) === String(id)) selectedContact.value = null;
+            await api.deleteContact(id);
+            return () => { contacts.value = contacts.value.filter(item => item.id !== String(id));
+                if (selectedContact.value?.id === String(id)) selectedContact.value = null; };
         }, 'contacts.messages.deleted');
     }
-
-    return { contacts, selectedContact, isLoading, isSaving, errorMessage, noticeMessage,
-        clearMessages, loadContacts, loadContact, createContact, updateContact, deleteContact };
+    return { contacts, selectedContact, isLoading, isSaving, loaded, errorMessage, noticeMessage, fieldErrors,
+        clearMessages, clearValidation, resetContext, loadContacts, loadContact, createContact, updateContact, deleteContact };
 });
-
-export default useContactsStore;

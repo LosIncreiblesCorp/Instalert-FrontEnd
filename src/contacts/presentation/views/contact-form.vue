@@ -1,9 +1,10 @@
 <script setup>
 /** Create/edit form for one emergency contact. */
 import { computed, nextTick, reactive, ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { EmergencyContact } from '../../domain/model/emergency-contact.entity.js';
+import { apiContext, currentContextRevision } from '../../../shared/infrastructure/api-context.js';
 import useContactsStore from '../../application/contacts.store.js';
 
 const route = useRoute();
@@ -13,26 +14,30 @@ const store = useContactsStore();
 const draft = reactive({ fullName: '', relationship: '', phone: '', email: '', notes: '' });
 const touched = ref(false);
 const ready = ref(false);
+const saved = ref(false);
+const initialDraft = ref('');
 const fieldRefs = {};
 const isEditing = computed(() => route.name === 'employee-contact-edit');
 const busy = computed(() => store.isLoading || store.isSaving);
-// Placeholder owner is used only for local field validation; the store assigns ownership.
-const errors = computed(() => new EmergencyContact({ ...draft, employeeId: 'validation-only' }).validationErrors());
+const errors = computed(() => ({ ...store.fieldErrors, ...new EmergencyContact(draft).validationErrors() }));
+const dirty = computed(() => ready.value && !saved.value && JSON.stringify(draft) !== initialDraft.value);
 const title = computed(() => t(isEditing.value ? 'contacts.form.editTitle' : 'contacts.form.createTitle'));
 const fields = ['fullName', 'relationship', 'phone', 'email', 'notes'];
 
 watch(() => route.fullPath, async (_, __, onCleanup) => {
     let stale = false;
+    const revision = currentContextRevision();
     onCleanup(() => { stale = true; });
     touched.value = false;
     ready.value = false;
+    saved.value = false;
     store.clearMessages();
     Object.assign(draft, { fullName: '', relationship: '', phone: '', email: '', notes: '' });
     if (isEditing.value) {
-        if (!await store.loadContact(route.params.id) || stale) return;
+        if (!await store.loadContact(route.params.id) || stale || revision !== currentContextRevision() || !store.selectedContact) return;
         for (const field of fields) draft[field] = store.selectedContact[field];
     }
-    if (!stale) ready.value = true;
+    if (!stale && revision === currentContextRevision()) { initialDraft.value = JSON.stringify(draft); ready.value = true; }
 }, { immediate: true });
 
 /** Validates the draft and creates or updates the contact.
@@ -48,8 +53,19 @@ async function saveContact() {
     const success = isEditing.value
         ? await store.updateContact(route.params.id, draft)
         : await store.createContact(draft);
-    if (success) await router.push({ name: 'employee-contacts' });
+    if (success) { saved.value = true; await router.push({ name: 'employee-contacts' }); }
 }
+
+watch(() => [apiContext.userId, apiContext.businessId], () => {
+    ready.value = false;
+    Object.assign(draft, { fullName: '', relationship: '', phone: '', email: '', notes: '' });
+});
+function canLeave() {
+    if (store.isSaving) return false;
+    return !dirty.value || window.confirm(t('contacts.form.unsavedChanges'));
+}
+onBeforeRouteLeave(canLeave);
+onBeforeRouteUpdate(canLeave);
 </script>
 
 <template>
@@ -67,7 +83,7 @@ async function saveContact() {
             <p v-if="!ready && busy" role="status">{{ t('contacts.loading') }}</p>
             <pv-button v-if="!ready && !busy" text :label="t('contacts.actions.refresh')"
                 @click="router.replace({ name: route.name, params: route.params, query: { ...route.query, retry: Date.now() } })" />
-            <form v-if="ready" novalidate @submit.prevent="saveContact">
+            <form v-if="ready" novalidate @input="store.clearValidation()" @submit.prevent="saveContact">
                 <div class="form-field">
                     <label for="contact-name">{{ t('contacts.fields.fullName') }} <span aria-hidden="true">*</span></label>
                     <pv-input-text id="contact-name" :ref="el => fieldRefs.fullName = el" v-model="draft.fullName" maxlength="100" required

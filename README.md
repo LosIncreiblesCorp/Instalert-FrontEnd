@@ -88,7 +88,7 @@ src/
 
 Alert uses the server's `POST alerts/panic-preparations` response to start the countdown. Cancelling removes the local preparation and sends no confirmation; no alert or incident report is created. Confirmation uses `POST alerts/panic` with the same preparation token on retries. A saved commerce location is used initially; device location requires browser permission. Manually changing a report address clears its old coordinates.
 
-Resolution (`POST alerts/{id}/resolution`), draft saving (`PUT alerts/{id}/report-draft`) and completion (`POST alerts/{id}/report-completion`) are separate commands. Draft saves are serialized and preserve later edits while a previous save is in flight. A completed panic remains resolved. Non-panic reports use `POST alerts/reports`; submitted records are read-only.
+Resolution (`POST alerts/{id}/resolution`), draft saving (`PUT alerts/{id}/report-draft`) and completion (`POST alerts/{id}/report-completion`) are separate commands. Draft saves are serialized and preserve later edits while a previous save is in flight. A completed panic remains resolved. Alert responses contain lifecycle data without event revisions; the store orders draft saves and rejects responses from an old account or commerce context. Non-panic reports use `POST alerts/reports`; submitted records are read-only.
 
 History follows the API pagination for the resolved commerce ID. Administrators can read the commerce's history; employees can resume only their own pending reports. The grace period is read/saved through `alert-preferences/{userId}`. Changing it can be saved explicitly or when starting the panic countdown. Preparations are retained in session storage for a reload under the same account and commerce; changing either clears timers, preparations and drafts, and old responses are discarded.
 
@@ -102,6 +102,11 @@ History follows the API pagination for the resolved commerce ID. Administrators 
 - Manages employee emergency contacts.
 - Uses `EmergencyContact` entity and `useContactsStore` for fetch/create/update/delete.
 - Routes in `contacts-routes.js`: `/employee/contacts`, `/employee/contacts/new`, `/employee/contacts/:id/edit`.
+- Uses `GET/POST emergency-contacts` and `GET/PUT/DELETE emergency-contacts/{id}`. Ownership comes from the caller's `User-Id`; bodies contain only `fullName`, `relationship`, `phone`, `email` and `notes`.
+- Reads the shared demonstration account rather than a separate contact owner ID. Contact state is cleared when account or commerce changes; late requests cannot overwrite the new context or a more recently selected contact.
+- Names and relationships are required, phones are normalized to 7–15 digits with an optional leading `+`, email is optional and notes allow up to 140 characters. Empty email is sent as `null`.
+- Forms preserve entered values on errors and ask before leaving with unsaved changes. Server field errors are localized; an unavailable list is not presented as an empty successful result. Deletion requires the confirmation dialog; cancelling keeps the record.
+- The backend enforces active operational membership and contact ownership. This feature stores contact details; it does not create accounts or send email. Notification delivery is a separate integration.
 
 ### Mapping Context
 - Manages risk polygons, incident markers and business locations on a Mapbox map.
@@ -178,7 +183,7 @@ Vite defaults to port 5173. The API connection is configured in `.env.developmen
 
 For a production build, supply the future ASP.NET API URL through `VITE_INSTALERT_PLATFORM_API_URL`, including `/api/v1`, then run `npm run build`. See the deployment configuration below. `npm run preview` serves the resulting build.
 
-The `server/` directory and JSON Server dependency remain for the module adapters that have not yet been integrated. They are not used by Shared, Alert, Business or Profiles. Those adapters will be adapted in separate features.
+The `server/` directory and JSON Server dependency remain for the module adapters that have not yet been integrated. They are not used by Shared, Alert, Business, Contacts or Profiles. Those adapters will be adapted in separate features.
 
 ## Environment Variables
 Environment files included:
@@ -208,7 +213,6 @@ API resource paths are configured in both environment files:
 | `VITE_NOTIFICATION_PREFERENCES_ENDPOINT_PATH` | `notification-preferences` |
 | `VITE_DASHBOARD_ENDPOINT_PATH` | `dashboard` |
 | `VITE_MONTHLY_REPORTS_ENDPOINT_PATH` | `monthly-reports` |
-| `VITE_EMERGENCY_CONTACTS_ENDPOINT_PATH` | `emergency-contacts` |
 
 The API base URL includes `/api/v1`; resource paths are relative to it. Development uses the ASP.NET backend on port 5221. Production requires an explicit build-time API URL; the former hosted mock is not the deployment default.
 
@@ -261,7 +265,7 @@ Only the fixed demonstration accounts are available in this delivery. Staff invi
 
 ## ASP.NET shared connection
 
-The shared HTTP client now uses the ASP.NET API. Development defaults to `http://localhost:5221/api/v1`, matching its HTTP launch profile; Vite uses port 5173. Starting JSON Server is not required for this connection. Alert, Business and Profiles use this connection; the other module adapters remain pending their respective integration features.
+The shared HTTP client now uses the ASP.NET API. Development defaults to `http://localhost:5221/api/v1`, matching its HTTP launch profile; Vite uses port 5173. Starting JSON Server is not required for this connection. Alert, Business, Contacts and Profiles use this connection; the other module adapters remain pending their respective integration features.
 
 The profile selector retains two fixed demonstration actors: administrator → `synthetic-admin`, employee → `synthetic-employee`. Every request reads the current actor and sends `User-Id` plus `Accept-Language` (`en-US` or `es-419`). This is a demonstration selector, without registration, passwords or IAM. Switching profiles clears the shared commerce context and rejects responses belonging to the previous actor.
 
@@ -281,4 +285,4 @@ npm run build
 On the demonstration backend, configure `Demo__Enabled=true` and `Cors__AllowedOrigins__0` with the exact frontend origin. Keep provider credentials on the server. These settings do not deploy either application.
 
 
-Shared, Alert, Business and Profiles are connected to the ASP.NET API. Contacts, Notifications, Payments, Mapping and Dashboard retain their pending integration work. IAM, employee account provisioning and checkout integration are outside these features.
+Shared, Alert, Business, Contacts and Profiles are connected to the ASP.NET API. Notifications, Payments, Mapping and Dashboard retain their pending integration work. IAM, employee account provisioning and checkout integration are outside these features.

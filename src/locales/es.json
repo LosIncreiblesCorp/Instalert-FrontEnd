@@ -329,7 +329,8 @@
       "phoneHelp": "Ingresa entre 7 y 15 dígitos. Puedes incluir el código de país, por ejemplo +51.",
       "optional": "Opcional",
       "characters": "{count}/{max} caracteres",
-      "requiredHelp": "Los campos marcados con * son obligatorios."
+      "requiredHelp": "Los campos marcados con * son obligatorios.",
+      "unsavedChanges": "¿Salir de esta página y descartar los cambios del contacto sin guardar?"
     },
     "actions": {
       "add": "Agregar contacto",
@@ -350,7 +351,6 @@
       "deleted": "Contacto de emergencia eliminado."
     },
     "errors": {
-      "ownerRequired": "No se pudo identificar al empleado.",
       "nameInvalid": "Ingresa un nombre de entre 1 y 100 caracteres.",
       "relationshipInvalid": "Ingresa una relación de entre 1 y 60 caracteres.",
       "phoneInvalid": "Ingresa un teléfono válido de 7 a 15 dígitos, con código de país + opcional.",
@@ -358,7 +358,9 @@
       "notesInvalid": "Las notas pueden tener hasta 140 caracteres.",
       "notFound": "Este contacto ya no está disponible. Vuelve a tu lista de contactos.",
       "load": "No se pudieron cargar tus contactos. Actualiza e inténtalo nuevamente.",
-      "save": "No se pudo guardar el cambio. Inténtalo nuevamente."
+      "save": "No se pudo guardar el cambio. Inténtalo nuevamente.",
+      "invalidResponse": "El servicio devolvió datos de contacto inválidos. Actualiza e inténtalo nuevamente.",
+      "conflict": "El contacto cambió durante la operación. Revisa los datos actuales e inténtalo nuevamente."
     }
   },
   "payments": {
