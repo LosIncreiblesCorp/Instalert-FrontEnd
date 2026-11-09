@@ -490,6 +490,7 @@
         "increase": "Increase grace period",
         "decrease": "Decrease grace period",
         "saved": "Preference saved.",
+        "save": "Save grace period",
         "failed": "The preference could not be saved.",
         "invalid": "Enter a whole number from 1 to 60."
       },
@@ -667,8 +668,10 @@
       "home": { "back": "Back to Alerts" },
       "actions": { "retry": "Retry" },
       "errors": {
-        "requestFailed": "Could not reach the alert service. Check that JSON Server is running and try again.",
-        "activationTitle": "The active alert could not be registered"
+        "requestFailed": "Unable to reach the alert service. Your changes are preserved; try again.",
+        "activationTitle": "The active alert could not be registered",
+        "invalidResponse": "The alert service returned an invalid response. Refresh and try again.",
+        "transition": "The alert state changed or the preparation expired. Refresh or start a new countdown."
       }
     },
     "title": "Alerts",

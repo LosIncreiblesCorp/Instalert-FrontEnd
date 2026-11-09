@@ -86,6 +86,12 @@ src/
 - Uses `useAlertStore` to orchestrate panic activation, grace-period countdown, report drafts and history queries.
 - Routes: base `alert-routes.js` (`alerts`) remapped to `/employee/*` in `src/router.js`, plus `/admin/alerts/history`.
 
+Alert uses the server's `POST alerts/panic-preparations` response to start the countdown. Cancelling removes the local preparation and sends no confirmation; no alert or incident report is created. Confirmation uses `POST alerts/panic` with the same preparation token on retries. A saved commerce location is used initially; device location requires browser permission. Manually changing a report address clears its old coordinates.
+
+Resolution (`POST alerts/{id}/resolution`), draft saving (`PUT alerts/{id}/report-draft`) and completion (`POST alerts/{id}/report-completion`) are separate commands. Draft saves are serialized and preserve later edits while a previous save is in flight. A completed panic remains resolved. Non-panic reports use `POST alerts/reports`; submitted records are read-only.
+
+History follows the API pagination for the resolved commerce ID. Administrators can read the commerce's history; employees can resume only their own pending reports. The grace period is read/saved through `alert-preferences/{userId}`. Changing it can be saved explicitly or when starting the panic countdown. Preparations are retained in session storage for a reload under the same account and commerce; changing either clears timers, preparations and drafts, and old responses are discarded.
+
 ### Business Context
 - Owns the business profile, operational memberships and staff invitations.
 - Uses `Business`, `BusinessMember` and `StaffInvitation` entities.
@@ -172,7 +178,7 @@ Vite defaults to port 5173. The API connection is configured in `.env.developmen
 
 For a production build, supply the future ASP.NET API URL through `VITE_INSTALERT_PLATFORM_API_URL`, including `/api/v1`, then run `npm run build`. See the deployment configuration below. `npm run preview` serves the resulting build.
 
-The `server/` directory and JSON Server dependency remain for the module adapters that have not yet been integrated. They are not used by Shared, Business or Profiles. Those adapters will be adapted in separate features.
+The `server/` directory and JSON Server dependency remain for the module adapters that have not yet been integrated. They are not used by Shared, Alert, Business or Profiles. Those adapters will be adapted in separate features.
 
 ## Environment Variables
 Environment files included:
@@ -189,7 +195,6 @@ API resource paths are configured in both environment files:
 | Variable | Configured resource path |
 |---|---|
 | `VITE_ALERTS_ENDPOINT_PATH` | `alerts` |
-| `VITE_ALERT_PREFERENCES_ENDPOINT_PATH` | `alertPreferences` |
 | `VITE_BUSINESS_MEMBERS_ENDPOINT_PATH` | `business-members` |
 | `VITE_STAFF_INVITATIONS_ENDPOINT_PATH` | `staff-invitations` |
 | `VITE_BUSINESSES_ENDPOINT_PATH` | `businesses` |
@@ -256,7 +261,7 @@ Only the fixed demonstration accounts are available in this delivery. Staff invi
 
 ## ASP.NET shared connection
 
-The shared HTTP client now uses the ASP.NET API. Development defaults to `http://localhost:5221/api/v1`, matching its HTTP launch profile; Vite uses port 5173. Starting JSON Server is not required for this connection. Business and Profiles use this connection; the other module adapters remain pending their respective integration features.
+The shared HTTP client now uses the ASP.NET API. Development defaults to `http://localhost:5221/api/v1`, matching its HTTP launch profile; Vite uses port 5173. Starting JSON Server is not required for this connection. Alert, Business and Profiles use this connection; the other module adapters remain pending their respective integration features.
 
 The profile selector retains two fixed demonstration actors: administrator → `synthetic-admin`, employee → `synthetic-employee`. Every request reads the current actor and sends `User-Id` plus `Accept-Language` (`en-US` or `es-419`). This is a demonstration selector, without registration, passwords or IAM. Switching profiles clears the shared commerce context and rejects responses belonging to the previous actor.
 
@@ -276,4 +281,4 @@ npm run build
 On the demonstration backend, configure `Demo__Enabled=true` and `Cors__AllowedOrigins__0` with the exact frontend origin. Keep provider credentials on the server. These settings do not deploy either application.
 
 
-Shared, Business and Profiles are connected to the ASP.NET API. Alert, Contacts, Notifications, Payments, Mapping and Dashboard retain their pending integration work. IAM and employee account provisioning are outside this delivery; no checkout or alert lifecycle is completed by these changes.
+Shared, Alert, Business and Profiles are connected to the ASP.NET API. Contacts, Notifications, Payments, Mapping and Dashboard retain their pending integration work. IAM, employee account provisioning and checkout integration are outside these features.
