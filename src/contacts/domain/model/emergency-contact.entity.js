@@ -16,7 +16,6 @@ export class EmergencyContact {
 
     validationErrors() {
         const errors = {};
-        if (!this.employeeId) errors.employeeId = 'contacts.errors.ownerRequired';
         if (!this.fullName || this.fullName.length > 100) errors.fullName = 'contacts.errors.nameInvalid';
         if (!this.relationship || this.relationship.length > 60) errors.relationship = 'contacts.errors.relationshipInvalid';
         if (!/^\+?[1-9]\d{6,14}$/.test(this.phone)) errors.phone = 'contacts.errors.phoneInvalid';

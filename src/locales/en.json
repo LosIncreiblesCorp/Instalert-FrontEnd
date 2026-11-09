@@ -329,7 +329,8 @@
       "phoneHelp": "Enter 7–15 digits. You can include the country code, for example +51.",
       "optional": "Optional",
       "characters": "{count}/{max} characters",
-      "requiredHelp": "Fields marked with * are required."
+      "requiredHelp": "Fields marked with * are required.",
+      "unsavedChanges": "Leave this page and discard your unsaved contact changes?"
     },
     "actions": {
       "add": "Add contact",
@@ -350,7 +351,6 @@
       "deleted": "Emergency contact deleted."
     },
     "errors": {
-      "ownerRequired": "The employee could not be identified.",
       "nameInvalid": "Enter a name between 1 and 100 characters.",
       "relationshipInvalid": "Enter a relationship between 1 and 60 characters.",
       "phoneInvalid": "Enter a valid phone number with 7–15 digits and an optional + country code.",
@@ -358,7 +358,9 @@
       "notesInvalid": "Notes can contain up to 140 characters.",
       "notFound": "This contact is no longer available. Return to your contacts list.",
       "load": "Unable to load your contacts. Please refresh and try again.",
-      "save": "Unable to save the change. Please try again."
+      "save": "Unable to save the change. Please try again.",
+      "invalidResponse": "The service returned invalid contact data. Refresh and try again.",
+      "conflict": "The contact changed during the operation. Review the latest details and try again."
     }
   },
   "payments": {

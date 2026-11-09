@@ -62,7 +62,7 @@ export default defineStore('alert', () => {
     function replaceRecord(record) {
         const index = alertRecords.value.findIndex(item => item.id === record.id);
         if (index === -1) alertRecords.value.unshift(record);
-        else if (record.revision >= alertRecords.value[index].revision) alertRecords.value[index] = record;
+        else alertRecords.value[index] = record;
     }
     function readRecord(response, businessId) {
         const record = AlertRecordAssembler.toEntityFromResponse(response);
