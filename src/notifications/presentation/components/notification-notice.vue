@@ -11,8 +11,8 @@ const { t } = useI18n();
     <div class="notice-copy" role="status" aria-live="polite" aria-atomic="true">
       <i class="pi pi-bell" aria-hidden="true" />
       <div>
-        <strong>{{ notification.type === 'NEARBY_ALERT' ? t('notifications.nearbyTitle') : notification.title || t('notifications.generalTitle') }}</strong>
-        <p>{{ notification.type === 'NEARBY_ALERT' ? t('notifications.nearbyMessage') : notification.message }}</p>
+        <strong>{{ notification.type === 'nearby-panic' ? t('notifications.nearbyTitle') : notification.title || t('notifications.generalTitle') }}</strong>
+        <p>{{ notification.type === 'nearby-panic' ? t('notifications.nearbyMessage') : notification.message }}</p>
       </div>
     </div>
     <button class="notice-close" type="button" :aria-label="t('notifications.dismiss')" @click="$emit('dismiss')"><i class="pi pi-times" aria-hidden="true" /></button>

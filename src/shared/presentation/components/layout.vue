@@ -5,8 +5,11 @@ import { useI18n } from "vue-i18n";
 import instalertLogo from "../../../assets/instalert-logo.svg";
 import { apiContext } from '../../infrastructure/api-context.js';
 import ApiConnectionState from './api-connection-state.vue';
+import { useNotificationsStore } from '../../../notifications/application/notifications.store.js';
+import NotificationNotice from '../../../notifications/presentation/components/notification-notice.vue';
 
-defineProps({ unreadNotifications: { type: Number, default: 0 } });
+const notifications = useNotificationsStore();
+const unreadNotifications = computed(() => notifications.unreadCount);
 
 const route = useRoute();
 const { locale, t } = useI18n();
@@ -189,6 +192,8 @@ function closeMobileNavigation() {
       <ApiConnectionState v-if="!(apiContext.status === 'missing' && route.name === 'admin-business-profile')" />
       <RouterView v-if="apiContext.status === 'ready' || ['admin-profile', 'employee-profile', 'admin-business-profile'].includes(route.name)" />
     </main>
+    <NotificationNotice v-if="notifications.currentNotice" :notification="notifications.currentNotice"
+        :route-name="notificationsRouteName" @dismiss="notifications.dismissNotice()" />
   </div>
 </template>
 

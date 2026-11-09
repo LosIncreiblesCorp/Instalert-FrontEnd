@@ -1010,7 +1010,7 @@
     "radius": "Reception radius",
     "radiusHelp": "Distance is measured from your business’s saved location. Saving changes does not delete notifications already received.",
     "meters": "{value} m",
-    "businessCenter": "Reference location: {name}. Uses the coordinates saved in the business profile.",
+    "businessCenter": "Reference location: {address}. Uses the coordinates saved in the business profile.",
     "centerUnavailable": "The business location is unavailable. Nearby alert delivery needs valid coordinates in the business profile.",
     "discard": "Discard changes",
     "save": "Save preferences",
@@ -1025,7 +1025,7 @@
     },
     "loadingInbox": "Loading notifications…",
     "nearbyTitle": "Nearby active alert",
-    "nearbyMessage": "An active alert was reported near your business. Check the alerts section for its current status.",
+    "nearbyMessage": "A panic alert was confirmed near your business. This notice records its delivery; the situation may have changed since then.",
     "generalTitle": "InstAlert update",
     "unread": "Unread",
     "read": "Read",
@@ -1043,8 +1043,9 @@
       "preferencesLoad": "Your notification preferences could not be loaded. Try again.",
       "preferencesSave": "Your preferences could not be saved. Your previous settings are still active.",
       "invalidPreferences": "Choose an available radius and a valid notification preference.",
-      "feedLoad": "Notifications or nearby alert delivery could not be refreshed. Check the connection and try again.",
-      "markRead": "The notification could not be marked as read. Try again."
+      "feedLoad": "Notifications could not be refreshed. Check the connection and try again.",
+      "markRead": "The notification could not be marked as read. Try again.",
+      "invalidResponse": "The service returned invalid notification data. Refresh and try again."
     }
   },
   "dashboard": {

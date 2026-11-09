@@ -1,6 +1,6 @@
 /** Received notification. The original alert remains owned by Alert. */
 export class Notification {
-    constructor({ id, recipientUserId, targetBusinessId = null, type = 'GENERAL', title = '', message = '',
+    constructor({ id, recipientUserId, targetBusinessId = null, type = 'nearby-panic', title = '', message = '',
         sourceAlertId = null, distanceMeters = null, createdAt, readAt = null } = {}) {
         this.id = id;
         this.recipientUserId = recipientUserId;

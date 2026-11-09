@@ -4,6 +4,7 @@ import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import Dialog from 'primevue/dialog';
 import { useNotificationsStore } from '../../application/notifications.store.js';
+import { apiContext } from '../../../shared/infrastructure/api-context.js';
 import { receptionRadiiMeters } from '../../domain/model/notification-preferences.entity.js';
 
 const store = useNotificationsStore();
@@ -24,6 +25,10 @@ function reset() {
 watch(() => store.preferences, preferences => {
   if (preferences) Object.assign(form, { nearbyAlertsEnabled: preferences.nearbyAlertsEnabled, nearbyRadiusMeters: preferences.nearbyRadiusMeters });
 }, { immediate: true });
+watch(() => [apiContext.userId, apiContext.businessId], () => {
+  preferencesOpen.value = false; filter.value = 'all';
+  Object.assign(form, { nearbyAlertsEnabled: true, nearbyRadiusMeters: 500 });
+}, { flush: 'sync' });
 async function save() { if (await store.savePreferences({ ...form })) await store.refresh(); }
 async function retryPreferences() { if (await store.loadPreferences()) await store.refresh(); }
 function openPreferences() {
@@ -71,7 +76,7 @@ onBeforeRouteUpdate(canLeave);
           <legend class="sr-only">{{ t('notifications.preferences') }}</legend>
           <label class="notification-toggle" for="nearby-alerts-enabled"><span><strong>{{ t('notifications.nearbyAlerts') }}</strong><small>{{ t('notifications.nearbyHelp') }}</small></span><input id="nearby-alerts-enabled" type="checkbox" v-model="form.nearbyAlertsEnabled" @change="store.preferencesSaved = false" /></label>
           <div class="radius-field"><label for="notification-radius">{{ t('notifications.radius') }}</label><pv-select input-id="notification-radius" v-model="form.nearbyRadiusMeters" :options="radiusChoices" option-label="label" option-value="value" :disabled="busy" :aria-label="t('notifications.radius')" aria-describedby="notification-radius-help" @change="store.preferencesSaved = false" /><small id="notification-radius-help">{{ t('notifications.radiusHelp') }}</small></div>
-          <p v-if="store.center" class="business-center"><i class="pi pi-map-marker" aria-hidden="true" /> {{ t('notifications.businessCenter', { name: store.center.name }) }}</p>
+          <p v-if="store.center" class="business-center"><i class="pi pi-map-marker" aria-hidden="true" /> {{ t('notifications.businessCenter', { address: store.center.location }) }}</p>
           <pv-message v-else-if="store.feedLoaded" severity="warn" :closable="false">{{ t('notifications.centerUnavailable') }}</pv-message>
           <div class="preferences-actions"><pv-button type="button" severity="secondary" outlined :label="t('notifications.discard')" :disabled="!dirty" @click="reset" /><pv-button type="submit" :label="t('notifications.save')" :loading="store.isPreferencesSaving" :disabled="!dirty" /></div>
         </fieldset>
@@ -87,8 +92,8 @@ onBeforeRouteUpdate(canLeave);
       <p v-if="!store.feedLoaded && store.isRefreshing" role="status">{{ t('notifications.loadingInbox') }}</p>
       <ul v-if="visibleNotifications.length" class="notification-list">
         <li v-for="notification in visibleNotifications" :key="notification.id" class="notification-item" :class="{ 'notification-item--unread': notification.isUnread }">
-          <span class="item-icon" aria-hidden="true"><i :class="notification.type === 'NEARBY_ALERT' ? 'pi pi-map-marker' : 'pi pi-bell'" /></span>
-          <div class="notification-content"><div class="notification-title"><h3>{{ notification.type === 'NEARBY_ALERT' ? t('notifications.nearbyTitle') : notification.title || t('notifications.generalTitle') }}</h3><span v-if="notification.isUnread" class="unread-label">{{ t('notifications.unread') }}</span></div><p>{{ notification.type === 'NEARBY_ALERT' ? t('notifications.nearbyMessage') : notification.message }}</p><time :datetime="notification.createdAt">{{ formatDate(notification.createdAt) }}</time><small v-if="notification.type === 'NEARBY_ALERT' && Number.isFinite(notification.distanceMeters)">{{ t('notifications.deliveryDistance', { value: notification.distanceMeters }) }}</small></div>
+          <span class="item-icon" aria-hidden="true"><i :class="notification.type === 'nearby-panic' ? 'pi pi-map-marker' : 'pi pi-bell'" /></span>
+          <div class="notification-content"><div class="notification-title"><h3>{{ notification.type === 'nearby-panic' ? t('notifications.nearbyTitle') : notification.title || t('notifications.generalTitle') }}</h3><span v-if="notification.isUnread" class="unread-label">{{ t('notifications.unread') }}</span></div><p>{{ notification.type === 'nearby-panic' ? t('notifications.nearbyMessage') : notification.message }}</p><time :datetime="notification.createdAt">{{ formatDate(notification.createdAt) }}</time><small v-if="notification.type === 'nearby-panic' && Number.isFinite(notification.distanceMeters)">{{ t('notifications.deliveryDistance', { value: Math.round(notification.distanceMeters) }) }}</small></div>
           <pv-button v-if="notification.isUnread" type="button" severity="secondary" outlined :label="t('notifications.markRead')" :loading="store.readingIds.includes(String(notification.id))" :disabled="store.isRefreshing || store.readingIds.includes(String(notification.id))" @click="store.markAsRead(notification.id)" /><span v-else class="read-label"><i class="pi pi-check" aria-hidden="true" /> {{ t('notifications.read') }}</span>
         </li>
       </ul>
