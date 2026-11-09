@@ -10,9 +10,11 @@ import { RouterView, useRoute } from "vue-router";
 import Layout from "./shared/presentation/components/layout.vue";
 
 import { apiContext } from './shared/infrastructure/api-context.js';
+import useAlertStore from './alert/application/alert.store.js';
 import { useProfilesStore } from './profiles/application/profiles.store.js';
 
 const profiles = useProfilesStore();
+useAlertStore();
 watch(() => apiContext.userId, () => profiles.setContext(apiContext.role), { immediate: true, flush: 'sync' });
 const route = useRoute();
 const isStandaloneRoute = computed(() => route.meta.standalone === true);

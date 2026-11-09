@@ -39,7 +39,7 @@ export class BaseApi {
             if (userId) config.headers.set('User-Id', userId);
             config.headers.set('Accept-Language', i18n.global.locale.value === 'es' ? 'es-419' : 'en-US');
             return config;
-        });
+        }, undefined, { synchronous: true });
         const stale = config => config?.demoContextRevision !== undefined && config.demoContextRevision !== currentContextRevision();
         this.#http.interceptors.response.use(response => {
             if (stale(response.config)) throw new axios.CanceledError('The selected demo account changed.', response.config);
