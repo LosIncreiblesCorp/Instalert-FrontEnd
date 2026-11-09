@@ -1,33 +1,12 @@
 import { AlertPreferences } from '../domain/model/alert-preferences.entity.js';
 
-/** Maps Alert preference API resources to and from domain entities. */
+/** Personal preferences are a single resource, not a collection. */
 export class AlertPreferencesAssembler {
-    static toEntityFromResource(resource) {
-        return new AlertPreferences({ ...resource });
-    }
-
-    static toEntitiesFromResponse(response) {
-        if (response.status < 200 || response.status >= 300) {
-            throw new Error(`Alert preferences API returned ${response.status} ${response.statusText}.`);
-        }
-
-        const resources = Array.isArray(response.data) ? response.data : response.data?.alertPreferences ?? [];
-        return resources.map((resource) => this.toEntityFromResource(resource));
-    }
-
     static toEntityFromResponse(response) {
-        if (response.status < 200 || response.status >= 300) {
-            throw new Error(`Alert preferences API returned ${response.status} ${response.statusText}.`);
+        const resource = response.data;
+        if (!resource || typeof resource.userId !== 'string' || resource.userId !== resource.employeeId) {
+            throw new Error('alerts.workflow.errors.invalidResponse');
         }
-        return this.toEntityFromResource(response.data);
-    }
-
-    static toResourceFromEntity(entity) {
-        const resource = {
-            employeeId: entity.employeeId,
-            panicGracePeriodSeconds: entity.panicGracePeriodSeconds,
-        };
-        if (entity.id !== null && entity.id !== undefined) resource.id = entity.id;
-        return resource;
+        return new AlertPreferences(resource);
     }
 }

@@ -12,7 +12,6 @@ export const AlertRecordStatus = Object.freeze({
     COMPLETED: 'completed',
     SUBMITTED: 'submitted',
     RESOLVED: 'resolved',
-    FALSE_ALARM: 'false-alarm',
 });
 
 export const PanicReportStatus = Object.freeze({
@@ -28,6 +27,8 @@ export class AlertRecord {
     constructor({
         id = null,
         employeeId = '',
+        businessId = '',
+        revision = 0,
         kind = AlertRecordKind.PANIC,
         status = AlertRecordStatus.ACTIVE,
         reportStatus = null,
@@ -48,6 +49,8 @@ export class AlertRecord {
     } = {}) {
         this.id = id;
         this.employeeId = employeeId;
+        this.businessId = businessId;
+        this.revision = revision;
         this.kind = kind;
         const legacyPanicReport = kind === AlertRecordKind.PANIC
             && [AlertRecordStatus.PENDING_REPORT, AlertRecordStatus.COMPLETED].includes(status);
@@ -112,7 +115,7 @@ export class AlertRecord {
         const occurredAt = Date.parse(this.moment);
         const hasRequiredInformation = Boolean(
             this.category?.trim() && this.location?.trim() && this.description?.trim()
-            && Number.isFinite(occurredAt) && occurredAt <= Date.parse(submittedAt),
+            && Number.isFinite(occurredAt) && occurredAt >= Date.UTC(1000, 0, 1) && occurredAt <= Date.parse(submittedAt),
         );
         if (this.kind === AlertRecordKind.PANIC || this.status !== AlertRecordStatus.DRAFT || !hasRequiredInformation) {
             return false;

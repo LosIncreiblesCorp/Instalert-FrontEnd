@@ -490,6 +490,7 @@
         "increase": "Aumentar segundos de gracia",
         "decrease": "Disminuir segundos de gracia",
         "saved": "Preferencia guardada.",
+        "save": "Guardar periodo de gracia",
         "failed": "No se pudo guardar la preferencia.",
         "invalid": "Ingresa un número entero entre 1 y 60."
       },
@@ -667,8 +668,10 @@
       "home": { "back": "Volver a Alertas" },
       "actions": { "retry": "Reintentar" },
       "errors": {
-        "requestFailed": "No se pudo comunicar con el servicio de alertas. Verifica que JSON Server esté ejecutándose e inténtalo de nuevo.",
-        "activationTitle": "No se pudo registrar la alerta activa"
+        "requestFailed": "No se pudo comunicar con el servicio de alertas. Se conservan tus cambios; inténtalo nuevamente.",
+        "activationTitle": "No se pudo registrar la alerta activa",
+        "invalidResponse": "El servicio de alertas devolvió una respuesta inválida. Actualiza e inténtalo nuevamente.",
+        "transition": "El estado de la alerta cambió o la preparación venció. Actualiza o inicia otra cuenta regresiva."
       }
     },
     "title": "Alertas",

@@ -1,670 +1,371 @@
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { AlertPreferences, DEFAULT_PANIC_GRACE_PERIOD_SECONDS } from '../domain/model/alert-preferences.entity.js';
-import { AlertRecord, AlertRecordKind, AlertRecordStatus, PanicReportStatus } from '../domain/model/alert-record.entity.js';
+import { AlertRecord, AlertRecordKind, AlertRecordStatus } from '../domain/model/alert-record.entity.js';
 import { AlertApi } from '../infrastructure/alert-api.js';
 import { AlertPreferencesAssembler } from '../infrastructure/alert-preferences.assembler.js';
 import { AlertRecordAssembler } from '../infrastructure/alert-record.assembler.js';
+import { apiContext, currentContextRevision, requireBusinessId } from '../../shared/infrastructure/api-context.js';
 
-const alertApi = new AlertApi();
-const demoEmployeeId = 'demo-employee';
-const countdownStorageKey = `instalert:${demoEmployeeId}:panic-countdown`;
+const api = new AlertApi();
+const blankLocation = () => ({ location: '', latitude: null, longitude: null });
+const blankDraft = () => ({ category: '', description: '', moment: '', ...blankLocation() });
+const locationDetails = value => ({ location: value.location ?? '', latitude: value.latitude ?? null, longitude: value.longitude ?? null });
 
-/** Application service store for the alert bounded context. @returns {Object} The alert store. */
-const useAlertStore = defineStore('alert', () => {
-    /** @type {import('vue').Ref<import('../domain/model/alert-preferences.entity.js').AlertPreferences>} */
-    const preferences = ref(new AlertPreferences({
-        employeeId: demoEmployeeId,
-        panicGracePeriodSeconds: DEFAULT_PANIC_GRACE_PERIOD_SECONDS,
-    }));
-    /** @type {import('vue').Ref<import('../domain/model/alert-record.entity.js').AlertRecord[]>} */
+/** Alert workflows scoped to one account and commerce; the API owns all persisted transitions. */
+export default defineStore('alert', () => {
+    const preferences = ref(new AlertPreferences());
     const alertRecords = ref([]);
-    /** @type {import('vue').Ref<string>} */
     const currentView = ref('home');
-    /** @type {import('vue').Ref<number|null>} */
     const countdownDeadline = ref(null);
-    /** @type {import('vue').Ref<number>} */
     const countdownDurationSeconds = ref(DEFAULT_PANIC_GRACE_PERIOD_SECONDS);
-    /** @type {import('vue').Ref<number>} */
     const remainingSeconds = ref(DEFAULT_PANIC_GRACE_PERIOD_SECONDS);
-    /** @type {import('vue').Ref<Object>} */
-    const countdownLocation = ref({ location: '', latitude: null, longitude: null });
-    /** @type {import('vue').Ref<Object>} */
-    const reportDraft = ref(createEmptyReportDraft());
-    /** @type {import('vue').Ref<string|null>} */
+    const countdownLocation = ref(blankLocation());
+    const preparation = ref(null);
+    const reportDraft = ref(blankDraft());
     const reportKind = ref(null);
-    /** @type {import('vue').Ref<string|null>} */
     const selectedRecordId = ref(null);
-    /** @type {import('vue').Ref<string|null>} */
     const lastSubmittedRecordId = ref(null);
-    /** @type {import('vue').Ref<boolean>} */
     const isLoading = ref(false);
-    /** @type {import('vue').Ref<boolean>} */
-    const isSaving = ref(false);
-    /** @type {import('vue').Ref<boolean>} */
     const isInitialized = ref(false);
-    /** @type {import('vue').Ref<boolean>} */
+    const isPreparingPanic = ref(false);
     const isActivatingPanic = ref(false);
-    /** @type {import('vue').Ref<string|null>} */
+    const isCompletingReport = ref(false);
+    const writes = ref(0);
     const errorMessage = ref(null);
     const noticeMessage = ref(null);
-    const isCompletingReport = ref(false);
-
-    const countdownProgress = computed(() => countdownDurationSeconds.value > 0
-        ? remainingSeconds.value / countdownDurationSeconds.value
-        : 0);
-    const activePanicRecord = computed(() => alertRecords.value.find((record) =>
-        record.employeeId === demoEmployeeId
-        && record.kind === AlertRecordKind.PANIC
-        && record.status === AlertRecordStatus.ACTIVE));
-    const selectedRecord = computed(() => alertRecords.value.find((record) =>
-        String(record.id) === String(selectedRecordId.value)) ?? null);
-    const pendingPanicRecord = computed(() => alertRecords.value.find((record) =>
-        record.employeeId === demoEmployeeId
-        && record.hasPendingPanicReport));
+    const isSaving = computed(() => writes.value > 0 || isPreparingPanic.value || isCompletingReport.value);
+    const countdownProgress = computed(() => remainingSeconds.value / countdownDurationSeconds.value);
+    const activePanicRecord = computed(() => alertRecords.value.find(record => record.employeeId === apiContext.userId
+        && record.kind === 'panic' && record.status === 'active'));
+    const pendingPanicRecord = computed(() => alertRecords.value.find(record => record.employeeId === apiContext.userId && record.hasPendingPanicReport));
+    const selectedRecord = computed(() => alertRecords.value.find(record => record.id === selectedRecordId.value) ?? null);
     const hasUnsavedReportDraft = computed(() => currentView.value === 'report-form');
-
+    let generation = 0;
     let initializationPromise = null;
     let countdownTimer = null;
     let draftSaveTimer = null;
     let pendingDraftSave = Promise.resolve(true);
+    let pendingLocationSave = Promise.resolve(true);
     const draftRevisions = new Map();
     const savedDraftRevisions = new Map();
-
-    /** Creates an empty incident report draft. @returns {Object} The blank draft. */
-    function createEmptyReportDraft() {
-        return {
-            category: '',
-            location: '',
-            latitude: null,
-            longitude: null,
-            moment: '',
-            description: '',
-        };
+    const keyForContext = () => apiContext.userId && apiContext.businessId
+        ? `instalert:${apiContext.userId}:${apiContext.businessId}:panic-preparation` : null;
+    let storageKey = keyForContext();
+    const scope = () => ({ generation, revision: currentContextRevision(), businessId: apiContext.businessId });
+    const current = value => value.generation === generation && value.revision === currentContextRevision() && value.businessId === apiContext.businessId;
+    function message(error) {
+        if (error.apiError?.code === 'already_completed') return 'alerts.workflow.results.alreadyCompleted';
+        if (error.apiError?.code === 'transition') return 'alerts.workflow.errors.transition';
+        return error.apiError?.messageKey ?? (error.message?.startsWith('alerts.') ? error.message : 'alerts.workflow.errors.requestFailed');
     }
-
-    /** Extracts a readable message from an API error. @param {Object} error - Caught error. @returns {string} The message. */
-    function getErrorMessage(error) {
-        return error?.response?.data?.message || error?.message || 'The alert service could not complete the request.';
+    function replaceRecord(record) {
+        const index = alertRecords.value.findIndex(item => item.id === record.id);
+        if (index === -1) alertRecords.value.unshift(record);
+        else if (record.revision >= alertRecords.value[index].revision) alertRecords.value[index] = record;
     }
-
-    /** Inserts or replaces a record in the local collection. @param {Object} updatedRecord - Updated record entity. @returns {void} */
-    function replaceRecord(updatedRecord) {
-        const index = alertRecords.value.findIndex((record) => String(record.id) === String(updatedRecord.id));
-        if (index === -1) alertRecords.value.unshift(updatedRecord);
-        else alertRecords.value[index] = updatedRecord;
+    function readRecord(response, businessId) {
+        const record = AlertRecordAssembler.toEntityFromResponse(response);
+        if (record.businessId !== businessId) throw new Error('alerts.workflow.errors.invalidResponse');
+        return record;
     }
-
-    /** Removes the persisted panic countdown snapshot. @returns {void} */
-    function clearCountdownSnapshot() {
+    function clearSnapshot() {
+        try { if (storageKey) window.sessionStorage.removeItem(storageKey); } catch { /* Storage is optional. */ }
+    }
+    function saveSnapshot() {
         try {
-            window.sessionStorage.removeItem(countdownStorageKey);
-        } catch {
-            // The in-memory countdown continues if session storage is unavailable.
-        }
-    }
-
-    /** Persists the panic countdown snapshot to session storage. @returns {void} */
-    function saveCountdownSnapshot() {
-        try {
-            window.sessionStorage.setItem(countdownStorageKey, JSON.stringify({
-                deadline: countdownDeadline.value,
-                durationSeconds: countdownDurationSeconds.value,
-                location: countdownLocation.value,
+            if (storageKey && preparation.value) window.sessionStorage.setItem(storageKey, JSON.stringify({
+                preparation: preparation.value, deadline: countdownDeadline.value ?? Date.now(),
+                durationSeconds: countdownDurationSeconds.value, location: countdownLocation.value,
             }));
-        } catch {
-            // Route changes still preserve the countdown in the Pinia store.
-        }
+        } catch { /* The in-memory preparation still works without storage. */ }
     }
-
-    /** Stops the panic countdown interval timer. @returns {void} */
-    function stopCountdownTimer() {
-        if (countdownTimer) window.clearInterval(countdownTimer);
-        countdownTimer = null;
+    function stopCountdownTimer() { if (countdownTimer) clearInterval(countdownTimer); countdownTimer = null; }
+    function clearPreparation() { stopCountdownTimer(); clearSnapshot(); countdownDeadline.value = null; preparation.value = null; }
+    function resetContext() {
+        clearPreparation(); clearTimeout(draftSaveTimer); draftSaveTimer = null;
+        generation++; initializationPromise = null; pendingDraftSave = Promise.resolve(true); pendingLocationSave = Promise.resolve(true);
+        draftRevisions.clear(); savedDraftRevisions.clear(); storageKey = keyForContext();
+        preferences.value = new AlertPreferences({ employeeId: apiContext.userId ?? '' });
+        alertRecords.value = []; currentView.value = 'home'; countdownLocation.value = blankLocation();
+        countdownDurationSeconds.value = DEFAULT_PANIC_GRACE_PERIOD_SECONDS; remainingSeconds.value = DEFAULT_PANIC_GRACE_PERIOD_SECONDS;
+        reportDraft.value = blankDraft(); reportKind.value = null; selectedRecordId.value = null; lastSubmittedRecordId.value = null;
+        isLoading.value = false; isInitialized.value = false; isPreparingPanic.value = false; isActivatingPanic.value = false;
+        isCompletingReport.value = false; writes.value = 0; errorMessage.value = null; noticeMessage.value = null;
     }
-
-    /** Recalculates remaining seconds and activates panic at zero. @returns {void} */
+    watch(() => [apiContext.userId, apiContext.businessId], resetContext, { flush: 'sync' });
     function updateCountdown() {
-        if (!countdownDeadline.value) return;
+        if (countdownDeadline.value === null) return;
         remainingSeconds.value = Math.max(0, Math.ceil((countdownDeadline.value - Date.now()) / 1000));
-        if (remainingSeconds.value === 0) {
-            stopCountdownTimer();
-            void activatePanic();
-        }
+        if (remainingSeconds.value === 0) { stopCountdownTimer(); void activatePanic(); }
     }
-
-    /** Restarts the panic countdown interval timer. @returns {void} */
     function runCountdownTimer() {
-        stopCountdownTimer();
-        updateCountdown();
-        if (countdownDeadline.value && remainingSeconds.value > 0) {
-            countdownTimer = window.setInterval(updateCountdown, 200);
-        }
+        stopCountdownTimer(); updateCountdown();
+        if (remainingSeconds.value > 0 && countdownDeadline.value) countdownTimer = setInterval(updateCountdown, 200);
     }
-
-    /** Activates a panic alert once the countdown expires. @returns {Promise<boolean>} True when activated. */
-    async function activatePanic() {
-        if (isActivatingPanic.value || !countdownDeadline.value) return false;
-        isActivatingPanic.value = true;
-        errorMessage.value = null;
-
-        const activatedAt = new Date().toISOString();
-        const record = new AlertRecord({
-            employeeId: demoEmployeeId,
-            kind: AlertRecordKind.PANIC,
-            status: AlertRecordStatus.ACTIVE,
-            location: countdownLocation.value.location,
-            latitude: countdownLocation.value.latitude,
-            longitude: countdownLocation.value.longitude,
-            createdAt: activatedAt,
-            activatedAt,
-            updatedAt: activatedAt,
-        });
-
-        try {
-            const response = await alertApi.createAlert(AlertRecordAssembler.toResourceFromEntity(record));
-            const activeRecord = AlertRecordAssembler.toEntityFromResponse(response);
-            alertRecords.value.unshift(activeRecord);
-            currentView.value = 'active';
-            countdownDeadline.value = null;
-            remainingSeconds.value = 0;
-            clearCountdownSnapshot();
-            const latestLocation = countdownLocation.value;
-            if (latestLocation.latitude !== activeRecord.latitude || latestLocation.longitude !== activeRecord.longitude) {
-                setCountdownLocation(latestLocation);
-            }
-            return true;
-        } catch (error) {
-            errorMessage.value = getErrorMessage(error);
-            currentView.value = 'activation-error';
-            countdownDeadline.value = null;
-            remainingSeconds.value = 0;
-            clearCountdownSnapshot();
-            return false;
-        } finally {
-            isActivatingPanic.value = false;
-        }
-    }
-
-    /** Reloads alert records sorted by creation date. @returns {Promise<void>} */
-    async function loadAlertRecords() {
-        const response = await alertApi.getAlerts();
-        alertRecords.value = AlertRecordAssembler.toEntitiesFromResponse(response)
-            .sort((first, second) => Date.parse(second.createdAt ?? '') - Date.parse(first.createdAt ?? ''));
-    }
-
-    /** Restores an interrupted panic countdown from storage. @returns {Promise<boolean>} True when restored. */
-    async function restoreCountdown() {
-        let snapshot;
-        try {
-            snapshot = JSON.parse(window.sessionStorage.getItem(countdownStorageKey) ?? 'null');
-        } catch {
-            snapshot = null;
-        }
-
-        if (!snapshot || !Number.isFinite(snapshot.deadline) || !Number.isInteger(snapshot.durationSeconds)) return false;
-
-        countdownDeadline.value = snapshot.deadline;
-        countdownDurationSeconds.value = snapshot.durationSeconds;
-        countdownLocation.value = snapshot.location ?? { location: '', latitude: null, longitude: null };
-        currentView.value = 'countdown';
-        runCountdownTimer();
+    async function loadAlertRecords(captured) {
+        const response = await api.getAlerts();
+        if (!current(captured)) return false;
+        const records = AlertRecordAssembler.toEntitiesFromResponse(response);
+        if (records.some(record => record.businessId !== captured.businessId)) throw new Error('alerts.workflow.errors.invalidResponse');
+        alertRecords.value = records;
         return true;
     }
-
-    /** Initializes records, preferences and any pending countdown. @returns {Promise<boolean>} True when initialized. */
+    function restoreCountdown() {
+        let snapshot;
+        try { snapshot = JSON.parse(window.sessionStorage.getItem(storageKey) ?? 'null'); } catch { return false; }
+        const proof = snapshot?.preparation;
+        if (!proof || typeof proof.preparationToken !== 'string' || !Number.isFinite(snapshot.deadline)
+            || !Number.isInteger(snapshot.durationSeconds) || snapshot.durationSeconds < 1 || snapshot.durationSeconds > 60
+            || !Number.isFinite(Date.parse(proof.expiresAt)) || Date.parse(proof.expiresAt) <= Date.now()) {
+            clearSnapshot(); return false;
+        }
+        preparation.value = proof; countdownDeadline.value = snapshot.deadline;
+        countdownDurationSeconds.value = snapshot.durationSeconds; countdownLocation.value = locationDetails(snapshot.location ?? {});
+        currentView.value = 'countdown'; runCountdownTimer(); return true;
+    }
     async function initialize() {
         if (isInitialized.value) return true;
         if (initializationPromise) return initializationPromise;
-
-        isLoading.value = true;
-        errorMessage.value = null;
-        initializationPromise = (async () => {
+        const captured = scope(); isLoading.value = true; errorMessage.value = null;
+        const request = (async () => {
             try {
-                const [alertsResponse, preferencesResponse] = await Promise.all([
-                    alertApi.getAlerts(),
-                    alertApi.getAlertPreferences(),
-                ]);
-
-                alertRecords.value = AlertRecordAssembler.toEntitiesFromResponse(alertsResponse)
-                    .sort((first, second) => Date.parse(second.createdAt ?? '') - Date.parse(first.createdAt ?? ''));
-
-                const allPreferences = AlertPreferencesAssembler.toEntitiesFromResponse(preferencesResponse);
-                const employeePreferences = allPreferences.find((item) => item.employeeId === demoEmployeeId);
-                if (employeePreferences) {
-                    preferences.value = employeePreferences;
-                } else {
-                    const defaults = new AlertPreferences({
-                        employeeId: demoEmployeeId,
-                        panicGracePeriodSeconds: DEFAULT_PANIC_GRACE_PERIOD_SECONDS,
-                    });
-                    const createdPreferences = await alertApi.createAlertPreferences(
-                        AlertPreferencesAssembler.toResourceFromEntity(defaults),
-                    );
-                    preferences.value = AlertPreferencesAssembler.toEntityFromResponse(createdPreferences);
-                }
-
-                isInitialized.value = true;
-                const restoredCountdown = await restoreCountdown();
-                if (!restoredCountdown && activePanicRecord.value) currentView.value = 'active';
+                requireBusinessId();
+                const [, response] = await Promise.all([loadAlertRecords(captured), api.getAlertPreferences()]);
+                if (!current(captured)) return false;
+                const saved = AlertPreferencesAssembler.toEntityFromResponse(response);
+                if (saved.employeeId !== apiContext.userId) throw new Error('alerts.workflow.errors.invalidResponse');
+                preferences.value = saved; isInitialized.value = true;
+                if (activePanicRecord.value) { clearPreparation(); currentView.value = 'active'; }
+                else if (!restoreCountdown()) currentView.value = 'home';
                 return true;
-            } catch (error) {
-                errorMessage.value = getErrorMessage(error);
-                return false;
-            } finally {
-                isLoading.value = false;
-                initializationPromise = null;
-            }
+            } catch (error) { if (current(captured)) errorMessage.value = message(error); return false; }
+            finally { if (current(captured)) { isLoading.value = false; initializationPromise = null; } }
         })();
-
-        return initializationPromise;
+        initializationPromise = request; return request;
     }
-
-    /** Forces a fresh store initialization after a failure. @returns {Promise<boolean>} True when initialized. */
-    async function retryInitialization() {
-        isInitialized.value = false;
-        return initialize();
-    }
-
-    /** Reloads the alert history with loading feedback. @returns {Promise<boolean>} True when loaded. */
+    async function retryInitialization() { isInitialized.value = false; return initialize(); }
     async function loadHistory() {
-        isLoading.value = true;
-        errorMessage.value = null;
-        try {
-            await loadAlertRecords();
-            return true;
-        } catch (error) {
-            errorMessage.value = getErrorMessage(error);
-            return false;
-        } finally {
-            isLoading.value = false;
-        }
+        if (isLoading.value || isSaving.value) return false;
+        const captured = scope(); isLoading.value = true; errorMessage.value = null;
+        try { return await loadAlertRecords(captured); }
+        catch (error) { if (current(captured)) errorMessage.value = message(error); return false; }
+        finally { if (current(captured)) isLoading.value = false; }
     }
-
-    /** Reloads history and navigates to the history view. @returns {Promise<boolean>} True when shown. */
-    async function refreshHistory() {
-        if (!await loadHistory()) return false;
-        currentView.value = 'history';
-        return true;
-    }
-
-    /** Updates the panic grace period preference. @param {number} seconds - Grace period in seconds. @returns {Promise<boolean>} True when saved. */
     async function saveGracePeriod(seconds) {
-        errorMessage.value = null;
-        isSaving.value = true;
+        if (isSaving.value || isActivatingPanic.value || countdownDeadline.value) return false;
+        const captured = scope(); writes.value++; errorMessage.value = null;
         try {
-            const updatedPreferences = new AlertPreferences({
-                ...preferences.value,
-                panicGracePeriodSeconds: seconds,
-            });
-            const response = await alertApi.updateAlertPreferences(
-                AlertPreferencesAssembler.toResourceFromEntity(updatedPreferences),
-            );
-            preferences.value = AlertPreferencesAssembler.toEntityFromResponse(response);
-            return true;
-        } catch (error) {
-            errorMessage.value = getErrorMessage(error);
-            return false;
-        } finally {
-            isSaving.value = false;
-        }
+            AlertPreferences.validateGracePeriod(seconds);
+            const response = await api.saveGracePeriod(seconds);
+            if (!current(captured)) return false;
+            preferences.value = AlertPreferencesAssembler.toEntityFromResponse(response); return true;
+        } catch (error) { if (current(captured)) errorMessage.value = message(error); return false; }
+        finally { if (current(captured)) writes.value--; }
     }
-
-    /** Sets the countdown location and syncs it to the active record. @param {Object} [location] - Location fields. @returns {void} */
-    function setCountdownLocation(location = {}) {
-        countdownLocation.value = {
-            location: location.location ?? '',
-            latitude: location.latitude ?? null,
-            longitude: location.longitude ?? null,
-        };
-        if (countdownDeadline.value) saveCountdownSnapshot();
-
-        const activeRecord = activePanicRecord.value;
-        if (activeRecord && (activeRecord.latitude !== countdownLocation.value.latitude
-            || activeRecord.longitude !== countdownLocation.value.longitude
-            || activeRecord.location !== countdownLocation.value.location)) {
-            const updatedRecord = AlertRecordAssembler.toEntityFromResource(
-                AlertRecordAssembler.toResourceFromEntity(activeRecord),
-            );
-            updatedRecord.location = countdownLocation.value.location;
-            updatedRecord.latitude = countdownLocation.value.latitude;
-            updatedRecord.longitude = countdownLocation.value.longitude;
-            updatedRecord.updatedAt = new Date().toISOString();
-            replaceRecord(updatedRecord);
-            void alertApi.updateAlert(AlertRecordAssembler.toResourceFromEntity(updatedRecord))
-                .catch((error) => { errorMessage.value = getErrorMessage(error); });
-        }
-    }
-
-    /** Starts the panic countdown with an optional location. @param {Object} [location] - Location fields. @returns {boolean} True when started. */
-    function startPanicCountdown(location = {}) {
-        if (!isInitialized.value || activePanicRecord.value || countdownDeadline.value) return false;
-
-        countdownDurationSeconds.value = preferences.value.panicGracePeriodSeconds;
-        remainingSeconds.value = countdownDurationSeconds.value;
-        countdownDeadline.value = Date.now() + countdownDurationSeconds.value * 1000;
-        countdownLocation.value = {
-            location: location.location ?? '',
-            latitude: location.latitude ?? null,
-            longitude: location.longitude ?? null,
-        };
-        currentView.value = 'countdown';
-        errorMessage.value = null;
-        noticeMessage.value = null;
-        saveCountdownSnapshot();
-        runCountdownTimer();
-        return true;
-    }
-
-    /** Cancels the running panic countdown. @returns {boolean} True when cancelled. */
-    function cancelPanicCountdown() {
-        if (!countdownDeadline.value || currentView.value !== 'countdown' || isActivatingPanic.value) return false;
-        if (Date.now() >= countdownDeadline.value) {
-            updateCountdown();
-            return false;
-        }
-        stopCountdownTimer();
-        countdownDeadline.value = null;
-        remainingSeconds.value = countdownDurationSeconds.value;
-        countdownLocation.value = { location: '', latitude: null, longitude: null };
-        currentView.value = 'home';
-        noticeMessage.value = 'alerts.workflow.countdown.cancelled';
-        clearCountdownSnapshot();
-        return true;
-    }
-
-    /** Retries panic activation after an error view. @returns {Promise<boolean>} True when activated. */
-    async function retryPanicActivation() {
-        errorMessage.value = null;
-        countdownDeadline.value = Date.now();
-        return activatePanic();
-    }
-
-    /** Finishes the active panic and opens its report form. @returns {Promise<boolean>} True when finished. */
-    async function finishActivePanic() {
-        if (isSaving.value) return false;
-        const activeRecord = activePanicRecord.value;
-        if (!activeRecord) return false;
-
-        const updatedRecord = AlertRecordAssembler.toEntityFromResource(
-            AlertRecordAssembler.toResourceFromEntity(activeRecord),
-        );
-        if (!updatedRecord.finishPanic()) return false;
-
-        isSaving.value = true;
-        errorMessage.value = null;
-        noticeMessage.value = null;
-        try {
-            const response = await alertApi.updateAlert(AlertRecordAssembler.toResourceFromEntity(updatedRecord));
-            const savedRecord = AlertRecordAssembler.toEntityFromResponse(response);
-            replaceRecord(savedRecord);
-            selectedRecordId.value = savedRecord.id;
-            currentView.value = 'panic-report';
-            return true;
-        } catch (error) {
-            errorMessage.value = getErrorMessage(error);
-            return false;
-        } finally {
-            isSaving.value = false;
-        }
-    }
-
-    /** Updates the panic report draft with autosave debounce. @param {Object} [fields] - Draft fields. @returns {boolean} True when applied. */
-    function updatePanicReportDraft(fields = {}) {
-        if (isCompletingReport.value) return false;
-        const record = alertRecords.value.find((item) =>
-            String(item.id) === String(selectedRecordId.value)
-            && item.hasPendingPanicReport);
-        if (!record) return false;
-
-        const updatedRecord = AlertRecordAssembler.toEntityFromResource(
-            AlertRecordAssembler.toResourceFromEntity(record),
-        );
-        if (!updatedRecord.updatePanicReportDraft(fields)) return false;
-        draftRevisions.set(String(updatedRecord.id), (draftRevisions.get(String(updatedRecord.id)) ?? 0) + 1);
-        replaceRecord(updatedRecord);
-        errorMessage.value = null;
-
-        if (draftSaveTimer) window.clearTimeout(draftSaveTimer);
-        draftSaveTimer = window.setTimeout(() => {
-            draftSaveTimer = null;
-            persistPanicReportDraft(updatedRecord.id);
-        }, 350);
-        return true;
-    }
-
-    /** Persists a pending panic report draft to the API. @param {string} recordId - Record id. @returns {Promise<boolean>} True when saved. */
-    function persistPanicReportDraft(recordId) {
-        pendingDraftSave = pendingDraftSave.then(() => savePanicReportDraft(recordId));
-        return pendingDraftSave;
-    }
-
-    async function savePanicReportDraft(recordId) {
-        const record = alertRecords.value.find((item) => String(item.id) === String(recordId));
-        if (!record?.hasPendingPanicReport) return true;
-        const revision = draftRevisions.get(String(recordId));
-        if (savedDraftRevisions.has(String(recordId)) && savedDraftRevisions.get(String(recordId)) === revision) return true;
-
-        isSaving.value = true;
-        try {
-            const response = await alertApi.updateAlert(AlertRecordAssembler.toResourceFromEntity(record));
-            const savedRecord = AlertRecordAssembler.toEntityFromResponse(response);
-            savedDraftRevisions.set(String(recordId), revision);
-            if (draftRevisions.get(String(recordId)) === revision) {
-                replaceRecord(savedRecord);
-            }
-            errorMessage.value = null;
-            return true;
-        } catch (error) {
-            errorMessage.value = getErrorMessage(error);
-            return false;
-        } finally {
-            isSaving.value = false;
-        }
-    }
-
-    /** Flushes any debounced panic draft save immediately. @returns {Promise<boolean>} True when saved. */
-    async function flushPanicReportDraft() {
-        const id = selectedRecordId.value;
-        if (draftSaveTimer || draftRevisions.get(String(id)) !== savedDraftRevisions.get(String(id))) {
-            window.clearTimeout(draftSaveTimer);
-            draftSaveTimer = null;
-            persistPanicReportDraft(id);
-        }
-        return pendingDraftSave;
-    }
-
-    /** Opens a pending panic report for editing. @param {string} recordId - Record id. @returns {boolean} True when resumed. */
-    function resumePanicReport(recordId) {
-        const record = alertRecords.value.find((item) =>
-            String(item.id) === String(recordId)
-            && item.hasPendingPanicReport);
-        if (!record) return false;
-        noticeMessage.value = null;
-        selectedRecordId.value = record.id;
-        currentView.value = 'panic-report';
-        return true;
-    }
-
-    /** Saves the panic draft and returns to the home view. @returns {Promise<boolean>} True when deferred. */
-    async function deferPanicReport() {
-        if (!await flushPanicReportDraft()) return false;
-        currentView.value = 'home';
-        selectedRecordId.value = null;
-        return true;
-    }
-
-    /** Completes the selected panic report after flushing drafts. @returns {Promise<boolean>} True when completed. */
-    async function completePanicReport() {
-        if (isCompletingReport.value) return false;
-        isCompletingReport.value = true;
-        try {
-            if (!await flushPanicReportDraft()) return false;
-            const record = alertRecords.value.find((item) => String(item.id) === String(selectedRecordId.value));
-            if (!record) return false;
-            if (record.kind === AlertRecordKind.PANIC && record.reportStatus === PanicReportStatus.COMPLETED) {
-                noticeMessage.value = 'alerts.workflow.results.alreadyCompleted';
-                return false;
-            }
-
-            const completedRecord = AlertRecordAssembler.toEntityFromResource(
-                AlertRecordAssembler.toResourceFromEntity(record),
-            );
-            if (!completedRecord.completePanicReport()) return false;
-
-            isSaving.value = true;
-            errorMessage.value = null;
-            const response = await alertApi.updateAlert(AlertRecordAssembler.toResourceFromEntity(completedRecord));
-            const savedRecord = AlertRecordAssembler.toEntityFromResponse(response);
-            replaceRecord(savedRecord);
-            selectedRecordId.value = savedRecord.id;
-            lastSubmittedRecordId.value = savedRecord.id;
-            currentView.value = 'report-completed';
-            return true;
-        } catch (error) {
-            errorMessage.value = getErrorMessage(error);
-            return false;
-        } finally {
-            isSaving.value = false;
-            isCompletingReport.value = false;
-        }
-    }
-
-    /** Starts a non-panic incident report draft. @param {string} kind - Report kind. @returns {boolean} True when started. */
-    function startReport(kind) {
-        if (!Object.values(AlertRecordKind).includes(kind) || kind === AlertRecordKind.PANIC) return false;
-        reportKind.value = kind;
-        reportDraft.value = createEmptyReportDraft();
-        errorMessage.value = null;
-        currentView.value = 'report-form';
-        noticeMessage.value = null;
-        return true;
-    }
-
-    /** Merges fields into the current report draft. @param {Object} [fields] - Draft fields. @returns {boolean} True when applied. */
-    function updateReportDraft(fields = {}) {
-        if (currentView.value !== 'report-form') return false;
-        reportDraft.value = { ...reportDraft.value, ...fields };
-        return true;
-    }
-
-    /** Submits the current incident report draft to the API. @returns {Promise<boolean>} True when submitted. */
-    async function submitReport() {
-        if (currentView.value !== 'report-form' || !reportKind.value) return false;
-
-        const report = new AlertRecord({
-            ...reportDraft.value,
-            employeeId: demoEmployeeId,
-            kind: reportKind.value,
-            status: AlertRecordStatus.DRAFT,
-            createdAt: new Date().toISOString(),
+    function setCountdownLocation(value = {}) {
+        const location = locationDetails(value); countdownLocation.value = location;
+        if (preparation.value) saveSnapshot();
+        const record = activePanicRecord.value;
+        if (!record) return Promise.resolve(true);
+        const captured = scope();
+        pendingLocationSave = pendingLocationSave.then(async () => {
+            if (!current(captured) || !activePanicRecord.value || activePanicRecord.value.id !== record.id) return false;
+            writes.value++;
+            try {
+                const response = await api.updateLocation(record.id, location);
+                if (!current(captured)) return false;
+                replaceRecord(readRecord(response, captured.businessId)); return true;
+            } catch (error) { if (current(captured)) errorMessage.value = message(error); return false; }
+            finally { if (current(captured)) writes.value--; }
         });
-        if (!report.submitReport()) return false;
-
-        isSaving.value = true;
-        errorMessage.value = null;
+        return pendingLocationSave;
+    }
+    async function startPanicCountdown(location = apiContext.businessLocation ?? {}) {
+        if (!isInitialized.value || isSaving.value || isActivatingPanic.value || activePanicRecord.value || countdownDeadline.value) return false;
+        const captured = scope(); isPreparingPanic.value = true; errorMessage.value = null; noticeMessage.value = null;
         try {
-            const response = await alertApi.createAlert(AlertRecordAssembler.toResourceFromEntity(report));
-            const savedReport = AlertRecordAssembler.toEntityFromResponse(response);
-            alertRecords.value.unshift(savedReport);
-            lastSubmittedRecordId.value = savedReport.id;
-            reportKind.value = null;
-            currentView.value = 'report-sent';
-            return true;
+            const selectedLocation = locationDetails(location);
+            const response = await api.preparePanic(selectedLocation);
+            if (!current(captured)) return false;
+            const proof = response.data;
+            if (!proof || typeof proof.preparationToken !== 'string' || !proof.preparationToken
+                || !Number.isInteger(proof.gracePeriodSeconds) || proof.gracePeriodSeconds < 1 || proof.gracePeriodSeconds > 60
+                || !Number.isFinite(Date.parse(proof.notBefore)) || !Number.isFinite(Date.parse(proof.expiresAt))) throw new Error('alerts.workflow.errors.invalidResponse');
+            preparation.value = proof; countdownLocation.value = selectedLocation;
+            countdownDurationSeconds.value = proof.gracePeriodSeconds; remainingSeconds.value = proof.gracePeriodSeconds;
+            // Start the full server-issued duration after receiving the preparation.
+            countdownDeadline.value = Date.now() + proof.gracePeriodSeconds * 1000;
+            currentView.value = 'countdown'; saveSnapshot(); runCountdownTimer(); return true;
+        } catch (error) { if (current(captured)) errorMessage.value = message(error); return false; }
+        finally { if (current(captured)) isPreparingPanic.value = false; }
+    }
+    function cancelPanicCountdown() {
+        if (!countdownDeadline.value || isActivatingPanic.value || Date.now() >= countdownDeadline.value) return false;
+        clearPreparation(); countdownLocation.value = blankLocation(); remainingSeconds.value = countdownDurationSeconds.value;
+        currentView.value = 'home'; noticeMessage.value = 'alerts.workflow.countdown.cancelled'; return true;
+    }
+    async function activatePanic() {
+        if (isActivatingPanic.value || !preparation.value) return false;
+        const captured = scope(); const proof = preparation.value;
+        isActivatingPanic.value = true; errorMessage.value = null;
+        try {
+            const response = await api.confirmPanic(proof.preparationToken, locationDetails(countdownLocation.value));
+            if (!current(captured)) return false;
+            replaceRecord(readRecord(response, captured.businessId)); clearPreparation();
+            currentView.value = activePanicRecord.value ? 'active' : 'home'; return true;
         } catch (error) {
-            errorMessage.value = getErrorMessage(error);
+            if (current(captured)) {
+                errorMessage.value = message(error); currentView.value = 'activation-error';
+                countdownDeadline.value = null; remainingSeconds.value = 0; saveSnapshot();
+            }
             return false;
-        } finally {
-            isSaving.value = false;
+        } finally { if (current(captured)) isActivatingPanic.value = false; }
+    }
+    async function retryPanicActivation() {
+        if (isActivatingPanic.value) return false;
+        if (!preparation.value) return startPanicCountdown(countdownLocation.value);
+        const captured = scope();
+        const expired = Date.parse(preparation.value.expiresAt) <= Date.now();
+        const recovered = await activatePanic();
+        if (recovered || !current(captured)) return recovered;
+        if (errorMessage.value === 'api.errors.conflict') {
+            try {
+                if (await loadAlertRecords(captured) && activePanicRecord.value) {
+                    clearPreparation(); currentView.value = 'active'; errorMessage.value = null; return true;
+                }
+            } catch (error) { if (current(captured)) errorMessage.value = message(error); }
         }
+        if (current(captured) && expired && errorMessage.value === 'alerts.workflow.errors.transition') {
+            clearPreparation(); return startPanicCountdown(countdownLocation.value);
+        }
+        return false;
     }
-
-    /** Discards the report draft and returns to the home view. @returns {void} */
-    function discardReportDraft() {
-        reportKind.value = null;
-        reportDraft.value = createEmptyReportDraft();
-        errorMessage.value = null;
-        currentView.value = 'home';
+    async function finishActivePanic() {
+        if (isSaving.value || !activePanicRecord.value) return false;
+        const captured = scope(); const id = activePanicRecord.value.id; writes.value++; errorMessage.value = null;
+        try {
+            await pendingLocationSave; if (!current(captured)) return false;
+            const response = await api.resolvePanic(id);
+            if (!current(captured)) return false;
+            replaceRecord(readRecord(response, captured.businessId)); selectedRecordId.value = id;
+            currentView.value = 'panic-report'; return true;
+        } catch (error) { if (current(captured)) errorMessage.value = message(error); return false; }
+        finally { if (current(captured)) writes.value--; }
     }
-
-    /** Flushes drafts and navigates to the history view. @returns {Promise<boolean>} True when shown. */
+    function updatePanicReportDraft(fields = {}) {
+        const record = selectedRecord.value;
+        if (isCompletingReport.value || !record?.hasPendingPanicReport || record.employeeId !== apiContext.userId) return false;
+        const draft = new AlertRecord({ ...record }); if (!draft.updatePanicReportDraft(fields)) return false;
+        draftRevisions.set(record.id, (draftRevisions.get(record.id) ?? 0) + 1); replaceRecord(draft); errorMessage.value = null;
+        clearTimeout(draftSaveTimer); const captured = scope();
+        draftSaveTimer = setTimeout(() => { draftSaveTimer = null; if (current(captured)) void persistPanicReportDraft(record.id); }, 350);
+        return true;
+    }
+    async function recoverCompletedReport(id, captured) {
+        try {
+            const response = await api.getAlert(id);
+            if (!current(captured)) return false;
+            const latest = readRecord(response, captured.businessId);
+            if (latest.reportStatus !== 'completed') return false;
+            replaceRecord(latest); draftRevisions.delete(id); savedDraftRevisions.delete(id);
+            lastSubmittedRecordId.value = id; currentView.value = 'report-completed';
+            errorMessage.value = null; noticeMessage.value = 'alerts.workflow.results.alreadyCompleted';
+            return true;
+        } catch { return false; }
+    }
+    function persistPanicReportDraft(id) {
+        const captured = scope();
+        pendingDraftSave = pendingDraftSave.then(async () => {
+            if (!current(captured)) return false;
+            const record = alertRecords.value.find(item => item.id === id);
+            const revision = draftRevisions.get(id) ?? 0;
+            if (!record?.hasPendingPanicReport || revision === (savedDraftRevisions.get(id) ?? 0)) return true;
+            writes.value++;
+            try {
+                const response = await api.savePanicDraft(id, AlertRecordAssembler.toReportDetails(record));
+                if (!current(captured)) return false;
+                const saved = readRecord(response, captured.businessId); savedDraftRevisions.set(id, revision);
+                if (revision === draftRevisions.get(id)) replaceRecord(saved);
+                errorMessage.value = null; return true;
+            } catch (error) {
+                if (current(captured) && error.apiError?.status === 409 && await recoverCompletedReport(id, captured)) return true;
+                if (current(captured)) errorMessage.value = message(error);
+                return false;
+            } finally { if (current(captured)) writes.value--; }
+        });
+        return pendingDraftSave;
+    }
+    async function flushPanicReportDraft() {
+        clearTimeout(draftSaveTimer); draftSaveTimer = null;
+        const id = selectedRecordId.value;
+        if ((draftRevisions.get(id) ?? 0) !== (savedDraftRevisions.get(id) ?? 0)) return persistPanicReportDraft(id);
+        return pendingDraftSave;
+    }
+    function resumePanicReport(id) {
+        const record = alertRecords.value.find(item => item.id === id);
+        if (!record?.hasPendingPanicReport || record.employeeId !== apiContext.userId) return false;
+        selectedRecordId.value = id; currentView.value = 'panic-report'; noticeMessage.value = null; return true;
+    }
+    async function deferPanicReport() {
+        const captured = scope();
+        if (!await flushPanicReportDraft() || !current(captured)) return false;
+        currentView.value = 'home'; selectedRecordId.value = null; return true;
+    }
+    async function completePanicReport() {
+        if (isCompletingReport.value || !selectedRecord.value?.hasPendingPanicReport) return false;
+        const captured = scope(); const id = selectedRecordId.value;
+        isCompletingReport.value = true; errorMessage.value = null;
+        try {
+            if (!await flushPanicReportDraft() || !current(captured)) return false;
+            if (selectedRecord.value?.reportStatus === 'completed') return true;
+            const response = await api.completePanicReport(id);
+            if (!current(captured)) return false;
+            replaceRecord(readRecord(response, captured.businessId)); lastSubmittedRecordId.value = id;
+            currentView.value = 'report-completed'; return true;
+        } catch (error) {
+            if (current(captured) && error.apiError?.status === 409 && await recoverCompletedReport(id, captured)) return true;
+            if (current(captured)) errorMessage.value = message(error);
+            return false;
+        } finally { if (current(captured)) isCompletingReport.value = false; }
+    }
+    function startReport(kind) {
+        if (isSaving.value || isActivatingPanic.value || !isInitialized.value || kind === 'panic' || !Object.values(AlertRecordKind).includes(kind)) return false;
+        reportKind.value = kind; reportDraft.value = { ...blankDraft(), ...locationDetails(apiContext.businessLocation ?? {}) };
+        currentView.value = 'report-form'; errorMessage.value = null; noticeMessage.value = null; return true;
+    }
+    function updateReportDraft(fields = {}) {
+        if (currentView.value !== 'report-form' || isSaving.value) return false;
+        reportDraft.value = { ...reportDraft.value, ...fields }; return true;
+    }
+    async function submitReport() {
+        if (isSaving.value || currentView.value !== 'report-form' || !reportKind.value) return false;
+        const draft = new AlertRecord({ ...reportDraft.value, kind: reportKind.value, status: AlertRecordStatus.DRAFT });
+        if (!draft.submitReport()) { errorMessage.value = 'alerts.workflow.form.required'; return false; }
+        const captured = scope(); writes.value++; errorMessage.value = null;
+        try {
+            const response = await api.createReport(draft.kind, AlertRecordAssembler.toReportDetails(draft));
+            if (!current(captured)) return false;
+            const record = readRecord(response, captured.businessId); replaceRecord(record);
+            lastSubmittedRecordId.value = record.id; reportKind.value = null; currentView.value = 'report-sent'; return true;
+        } catch (error) { if (current(captured)) errorMessage.value = message(error); return false; }
+        finally { if (current(captured)) writes.value--; }
+    }
+    function discardReportDraft() { reportKind.value = null; reportDraft.value = blankDraft(); errorMessage.value = null; openHome(); }
     async function showHistory() {
+        const captured = scope();
         if (currentView.value === 'panic-report' && !await flushPanicReportDraft()) return false;
-        noticeMessage.value = null;
-        return refreshHistory();
+        if (!current(captured) || !await loadHistory()) return false;
+        currentView.value = 'history'; noticeMessage.value = null; return true;
     }
-
-    /** Returns from history to the countdown, active or home view. @returns {void} */
-    function backFromHistory() {
-        currentView.value = countdownDeadline.value
-            ? 'countdown'
-            : activePanicRecord.value ? 'active' : 'home';
-    }
-
-    /** Opens a record detail view. @param {string} recordId - Record id. @returns {void} */
-    function openRecord(recordId) {
-        selectedRecordId.value = recordId;
-        currentView.value = 'record-detail';
-    }
-
-    /** Closes the record detail and returns to history. @returns {void} */
-    function closeRecordDetail() {
-        currentView.value = 'history';
-    }
-
-    /** Opens the home, countdown or active view as applicable. @returns {void} */
-    function openHome() {
-        currentView.value = countdownDeadline.value
-            ? 'countdown'
-            : activePanicRecord.value ? 'active' : 'home';
-    }
-
-    return {
-        preferences,
-        alertRecords,
-        currentView,
-        countdownDurationSeconds,
-        remainingSeconds,
-        countdownProgress,
-        countdownLocation,
-        reportDraft,
-        reportKind,
-        selectedRecordId,
-        selectedRecord,
-        lastSubmittedRecordId,
-        activePanicRecord,
-        pendingPanicRecord,
-        isLoading,
-        isSaving: computed(() => isSaving.value || isCompletingReport.value),
-        isInitialized,
-        isActivatingPanic,
-        errorMessage,
-        noticeMessage,
-        hasUnsavedReportDraft,
-        initialize,
-        retryInitialization,
-        saveGracePeriod,
-        setCountdownLocation,
-        startPanicCountdown,
-        cancelPanicCountdown,
-        retryPanicActivation,
-        finishActivePanic,
-        updatePanicReportDraft,
-        flushPanicReportDraft,
-        resumePanicReport,
-        deferPanicReport,
-        completePanicReport,
-        startReport,
-        updateReportDraft,
-        submitReport,
-        discardReportDraft,
-        showHistory,
-        loadHistory,
-        backFromHistory,
-        openRecord,
-        closeRecordDetail,
-        openHome,
-    };
+    function openHome() { currentView.value = countdownDeadline.value ? 'countdown' : activePanicRecord.value ? 'active' : 'home'; }
+    function openRecord(id) { selectedRecordId.value = id; currentView.value = 'record-detail'; }
+    function closeRecordDetail() { currentView.value = 'history'; }
+    return { preferences, alertRecords, currentView, countdownDurationSeconds, remainingSeconds, countdownProgress, countdownLocation,
+        reportDraft, reportKind, selectedRecordId, selectedRecord, lastSubmittedRecordId, activePanicRecord, pendingPanicRecord,
+        isLoading, isSaving, isInitialized, isPreparingPanic, isActivatingPanic, errorMessage, noticeMessage, hasUnsavedReportDraft,
+        initialize, retryInitialization, saveGracePeriod, setCountdownLocation, startPanicCountdown, cancelPanicCountdown,
+        retryPanicActivation, finishActivePanic, updatePanicReportDraft, flushPanicReportDraft, resumePanicReport, deferPanicReport,
+        completePanicReport, startReport, updateReportDraft, submitReport, discardReportDraft, showHistory, loadHistory,
+        backFromHistory: openHome, openRecord, closeRecordDetail, openHome, resetContext };
 });
-
-export default useAlertStore;

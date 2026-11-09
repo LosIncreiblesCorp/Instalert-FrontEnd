@@ -1,48 +1,20 @@
 import { AlertRecord } from '../domain/model/alert-record.entity.js';
 
-/** Maps Alert API resources to and from domain entities. */
+/** Maps server facts and sends only editable report details. */
 export class AlertRecordAssembler {
     static toEntityFromResource(resource) {
-        return new AlertRecord({ ...resource });
+        if (!resource || typeof resource.id !== 'string' || typeof resource.businessId !== 'string'
+            || typeof resource.employeeId !== 'string' || !['panic', 'past-incident', 'suspicious-activity', 'other-situation'].includes(resource.kind)
+            || !['active', 'resolved', 'submitted'].includes(resource.status)) throw new Error('alerts.workflow.errors.invalidResponse');
+        return new AlertRecord(resource);
     }
-
     static toEntitiesFromResponse(response) {
-        if (response.status < 200 || response.status >= 300) {
-            throw new Error(`Alert API returned ${response.status} ${response.statusText}.`);
-        }
-
-        const resources = Array.isArray(response.data) ? response.data : response.data?.alerts ?? [];
-        return resources.map((resource) => this.toEntityFromResource(resource));
+        if (!Array.isArray(response.data)) throw new Error('alerts.workflow.errors.invalidResponse');
+        return response.data.map(resource => this.toEntityFromResource(resource));
     }
-
-    static toEntityFromResponse(response) {
-        if (response.status < 200 || response.status >= 300) {
-            throw new Error(`Alert API returned ${response.status} ${response.statusText}.`);
-        }
-        return this.toEntityFromResource(response.data);
-    }
-
-    static toResourceFromEntity(entity) {
-        const resource = {
-            employeeId: entity.employeeId,
-            kind: entity.kind,
-            status: entity.status,
-            reportStatus: entity.reportStatus,
-            category: entity.category,
-            location: entity.location,
-            latitude: entity.latitude,
-            longitude: entity.longitude,
-            moment: entity.moment,
-            description: entity.description,
-            createdAt: entity.createdAt,
-            activatedAt: entity.activatedAt,
-            endedAt: entity.endedAt,
-            resolvedAt: entity.resolvedAt,
-            submittedAt: entity.submittedAt,
-            completedAt: entity.completedAt,
-            updatedAt: entity.updatedAt,
-        };
-        if (entity.id !== null && entity.id !== undefined) resource.id = entity.id;
-        return resource;
+    static toEntityFromResponse(response) { return this.toEntityFromResource(response.data); }
+    static toReportDetails(record) {
+        const { category, description, location, latitude, longitude, moment } = record;
+        return { category, description, location, latitude, longitude, moment: moment || null };
     }
 }
