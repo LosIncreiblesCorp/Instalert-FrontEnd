@@ -132,7 +132,12 @@ History follows the API pagination for the resolved commerce ID. Administrators 
 - Uses `Notification`, `NotificationPreferences`, `NotificationsApi`, assemblers and `useNotificationsStore`.
 - The header bell opens the inbox with an unread count, all/unread filters and read-state actions. A gear opens preferences in a modal dialog.
 - Nearby-alert preferences use radii of 100, 500 or 1000 meters (initially 500), measured from the business's saved location.
-- The current JSON Server flow refreshes in-app notices while the application is visible.
+- Uses `GET notifications?businessId=...&page=...&pageSize=100`, `POST notifications/{id}/reading` and `GET/PUT notification-preferences/{userId}?businessId=...`. Preferences send only `nearbyAlertsEnabled` and `nearbyRadiusMeters`; read timestamps are assigned by the server.
+- Loads the entire paginated inbox for the resolved commerce. The server selects recipients and measures distances; the browser does not create notifications or derive recipients from Alert resources.
+- Refreshes every 15 seconds while the application is visible and resumes immediately when the tab becomes visible. The header badge works across module pages. New unread arrivals after the initial load display a dismissible notice; dismissing it does not mark it as read.
+- Changing the demonstration account or commerce clears the inbox, preferences, notices and pending request state. Late responses cannot populate another account. A failed refresh preserves received data and shows an error; it is not treated as an empty inbox.
+- Preferences apply to future delivery and do not remove previously received notifications. Notices are delivery history and can remain after the source panic has been resolved.
+- Backend in-app generation requires `Workers__Enabled=true` to process committed alert events. External email remains a separate server transport; no provider key is exposed to the frontend.
 - Routes in `notifications-routes.js`: `/admin/notifications` and `/employee/notifications`.
 
 ### Dashboard Context
@@ -183,7 +188,7 @@ Vite defaults to port 5173. The API connection is configured in `.env.developmen
 
 For a production build, supply the future ASP.NET API URL through `VITE_INSTALERT_PLATFORM_API_URL`, including `/api/v1`, then run `npm run build`. See the deployment configuration below. `npm run preview` serves the resulting build.
 
-The `server/` directory and JSON Server dependency remain for the module adapters that have not yet been integrated. They are not used by Shared, Alert, Business, Contacts or Profiles. Those adapters will be adapted in separate features.
+The `server/` directory and JSON Server dependency remain for the module adapters that have not yet been integrated. They are not used by Shared, Alert, Business, Contacts, Notifications or Profiles. Those adapters will be adapted in separate features.
 
 ## Environment Variables
 Environment files included:
@@ -210,7 +215,6 @@ API resource paths are configured in both environment files:
 | `VITE_PAYMENT_METHODS_ENDPOINT_PATH` | `payment-methods` |
 | `VITE_INVOICES_ENDPOINT_PATH` | `invoices` |
 | `VITE_NOTIFICATIONS_ENDPOINT_PATH` | `notifications` |
-| `VITE_NOTIFICATION_PREFERENCES_ENDPOINT_PATH` | `notification-preferences` |
 | `VITE_DASHBOARD_ENDPOINT_PATH` | `dashboard` |
 | `VITE_MONTHLY_REPORTS_ENDPOINT_PATH` | `monthly-reports` |
 
@@ -265,7 +269,7 @@ Only the fixed demonstration accounts are available in this delivery. Staff invi
 
 ## ASP.NET shared connection
 
-The shared HTTP client now uses the ASP.NET API. Development defaults to `http://localhost:5221/api/v1`, matching its HTTP launch profile; Vite uses port 5173. Starting JSON Server is not required for this connection. Alert, Business, Contacts and Profiles use this connection; the other module adapters remain pending their respective integration features.
+The shared HTTP client now uses the ASP.NET API. Development defaults to `http://localhost:5221/api/v1`, matching its HTTP launch profile; Vite uses port 5173. Starting JSON Server is not required for this connection. Alert, Business, Contacts, Notifications and Profiles use this connection; the other module adapters remain pending their respective integration features.
 
 The profile selector retains two fixed demonstration actors: administrator → `synthetic-admin`, employee → `synthetic-employee`. Every request reads the current actor and sends `User-Id` plus `Accept-Language` (`en-US` or `es-419`). This is a demonstration selector, without registration, passwords or IAM. Switching profiles clears the shared commerce context and rejects responses belonging to the previous actor.
 
@@ -285,4 +289,4 @@ npm run build
 On the demonstration backend, configure `Demo__Enabled=true` and `Cors__AllowedOrigins__0` with the exact frontend origin. Keep provider credentials on the server. These settings do not deploy either application.
 
 
-Shared, Alert, Business, Contacts and Profiles are connected to the ASP.NET API. Notifications, Payments, Mapping and Dashboard retain their pending integration work. IAM, employee account provisioning and checkout integration are outside these features.
+Shared, Alert, Business, Contacts, Notifications and Profiles are connected to the ASP.NET API. Payments, Mapping and Dashboard retain their pending integration work. IAM, employee account provisioning and checkout integration are outside these features.

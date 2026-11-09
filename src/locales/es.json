@@ -1010,7 +1010,7 @@
     "radius": "Radio de recepción",
     "radiusHelp": "La distancia se mide desde la ubicación guardada de tu negocio. Guardar cambios no elimina las notificaciones que ya recibiste.",
     "meters": "{value} m",
-    "businessCenter": "Ubicación de referencia: {name}. Usa las coordenadas guardadas en el perfil del negocio.",
+    "businessCenter": "Ubicación de referencia: {address}. Usa las coordenadas guardadas en el perfil del negocio.",
     "centerUnavailable": "La ubicación del negocio no está disponible. La recepción de alertas cercanas necesita coordenadas válidas en el perfil del negocio.",
     "discard": "Descartar cambios",
     "save": "Guardar preferencias",
@@ -1025,7 +1025,7 @@
     },
     "loadingInbox": "Cargando notificaciones…",
     "nearbyTitle": "Alerta activa cercana",
-    "nearbyMessage": "Se reportó una alerta activa cerca de tu negocio. Consulta la sección de alertas para conocer su estado actual.",
+    "nearbyMessage": "Se confirmó una alerta de pánico cerca de tu negocio. Este aviso registra su recepción; la situación puede haber cambiado desde entonces.",
     "generalTitle": "Aviso de InstAlert",
     "unread": "Sin leer",
     "read": "Leída",
@@ -1043,8 +1043,9 @@
       "preferencesLoad": "No se pudieron cargar tus preferencias de notificación. Inténtalo nuevamente.",
       "preferencesSave": "No se pudieron guardar tus preferencias. Tu configuración anterior sigue activa.",
       "invalidPreferences": "Elige un radio disponible y una preferencia de notificación válida.",
-      "feedLoad": "No se pudieron actualizar las notificaciones o la recepción de alertas cercanas. Revisa la conexión e inténtalo nuevamente.",
-      "markRead": "No se pudo marcar la notificación como leída. Inténtalo nuevamente."
+      "feedLoad": "No se pudieron actualizar las notificaciones. Revisa la conexión e inténtalo nuevamente.",
+      "markRead": "No se pudo marcar la notificación como leída. Inténtalo nuevamente.",
+      "invalidResponse": "El servicio devolvió datos de notificación inválidos. Actualiza e inténtalo nuevamente."
     }
   },
   "dashboard": {
