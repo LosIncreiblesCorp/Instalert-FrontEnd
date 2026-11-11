@@ -177,7 +177,8 @@
       "24h": "Últimas 24h",
       "7d": "7 días",
       "30d": "30 días",
-      "all": "Todas las fechas"
+      "all": "Todas las fechas",
+      "radius": "Radio de búsqueda"
     },
     "incidentCategories": {
       "robbery": "Robo",
@@ -217,7 +218,8 @@
       "noLocation": "Este registro no tiene coordenadas válidas disponibles.",
       "unlocated": "Registros sin ubicación o límites de zona válidos: {count}. Consulta sus datos disponibles en Explorar datos del mapa.",
       "selectionFiltered": "El incidente seleccionado está fuera de los filtros actuales.",
-      "unavailable": "Este registro ya no está disponible. Actualiza los datos e inténtalo nuevamente."
+      "unavailable": "Este registro ya no está disponible. Actualiza los datos e inténtalo nuevamente.",
+      "noBusinessLocation": "Guarda la ubicación del comercio para explorar los incidentes cercanos."
     },
     "legend": {
       "title": "SIMBOLOGÍA DEL MAPA",
@@ -256,7 +258,16 @@
       "noZoneGeometry": "No están disponibles los límites de esta zona. No se pueden asociar reportes geográficamente.",
       "zoneReports": "Incidentes en la zona",
       "noZoneReports": "No hay incidentes en esta zona que coincidan con los filtros actuales.",
-      "readOnly": "Consulta de datos geográficos"
+      "readOnly": "Consulta de datos geográficos",
+      "classificationCount": "Incidentes usados para la clasificación: {count}",
+      "classificationWindow": "Período de clasificación: del {start} al {end}. Los filtros del mapa no cambian este período."
+    },
+    "zoneName": "Concentración de incidentes",
+    "kinds": {
+      "panic": "Alerta de pánico",
+      "past-incident": "Evento pasado",
+      "suspicious-activity": "Actividad sospechosa",
+      "other-situation": "Otra situación"
     }
   },
   "navigation": {

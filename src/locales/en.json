@@ -177,7 +177,8 @@
       "24h": "Last 24h",
       "7d": "7 days",
       "30d": "30 days",
-      "all": "All dates"
+      "all": "All dates",
+      "radius": "Search radius"
     },
     "incidentCategories": {
       "robbery": "Robbery",
@@ -217,7 +218,8 @@
       "noLocation": "No valid coordinates are available for this record.",
       "unlocated": "Records without a valid location or zone boundary: {count}. Consult their available details in Explore map data.",
       "selectionFiltered": "The selected incident is outside the current filters.",
-      "unavailable": "This record is no longer available. Refresh the data and try again."
+      "unavailable": "This record is no longer available. Refresh the data and try again.",
+      "noBusinessLocation": "Save the business location to explore nearby incidents."
     },
     "legend": {
       "title": "MAP LEGEND",
@@ -256,7 +258,16 @@
       "noZoneGeometry": "The zone boundary is unavailable. Reports cannot be associated geographically.",
       "zoneReports": "Incidents in the zone",
       "noZoneReports": "No incidents in this zone match the current filters.",
-      "readOnly": "Geographical read projection"
+      "readOnly": "Geographical read projection",
+      "classificationCount": "Incidents used for classification: {count}",
+      "classificationWindow": "Classification window: {start} to {end}. Map filters do not change this window."
+    },
+    "zoneName": "Incident concentration",
+    "kinds": {
+      "panic": "Panic alert",
+      "past-incident": "Past incident",
+      "suspicious-activity": "Suspicious activity",
+      "other-situation": "Other situation"
     }
   },
   "navigation": {
