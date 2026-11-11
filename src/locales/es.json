@@ -1181,22 +1181,24 @@
       "summary": "No se pudo cargar o actualizar el dashboard. Los datos anteriores, si se muestran, conservan su fecha de actualización.",
       "history": "No se pudieron cargar o actualizar los reportes mensuales.",
       "reportMissing": "Este reporte mensual ya no está disponible.",
-      "detail": "No se pudo cargar el reporte mensual."
+      "detail": "No se pudo cargar el reporte mensual.",
+      "invalidRange": "Elige un rango válido que termine hoy o antes.",
+      "generate": "No se pudo generar el reporte. Intenta de nuevo."
     },
     "monthly": {
-      "title": "Reportes mensuales",
-      "detailTitle": "Detalle del reporte mensual",
-      "backToHistory": "Volver a reportes mensuales",
+      "title": "Reportes guardados",
+      "detailTitle": "Detalle del reporte",
+      "backToHistory": "Volver a reportes guardados",
       "backToDashboard": "Volver al dashboard",
-      "historyHelp": "Consulta los cierres mensuales guardados de tu negocio.",
-      "detailHelp": "Indicadores conservados para el periodo y la fecha de cierre del reporte.",
+      "historyHelp": "Consulta los reportes guardados o crea uno para un rango de fechas.",
+      "detailHelp": "Este reporte conserva la información disponible en su fecha de corte.",
       "statusHelp": "Estado de los reportes del periodo conservado al cierre.",
-      "loading": "Cargando reportes mensuales…",
+      "loading": "Cargando reportes…",
       "filter": "Filtrar por mes",
       "clearFilter": "Mostrar todos los meses",
-      "emptyTitle": "Aún no hay reportes mensuales",
+      "emptyTitle": "Aún no hay reportes guardados",
       "noMatch": "No hay reporte para este mes",
-      "emptyHelp": "Aquí aparecerán los cierres mensuales disponibles con sus indicadores guardados y fecha de generación.",
+      "emptyHelp": "Genera un reporte con el rango de fechas de arriba.",
       "open": "Ver reporte",
       "reportFor": "Reporte mensual · {month}",
       "generatedAt": "Generado: {date}",
@@ -1205,8 +1207,8 @@
       "partial": "Este reporte guardado identifica datos de origen no disponibles.",
       "duringPeriod": "Durante el periodo del reporte",
       "atClosing": "Al cierre",
-      "comparison": "Reportes registrados frente al mes anterior",
-      "comparisonHelp": "La variación compara el total de reportes registrados en ambos meses.",
+      "comparison": "Reportes registrados frente al intervalo anterior",
+      "comparisonHelp": "El intervalo anterior tiene la misma duración efectiva que este reporte.",
       "source": {
         "scheduled": "Cierre programado",
         "manual": "Solicitado por el administrador"
@@ -1214,12 +1216,19 @@
       "increased": "Se registraron un {value} % más de reportes que en {month}.",
       "decreased": "Se registraron un {value} % menos de reportes que en {month}.",
       "unchanged": "Se registró la misma cantidad de reportes que en {month}.",
-      "bothZero": "No se registraron reportes en ninguno de los dos meses.",
+      "bothZero": "No se registraron reportes en ninguno de los dos intervalos.",
       "noBaseline": "En {month} no se registraron reportes; no se calcula una variación porcentual.",
       "lessThanPointOne": "<0,1"
     },
     "summaryNearby": "Mes actual · a 500 metros",
-    "thisMonth": "Este mes"
+    "thisMonth": "Este mes",
+    "reports": {
+      "createTitle": "Crear un reporte",
+      "startDate": "Fecha inicial",
+      "endDate": "Fecha final",
+      "generate": "Generar reporte",
+      "help": "Ambas fechas se incluyen. Cada reporte guarda una instantánea y se compara con el intervalo anterior de igual duración."
+    }
   },
   "api": {
     "connection": {

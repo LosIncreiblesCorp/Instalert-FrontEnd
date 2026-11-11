@@ -141,12 +141,12 @@ History follows the API pagination for the resolved commerce ID. Administrators 
 - Routes in `notifications-routes.js`: `/admin/notifications` and `/employee/notifications`.
 
 ### Dashboard Context
-- Owns read projections and monthly report snapshots; source records remain with their original contexts.
-- Uses DashboardSummary, MonthlyReport, DashboardApi, DashboardAssembler and useDashboardStore.
-- Provides current-month summaries by role with accessible charts, current alert state and team capacity where applicable.
-- The administrator opens saved monthly reports from Dashboard; each detail preserves its closing counts, charts and previous-month comparison.
-- Its infrastructure adapter composes JSON Server resources for local development; views consume store actions.
-- Routes in dashboard-routes.js: /admin/dashboard, /employee/dashboard, /admin/monthly-reports and /admin/monthly-reports/:reportId.
+- Reads the current-month projection from `GET businesses/{id}/dashboard`; metrics and series are calculated by the backend for the caller's role.
+- Administrators create immutable report snapshots using `POST businesses/{id}/reports` with inclusive `startDate` and `endDate` values (`YYYY-MM-DD`).
+- Reads saved reports from `GET businesses/{id}/reports` and `GET businesses/{id}/reports/{reportId}`. Multiple snapshots may use the same date range.
+- Report schema version 2 includes its requested dates, effective cutoff and a comparison with the preceding interval of equal duration. There is no automatic monthly closing job.
+- Clears data when the account or commerce changes, rejects late responses and retains the current summary if a refresh fails.
+- Existing route names are retained: `/admin/dashboard`, `/employee/dashboard`, `/admin/monthly-reports` and `/admin/monthly-reports/:reportId`.
 
 ### Shared Context
 Provides reusable infrastructure and presentation utilities.
@@ -224,7 +224,7 @@ Missing API configuration raises an error rather than falling back to hard-coded
 
 Tip: if your API is running on a different port, update `VITE_INSTALERT_PLATFORM_API_URL` in `.env.development`.
 
-VITE_DASHBOARD_DATA_SOURCE=mock selects the local resource-composition adapter for Dashboard.
+Dashboard always consumes the ASP.NET API; it does not aggregate JSON Server collections in the browser.
 
 ## Routing Notes
 - Router exposes role-scoped trees: `/admin/*` (`administrator`) and `/employee/*` (`employee`). `/` shows the demonstration profile selector; `/admin` and `/employee` redirect to their respective dashboards.

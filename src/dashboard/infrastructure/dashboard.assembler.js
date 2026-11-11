@@ -25,7 +25,7 @@ export class DashboardAssembler {
             && (resource.userId === null || typeof resource.userId === 'string') && (resource.role !== 'employee' || resource.userId)
             && typeof resource.businessName === 'string' && timestamp(resource.refreshedAt) && [100, 500, 1000].includes(resource.radiusMeters));
         const period = resource.period;
-        requireValue(period && ['7d', '30d', 'month', 'year'].includes(period.kind) && period.timeZone === dashboardTimeZone
+        requireValue(period && ['month', 'range'].includes(period.kind) && period.timeZone === dashboardTimeZone
             && [period.start, period.end, period.previousStart, period.previousEnd].every(timestamp)
             && Date.parse(period.start) <= Date.parse(period.end) && Date.parse(period.previousStart) <= Date.parse(period.previousEnd)
             && Date.parse(period.previousEnd) <= Date.parse(period.start));
@@ -76,18 +76,18 @@ export class DashboardAssembler {
     }
     static toMonthlyReport(resource) {
         requireValue(resource && identifier(resource.id));
-        return new MonthlyReport({ id: resource.id, businessId: resource.businessId, month: resource.month, generatedAt: resource.generatedAt,
+        return new MonthlyReport({ id: resource.id, businessId: resource.businessId, startDate: resource.startDate, endDate: resource.endDate, cutoffAt: resource.cutoffAt, generatedAt: resource.generatedAt,
             generationSource: resource.generationSource, generatedByUserId: resource.generatedByUserId ?? null,
             schemaVersion: resource.schemaVersion, summary: this.toSummary(resource.summary) });
     }
     static toMonthlyReportList(resources) {
         requireValue(Array.isArray(resources));
-        const periods = new Set(), ids = new Set();
+        const ids = new Set();
         return resources.map(resource => {
-            const report = this.toMonthlyReport(resource), key = report.businessId + ':' + report.month;
-            requireValue(!periods.has(key) && !ids.has(String(report.id)));
-            periods.add(key); ids.add(String(report.id));
+            const report = this.toMonthlyReport(resource);
+            requireValue(!ids.has(String(report.id)));
+            ids.add(String(report.id));
             return report;
-        }).sort((a, b) => b.month.localeCompare(a.month));
+        }).sort((a, b) => Date.parse(b.generatedAt) - Date.parse(a.generatedAt) || b.id.localeCompare(a.id));
     }
 }

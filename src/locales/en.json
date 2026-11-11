@@ -1181,22 +1181,24 @@
       "summary": "Could not load or refresh the dashboard. Previously loaded data, if shown, retains its update time.",
       "history": "Could not load or refresh monthly reports.",
       "reportMissing": "This monthly report is no longer available.",
-      "detail": "Could not load the monthly report."
+      "detail": "Could not load the monthly report.",
+      "invalidRange": "Choose a valid date range ending today or earlier.",
+      "generate": "The report could not be generated. Please try again."
     },
     "monthly": {
-      "title": "Monthly reports",
-      "detailTitle": "Monthly report detail",
-      "backToHistory": "Back to monthly reports",
+      "title": "Saved reports",
+      "detailTitle": "Report detail",
+      "backToHistory": "Back to saved reports",
       "backToDashboard": "Back to dashboard",
-      "historyHelp": "Consult the saved monthly closings for your business.",
-      "detailHelp": "Indicators preserved for the report’s period and closing date.",
+      "historyHelp": "Consult saved reports or create one for a date range.",
+      "detailHelp": "This report preserves the information available at its cutoff time.",
       "statusHelp": "Status of the period’s reports preserved at closing.",
-      "loading": "Loading monthly reports…",
+      "loading": "Loading reports…",
       "filter": "Filter by month",
       "clearFilter": "Show all months",
-      "emptyTitle": "No monthly reports yet",
+      "emptyTitle": "No saved reports yet",
       "noMatch": "No report for this month",
-      "emptyHelp": "Available monthly closings will appear here with their saved indicators and generation date.",
+      "emptyHelp": "Generate a report using the date range above.",
       "open": "View report",
       "reportFor": "Monthly report · {month}",
       "generatedAt": "Generated {date}",
@@ -1206,7 +1208,7 @@
       "duringPeriod": "During the report period",
       "atClosing": "At closing",
       "comparison": "Registered reports compared with the previous month",
-      "comparisonHelp": "The change compares the total number of reports registered in both months.",
+      "comparisonHelp": "The previous interval has the same effective duration as this report.",
       "source": {
         "scheduled": "Scheduled closing",
         "manual": "Requested by administrator"
@@ -1214,12 +1216,19 @@
       "increased": "{value}% more reports were registered than in {month}.",
       "decreased": "{value}% fewer reports were registered than in {month}.",
       "unchanged": "The same number of reports was registered as in {month}.",
-      "bothZero": "No reports were registered in either month.",
+      "bothZero": "No reports were registered in either interval.",
       "noBaseline": "No reports were registered in {month}; a percentage change is not calculated.",
       "lessThanPointOne": "<0.1"
     },
     "summaryNearby": "Current month · within 500 meters",
-    "thisMonth": "This month"
+    "thisMonth": "This month",
+    "reports": {
+      "createTitle": "Create a report",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "generate": "Generate report",
+      "help": "Both dates are included. Each report saves a snapshot and compares it with the preceding interval of the same duration."
+    }
   },
   "api": {
     "connection": {
