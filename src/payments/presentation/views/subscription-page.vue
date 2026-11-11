@@ -1,7 +1,8 @@
 <script setup>
 /** Subscription management page with plans and billing. */
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { onBeforeRouteLeave } from 'vue-router';
 import { useConfirm } from "primevue/useconfirm";
 import Dialog from "primevue/dialog";
 import { usePaymentsStore } from "../../application/payments.store.js";
@@ -10,6 +11,8 @@ import PlanCard from "../components/plan-card.vue";
 import SubscriptionSummary from "../components/subscription-summary.vue";
 import BillingHistory from "../components/billing-history.vue";
 import PayPalSubscriptionButton from "../components/paypal-subscription-button.vue";
+
+import { apiContext } from '../../../shared/infrastructure/api-context.js';
 
 const paymentsStore = usePaymentsStore();
 const { locale, t } = useI18n();
@@ -21,6 +24,8 @@ const cancelling = ref(false);
 const notice = ref("");
 const currency = "USD";
 let checkoutTrigger = null;
+onBeforeRouteLeave(() => !paymentsStore.checkoutBusy);
+watch(() => paymentsStore.checkoutOutcome, outcome => { if (outcome === 'approved') selectingPlanId.value = null; });
 
 function restoreCheckoutFocus() {
   if (checkoutTrigger instanceof HTMLElement && checkoutTrigger.isConnected) {
@@ -44,7 +49,7 @@ const topPlanId = computed(() => {
 
 /** Checks whether a plan is blocked by seat usage. @param {Object} plan - Plan entity. @returns {boolean} True when blocked. */
 function isBlocked(plan) {
-  return !paymentsStore.seatUsageAvailable || plan.maxEmployees < assignedOperators.value;
+  return Boolean(paymentsStore.checkoutApproval) || !paymentsStore.seatUsageAvailable || plan.maxEmployees < assignedOperators.value;
 }
 
 /** Formats a monthly plan price. @param {Object} plan - Plan entity. @returns {string} Formatted price. */
@@ -52,9 +57,22 @@ function formatPlanPrice(plan) {
   return formatMoney(planPrice(plan, currency), currency, locale.value);
 }
 
+function refreshPending() {
+  if (!document.hidden && paymentsStore.checkoutApproval && !paymentsStore.checkoutBusy) void paymentsStore.verifyPending();
+}
+let verificationTimer;
 onMounted(() => {
-  paymentsStore.resetPayPalCheckout();
-  paymentsStore.fetchPaymentsData();
+  void paymentsStore.fetchPaymentsData().then(refreshPending);
+  verificationTimer = window.setInterval(refreshPending, 15000);
+  document.addEventListener('visibilitychange', refreshPending);
+});
+onUnmounted(() => {
+  clearInterval(verificationTimer);
+  document.removeEventListener('visibilitychange', refreshPending);
+});
+watch(() => [apiContext.userId, apiContext.businessId, apiContext.status], () => {
+  selectingPlanId.value = null; notice.value = '';
+  void paymentsStore.fetchPaymentsData().then(refreshPending);
 });
 
 /** Opens checkout after checking plan availability. @param {string} planId - Plan identifier. */
@@ -102,10 +120,13 @@ function handleCancelClick() {
       {{ $t(paymentsStore.errorMessage) }}
     </pv-message>
 
+    <pv-button :label="$t('payments.refresh')" icon="pi pi-refresh" :disabled="paymentsStore.checkoutBusy || paymentsStore.isLoading" @click="paymentsStore.fetchPaymentsData()" />
+    <pv-message v-if="paymentsStore.isSimulated" severity="info" :closable="false">{{ $t('payments.demoSubscription') }}</pv-message>
+    <pv-button v-if="paymentsStore.checkoutApproval" :label="$t('payments.retryVerification')" :loading="paymentsStore.checkoutBusy" :disabled="paymentsStore.checkoutBusy" @click="paymentsStore.verifyPending()" />
     <p v-if="paymentsStore.isLoading" class="subscription-page__state" role="status">
       {{ $t("payments.loading") }}
     </p>
-    <p v-else-if="!paymentsStore.currentSubscription" class="subscription-page__state" role="alert">
+    <p v-else-if="paymentsStore.hasLoaded && !paymentsStore.currentSubscription" class="subscription-page__state" role="alert">
       {{ $t("payments.empty") }}
     </p>
 
@@ -136,11 +157,12 @@ function handleCancelClick() {
               v-for="plan in paymentsStore.plans"
               :key="plan.id"
               :plan="plan"
-              :selected="plan.id === paymentsStore.currentSubscription?.planId"
+              :selected="plan.id === paymentsStore.currentSubscription?.planId && paymentsStore.currentSubscription?.isActive && !paymentsStore.isSimulated"
               :selecting="paymentsStore.checkoutBusy || openingCheckout"
               :currency="currency"
               :accent="plan.id === topPlanId"
-              :blocked="plan.id !== paymentsStore.currentSubscription?.planId && isBlocked(plan)"
+              :blocked="plan.maxEmployees < assignedOperators"
+              :unavailable="!paymentsStore.seatUsageAvailable || Boolean(paymentsStore.checkoutApproval) || Boolean(paymentsStore.currentSubscription?.cancelAtPeriodEnd)"
               :assigned-operators="assignedOperators"
               @select="handleSelectRequest"
           />
@@ -189,7 +211,7 @@ function handleCancelClick() {
         <pv-button
             class="pause-banner__action"
             type="button"
-            :disabled="paymentsStore.currentSubscription.cancelAtPeriodEnd || cancelling || paymentsStore.checkoutBusy"
+            :disabled="paymentsStore.isSimulated || paymentsStore.currentSubscription.cancelAtPeriodEnd || cancelling || paymentsStore.checkoutBusy"
             :label="$t('payments.cancelSubscription')"
             @click="handleCancelClick"
         />

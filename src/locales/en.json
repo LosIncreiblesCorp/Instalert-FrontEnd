@@ -388,13 +388,15 @@
     "errors": {
       "subscriptionLoad": "Unable to load the subscription. Please try again.",
       "seatUsageLoad": "Unable to check occupied and reserved seats. Refresh before changing plans.",
-      "save": "Unable to save the subscription change. Please try again."
+      "save": "Unable to save the subscription change. Please try again.",
+      "verification": "Payment could not be confirmed yet. You can retry verification without paying again."
     },
     "status": {
       "active": "Active",
       "past_due": "Past due",
       "canceled": "Canceled",
-      "trialing": "Trial"
+      "trialing": "Trial",
+      "expired": "Expired"
     },
     "statusPaid": "Paid",
     "tiers": {
@@ -446,17 +448,19 @@
       "selectedPlan": "Selected plan",
       "checkoutHelp": "Complete the subscription authorization in PayPal. You will return to InstAlert when you finish.",
       "checkoutTitle": "Continue with PayPal",
-      "sandboxNotice": "PayPal Sandbox: test subscriptions only. InstAlert subscription data, cancellation and invoices are still simulated.",
+      "sandboxNotice": "PayPal Sandbox uses test payments.",
       "loading": "Loading PayPal…",
       "loadError": "Unable to load PayPal. Check your connection and try again.",
       "configurationError": "PayPal is not available for this plan. Please try again later.",
       "retry": "Retry",
-      "approved": "Authorization received in PayPal.",
+      "approved": "Payment verified. Your subscription is active.",
       "canceled": "PayPal approval was canceled. Your current plan has not changed.",
       "error": "PayPal could not complete approval. Your current plan has not changed.",
       "blocked": "Seat usage exceeds this plan capacity. Choose another plan.",
       "fundingHelp": "Manage the funding source in your Sandbox buyer account. InstAlert does not collect card details. Opening PayPal does not confirm a payment method update here.",
-      "manageFunding": "Manage test payment methods in PayPal (opens a new tab)"
+      "manageFunding": "Manage test payment methods in PayPal (opens a new tab)",
+      "verifying": "Verifying the payment with the server...",
+      "pending": "Approval received. Payment verification is pending; do not pay again."
     },
     "methodTitle": "Payment method",
     "methodPrimary": "PRIMARY",
@@ -474,7 +478,12 @@
     "cancelSubscription": "Cancel renewal",
     "confirmCancelTitle": "Cancel subscription",
     "confirmCancelMessage": "Schedule cancellation at period end? You keep access until then.",
-    "cancelScheduled": "Cancellation scheduled for end of period."
+    "cancelScheduled": "Cancellation scheduled for end of period.",
+    "refresh": "Refresh",
+    "retryVerification": "Verify payment again",
+    "demoSubscription": "The current plan is demonstration data. It is not a confirmed PayPal payment.",
+    "periodEnd": "Period end: {date}",
+    "planUnavailable": "Not available right now"
   },
   "alerts": {
     "workflow": {

@@ -1,20 +1,9 @@
 /** PayPal Sandbox subscription approval adapter. No server credentials belong here. */
 let sdkPromise;
 
-const planIds = {
-    'demo-basic': import.meta.env.VITE_PAYPAL_ESSENTIAL_MONTHLY_PLAN_ID,
-    'demo-standard': import.meta.env.VITE_PAYPAL_PROFESSIONAL_MONTHLY_PLAN_ID,
-    'demo-extended': import.meta.env.VITE_PAYPAL_BUSINESS_MONTHLY_PLAN_ID
-};
-
-export function paypalPlanId(planId) {
-    return planIds[planId]?.trim() ?? '';
-}
-
-export function isPayPalConfigured(planId) {
+export function isPayPalConfigured() {
     return import.meta.env.VITE_PAYPAL_ENVIRONMENT === 'sandbox'
-        && Boolean(import.meta.env.VITE_PAYPAL_CLIENT_ID?.trim())
-        && Boolean(paypalPlanId(planId));
+        && Boolean(import.meta.env.VITE_PAYPAL_CLIENT_ID?.trim());
 }
 
 /** Loads the subscription SDK once; failed loads can be retried. */
@@ -27,7 +16,7 @@ export function loadPayPalSdk() {
             return;
         }
         const script = document.createElement('script');
-        const url = new URL('https://www.sandbox.paypal.com/sdk/js');
+        const url = new URL('https://www.paypal.com/sdk/js');
         url.search = new URLSearchParams({
             'client-id': clientId, components: 'buttons', currency: 'USD',
             intent: 'subscription', vault: 'true'
@@ -55,31 +44,32 @@ export function loadPayPalSdk() {
     return sdkPromise;
 }
 
-/** Adapts SDK callbacks to application callbacks without treating approval as payment verification. */
-export async function createPayPalButtons({ planId, beforeApprove, onApproved, onCancel, onError, onBusy }) {
-    if (!isPayPalConfigured(planId)) throw new Error('Missing PayPal Sandbox plan configuration.');
+
+/** The backend supplies the provider plan and correlation for each checkout. */
+export async function createPayPalButtons({ getCheckout, beforeApprove, onApproved, onCancel, onError, isCurrent }) {
+    if (!isPayPalConfigured()) throw new Error('Missing PayPal Sandbox configuration.');
     const sdk = await loadPayPalSdk();
+    let checkout;
     return sdk.Buttons({
         fundingSource: sdk.FUNDING.PAYPAL,
         style: { layout: 'vertical', label: 'subscribe' },
         onClick: async (_data, actions) => {
-            try {
-                return await beforeApprove() ? actions.resolve() : actions.reject();
-            } catch {
-                onError();
-                return actions.reject();
-            }
+            try { return isCurrent() && await beforeApprove() ? actions.resolve() : actions.reject(); }
+            catch { if (isCurrent()) onError(); return actions.reject(); }
         },
-        createSubscription: (_data, actions) => {
-            onBusy(true);
-            return actions.subscription.create({ plan_id: paypalPlanId(planId) });
+        createSubscription: async (_data, actions) => {
+            checkout = await getCheckout();
+            if (!isCurrent()) throw new Error('The selected account changed.');
+            return checkout.subscriptionId
+                ? actions.subscription.revise(checkout.subscriptionId, { plan_id: checkout.paypalPlanId })
+                : actions.subscription.create({ plan_id: checkout.paypalPlanId, custom_id: checkout.customId });
         },
-        onApprove: data => {
-            onBusy(false);
-            if (!data.subscriptionID) return onError();
-            return onApproved({ providerSubscriptionId: data.subscriptionID, planId });
+        onApprove: async data => {
+            if (!isCurrent()) return;
+            if (!checkout || !data.subscriptionID) return onError();
+            return onApproved({ providerSubscriptionId: data.subscriptionID, checkoutId: checkout.checkoutId });
         },
-        onCancel: () => { onBusy(false); onCancel(); },
-        onError: () => { onBusy(false); onError(); }
+        onCancel: () => { if (isCurrent()) onCancel(); },
+        onError: () => { if (isCurrent()) onError(); },
     });
 }
