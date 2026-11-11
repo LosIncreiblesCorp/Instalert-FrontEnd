@@ -109,10 +109,11 @@ History follows the API pagination for the resolved commerce ID. Administrators 
 - The backend enforces active operational membership and contact ownership. This feature stores contact details; it does not create accounts or send email. Notification delivery is a separate integration.
 
 ### Mapping Context
-- Manages risk polygons, incident markers and business locations on a Mapbox map.
-- Uses `RiskZone`, `IncidentMarker` and `BusinessLocation` entities.
-- Uses `useMappingStore` to load zones/incidents and keep selection state.
-- Presentation splits container (`risk-map-page.vue`) from map primitives (`risk-map.vue`, `tactical-inspector.vue`, `zone-detail.vue`).
+- Queries `mapping/incidents`, `mapping/businesses` and `mapping/risk-zones` from the ASP.NET API.
+- The server resolves the commerce center and applies radius (100, 500 or 1000 meters), category and date filters.
+- Keeps alert kind separate from incident category. Risk-zone counts and classification windows are supplied by Mapping.
+- Refreshes every 15 seconds while the map page is visible. Account or commerce changes clear the snapshot and discard late responses; a failed refresh preserves the current snapshot.
+- Mapbox renders the geography. The explorer also makes incidents, businesses and zones available through keyboard navigation.
 
 ### Payments Context
 - Owns the plan catalog, subscriptions, transactions and employee limits associated with each plan.

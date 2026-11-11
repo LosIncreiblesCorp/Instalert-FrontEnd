@@ -16,8 +16,8 @@
       <div v-if="type === 'incident'">
         <button type="button" class="text-button mb-3" @click="$emit('close')"><i class="pi pi-arrow-left mr-1" aria-hidden="true"></i>{{ t('mapping.actions.back') }}</button>
         <div class="bg-red-50 border-round p-4 mb-3 border-left-3 border-red-500">
-          <p class="text-xs font-bold text-red-700 mb-1"><i class="pi pi-exclamation-triangle mr-2" aria-hidden="true"></i>{{ categoryLabel(item.type) }}</p>
-          <h2 class="text-xl font-bold m-0 mb-2 text-gray-900">{{ item.title || t('mapping.notRecorded') }}</h2>
+          <p class="text-xs font-bold text-red-700 mb-1"><i class="pi pi-exclamation-triangle mr-2" aria-hidden="true"></i>{{ categoryLabel(item.category) }}</p>
+          <h2 class="text-xl font-bold m-0 mb-2 text-gray-900">{{ incidentTitle(item, t) }}</h2>
           <p class="text-sm text-gray-600 m-0 mb-3"><i class="pi pi-clock mr-1" aria-hidden="true"></i>{{ formatDate(item.reportedAt) }}</p>
           <span class="status-badge" :class="statusClass(item.status)">{{ statusLabel(item.status) }}</span>
         </div>
@@ -45,7 +45,7 @@
             </div>
             <div v-if="recentIncident" class="border-left-2 border-blue-500 pl-3 py-1 mb-4">
               <p class="text-xs font-bold text-blue-600 mb-1">{{ t('mapping.inspector.latestReport') }}</p>
-              <button type="button" class="text-button font-bold" @click="$emit('incident-selected', recentIncident.id)">{{ recentIncident.title || t('mapping.notRecorded') }}</button>
+              <button type="button" class="text-button font-bold" @click="$emit('incident-selected', recentIncident.id)">{{ incidentTitle(recentIncident, t) }}</button>
               <p class="text-xs text-gray-600">{{ formatDate(recentIncident.reportedAt) }}</p>
               <p class="text-xs text-gray-600 line-height-3">{{ recentIncident.description || t('mapping.notRecorded') }}</p>
               <span class="status-badge" :class="statusClass(recentIncident.status)">{{ statusLabel(recentIncident.status) }}</span>
@@ -69,14 +69,16 @@
       <div v-else>
         <p v-if="!applicableZones.length" class="text-sm text-gray-600">{{ t('mapping.inspector.noAssociatedZone') }}</p>
         <section v-for="zone in applicableZones" :key="zone.id" class="zone-section">
-          <h2 class="text-xl font-bold m-0 mb-1">{{ zone.name || t('mapping.notRecorded') }}</h2>
+          <h2 class="text-xl font-bold m-0 mb-1">{{ zoneName(zone, t) }}</h2>
           <p class="text-sm font-bold mb-4" :class="riskClass(zone.riskLevel)">{{ t('mapping.inspector.riskLabel') }}: {{ riskLabel(zone.riskLevel) }}</p>
+          <p class="text-sm text-gray-600">{{ t('mapping.inspector.classificationCount', { count: zone.incidentCount }) }}</p>
+          <p v-if="zone.windowStart && zone.windowEnd" class="text-xs text-gray-600">{{ t('mapping.inspector.classificationWindow', { start: formatDate(zone.windowStart), end: formatDate(zone.windowEnd) }) }}</p>
           <p v-if="!zone.hasGeometry" class="text-sm text-gray-600">{{ t('mapping.inspector.noZoneGeometry') }}</p>
           <template v-else>
             <h3 class="text-sm font-bold text-gray-700 border-bottom-1 surface-border pb-2 mb-2">{{ t('mapping.inspector.zoneReports') }}</h3>
             <p class="text-xs text-gray-600">{{ filterLabel }}</p>
             <ul v-if="reportsForZone(zone).length" class="record-list"><li v-for="incident in reportsForZone(zone)" :key="incident.id" class="border-left-2 pl-3" :class="incident.status === 'active' ? 'border-red-500' : 'border-gray-300'">
-              <button type="button" class="text-button font-bold text-sm" @click="$emit('incident-selected', incident.id)">{{ incident.title || t('mapping.notRecorded') }}</button>
+              <button type="button" class="text-button font-bold text-sm" @click="$emit('incident-selected', incident.id)">{{ incidentTitle(incident, t) }}</button>
               <p class="m-0 text-xs text-gray-600 mb-1">{{ formatDate(incident.reportedAt) }}</p>
               <p class="m-0 text-xs text-gray-600">{{ incident.description || t('mapping.notRecorded') }}</p>
             </li></ul>

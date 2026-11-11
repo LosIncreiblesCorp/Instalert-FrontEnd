@@ -1,6 +1,6 @@
 <template>
   <div class="risk-map-page" :class="{ 'inspector-open': selectedItem }" @keydown.esc="closeInspector">
-    <risk-map :inert="selectedItem && narrowScreen ? true : undefined" ref="mapView" :key="mapKey" :risk-zones="mappingStore.riskZones" :incidents="filteredIncidents" :businesses="mappingStore.businesses"
+    <risk-map v-if="mappingStore.center" :center="mappingStore.center" :inert="selectedItem && narrowScreen ? true : undefined" ref="mapView" :key="mapKey" :risk-zones="mappingStore.riskZones" :incidents="filteredIncidents" :businesses="mappingStore.businesses"
       :selected-item-id="selection?.id ?? null" :selected-type="selection?.type ?? ''"
       @zone-selected="selectItem('zone', $event)" @incident-selected="selectItem('incident', $event)" @business-selected="selectItem('business', $event)"
       @map-ready="mapReady = true; mapError = false" @map-error="mapError = true" />
@@ -13,6 +13,9 @@
         <pv-select v-model="incidentTypeFilter" class="type-filter" :options="incidentTypeOptions" option-label="label" option-value="value" :aria-label="t('mapping.filters.incidentCategory')" :pt="{ overlay: { class: 'mapping-incident-options' } }">
           <template #value><span class="selected-incident-type" :title="selectedIncidentTypeLabel">{{ selectedIncidentTypeLabel }}</span></template>
         </pv-select>
+        <label class="radius-filter">{{ t('mapping.filters.radius') }}
+          <select v-model.number="radiusMeters"><option v-for="radius in [100, 500, 1000]" :key="radius" :value="radius">{{ radius }} m</option></select>
+        </label>
         <button type="button" class="tool-button" @click="clearFilters">{{ t('mapping.actions.clear') }}</button>
         <button type="button" class="tool-button" :disabled="mappingStore.isLoading" @click="reloadData">{{ t('mapping.actions.refresh') }}</button>
       </div>
@@ -20,7 +23,7 @@
         <p v-if="mappingStore.isLoading" role="status"><i class="pi pi-spin pi-spinner" aria-hidden="true"></i> {{ t('mapping.feedback.loading') }}</p>
         <p v-if="mappingStore.error" role="alert">{{ t(mappingStore.error) }} <button type="button" :disabled="mappingStore.isLoading" @click="reloadData">{{ t('mapping.actions.retry') }}</button></p>
         <p v-if="mapError" role="alert">{{ t('mapping.feedback.mapError') }} <button type="button" @click="retryMap">{{ t('mapping.actions.retryMap') }}</button></p>
-        <p v-else-if="!mapReady" role="status">{{ t('mapping.feedback.mapLoading') }}</p>
+        <p v-else-if="mappingStore.center && !mapReady" role="status">{{ t('mapping.feedback.mapLoading') }}</p>
         <p v-if="mappingStore.hasLoaded && !filteredIncidents.length">{{ t('mapping.feedback.noResults') }}</p>
         <p v-if="unlocatedCount">{{ t('mapping.feedback.unlocated', { count: unlocatedCount }) }}</p>
         <p v-if="selectionMessage">{{ t(selectionMessage) }}</p>
@@ -31,10 +34,10 @@
         </button>
         <div v-if="explorerOpen" id="mapping-results" class="explorer-results">
           <h2>{{ t('mapping.legend.incident') }}</h2>
-          <ul v-if="filteredIncidents.length"><li v-for="incident in filteredIncidents" :key="incident.id"><button type="button" @click="selectItem('incident', incident.id)">{{ incident.title || t('mapping.notRecorded') }}</button></li></ul>
+          <ul v-if="filteredIncidents.length"><li v-for="incident in filteredIncidents" :key="incident.id"><button type="button" @click="selectItem('incident', incident.id)">{{ incidentTitle(incident, t) }}</button></li></ul>
           <p v-else>{{ t('mapping.feedback.noResults') }}</p>
           <h2>{{ t('mapping.inspector.riskZone') }}</h2>
-          <ul v-if="mappingStore.riskZones.length"><li v-for="zone in mappingStore.riskZones" :key="zone.id"><button type="button" @click="selectItem('zone', zone.id)">{{ zone.name || t('mapping.notRecorded') }}</button></li></ul>
+          <ul v-if="mappingStore.riskZones.length"><li v-for="zone in mappingStore.riskZones" :key="zone.id"><button type="button" @click="selectItem('zone', zone.id)">{{ zoneName(zone, t) }}</button></li></ul>
           <p v-else>{{ t('mapping.feedback.noZones') }}</p>
           <h2>{{ t('mapping.inspector.registeredBusiness') }}</h2>
           <ul v-if="mappingStore.businesses.length"><li v-for="business in mappingStore.businesses" :key="business.id"><button type="button" @click="selectItem('business', business.id)">{{ business.name || t('mapping.notRecorded') }}</button></li></ul>
@@ -68,7 +71,9 @@
 import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMappingStore } from '../../application/mapping.store.js';
+import { apiContext } from '../../../shared/infrastructure/api-context.js';
 import { IncidentCategory } from '../../domain/model/incident-marker.entity.js';
+import { incidentTitle, zoneName } from '../mapping-format.js';
 import RiskMap from '../components/risk-map.vue';
 import TacticalInspector from '../components/tactical-inspector.vue';
 const mappingStore = useMappingStore();
@@ -78,7 +83,7 @@ const selectionMessage = ref('');
 const timeFilter = ref('24h');
 const incidentTypeFilter = ref('all');
 const periods = ['24h', '7d', '30d', 'all'];
-const now = ref(Date.now());
+const radiusMeters = ref(1000);
 const mapView = ref(null), inspector = ref(null), explorerButton = ref(null);
 const mapReady = ref(false), mapError = ref(false), mapKey = ref(0), explorerOpen = ref(false);
 const narrowScreen = ref(false);
@@ -91,11 +96,7 @@ const incidentTypeOptions = computed(() => [
 ]);
 const selectedIncidentTypeLabel = computed(() => incidentTypeOptions.value.find(option => option.value === incidentTypeFilter.value)?.label ?? t('mapping.filters.allIncidents'));
 const filterLabel = computed(() => t('mapping.filters.' + timeFilter.value) + ' · ' + selectedIncidentTypeLabel.value);
-const filteredIncidents = computed(() => {
-  const duration = { '24h': 86400000, '7d': 604800000, '30d': 2592000000 }[timeFilter.value];
-  return mappingStore.incidents.filter(incident => incident.matchesFilters({ category: incidentTypeFilter.value,
-    since: duration ? now.value - duration : null, until: duration ? now.value : null }));
-});
+const filteredIncidents = computed(() => mappingStore.incidents);
 const selectedItem = computed(() => {
   if (!selection.value) return null;
   const resources = { zone: mappingStore.riskZones, incident: filteredIncidents.value, business: mappingStore.businesses }[selection.value.type] ?? [];
@@ -127,16 +128,22 @@ async function closeInspector() {
   else explorerButton.value?.focus();
 }
 function clearFilters() { timeFilter.value = 'all'; incidentTypeFilter.value = 'all'; }
-function reloadData() { now.value = Date.now(); return mappingStore.fetchMapData(); }
+function reloadData() { return mappingStore.fetchMapData({ radiusMeters: radiusMeters.value, category: incidentTypeFilter.value, period: timeFilter.value }); }
+function refreshVisible() { if (!document.hidden && !mappingStore.isLoading) void reloadData(); }
+watch([timeFilter, incidentTypeFilter, radiusMeters, () => apiContext.userId, () => apiContext.businessId, () => apiContext.status], () => {
+  void closeInspector();
+  void reloadData();
+});
 function retryMap() { mapReady.value = false; mapError.value = false; mapKey.value++; }
 onMounted(() => {
   mediaQuery = window.matchMedia('(max-width: 1000px)');
   updateScreen(mediaQuery);
   mediaQuery.addEventListener('change', updateScreen);
   void reloadData();
-  timer = window.setInterval(() => { now.value = Date.now(); }, 60000);
+  timer = window.setInterval(refreshVisible, 15000);
+  document.addEventListener('visibilitychange', refreshVisible);
 });
-onUnmounted(() => { window.clearInterval(timer); mediaQuery?.removeEventListener('change', updateScreen); });
+onUnmounted(() => { document.removeEventListener('visibilitychange', refreshVisible); window.clearInterval(timer); mediaQuery?.removeEventListener('change', updateScreen); });
 </script>
 
 <style scoped>
@@ -150,6 +157,8 @@ onUnmounted(() => { window.clearInterval(timer); mediaQuery?.removeEventListener
 .tool-button { color: #1d4ed8; }
 button:disabled { opacity: .55; cursor: wait; }
 button:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+.radius-filter { display: flex; align-items: center; gap: 6px; padding: 4px 8px; font-size: 13px; }
+.radius-filter select { min-height: 32px; border: 1px solid #cbd5e1; border-radius: 4px; background: white; color: #172033; }
 .divider { width: 1px; height: 20px; background: #e6ebf2; margin: 0 6px; }
 .type-filter { min-width: 175px; max-width: 240px; border: none; background: white; font-weight: 500; font-size: 13px; color: #172033; color-scheme: light; }
 .type-filter :deep(.p-select-label) { padding: 6px 8px; font-size: 13px; color: #172033; }
@@ -183,6 +192,8 @@ button:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
 .floating-inspector > * { width: 100%; }
 .inspector-open .floating-top-bar { right: 420px; }
 @media (max-width: 1000px) { .inspector-open .floating-top-bar { display: none; } }
-@media (max-width: 600px) { .floating-top-bar { top: 12px; left: 12px; right: 12px; } .divider { display: none; } .filters-card { gap: 2px; } .type-filter { min-width: 150px; flex: 1; } .floating-legend { left: 12px; bottom: 40px; } .legend-card { padding: 12px; width: 250px; } .floating-inspector { width: 100%; } .inspector-open .floating-legend { display: none; } }
+@media (max-width: 600px) { .floating-top-bar { top: 12px; left: 12px; right: 12px; } .radius-filter { display: flex; align-items: center; gap: 6px; padding: 4px 8px; font-size: 13px; }
+.radius-filter select { min-height: 32px; border: 1px solid #cbd5e1; border-radius: 4px; background: white; color: #172033; }
+.divider { display: none; } .filters-card { gap: 2px; } .type-filter { min-width: 150px; flex: 1; } .floating-legend { left: 12px; bottom: 40px; } .legend-card { padding: 12px; width: 250px; } .floating-inspector { width: 100%; } .inspector-open .floating-legend { display: none; } }
 @media (max-height: 650px) { .floating-legend { display: none; } .explorer-results { max-height: 25dvh; } }
 </style>

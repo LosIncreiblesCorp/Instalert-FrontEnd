@@ -3,9 +3,12 @@
 export class RiskZone {
 /** Creates a risk zone polygon entity.
 * @param {Object} params - Risk zone fields. */
-    constructor({ id, name, riskLevel, bounds } = {}) {
+    constructor({ id, name, riskLevel, bounds, incidentCount = 0, windowStart = null, windowEnd = null } = {}) {
         this.id = id;
         this.name = name;
+        this.incidentCount = incidentCount;
+        this.windowStart = windowStart;
+        this.windowEnd = windowEnd;
         this.riskLevel = ['low', 'medium', 'high'].includes(riskLevel) ? riskLevel : null;
         this.bounds = Array.isArray(bounds) && bounds.every(point => Array.isArray(point) && point.length >= 2
             && Number.isFinite(point[0]) && Math.abs(point[0]) <= 180
