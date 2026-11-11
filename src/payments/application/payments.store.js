@@ -1,237 +1,167 @@
-import { defineStore } from "pinia";
-import { PaymentsApi } from "../infrastructure/payments-api.js";
-import { PlanAssembler } from "../infrastructure/plan.assembler.js";
-import { SubscriptionAssembler } from "../infrastructure/subscription.assembler.js";
-import { InvoiceAssembler } from "../infrastructure/invoice.assembler.js";
+import { computed, ref, watch } from 'vue';
+import { defineStore } from 'pinia';
+import { PaymentsApi } from '../infrastructure/payments-api.js';
+import { PlanAssembler } from '../infrastructure/plan.assembler.js';
+import { SubscriptionAssembler } from '../infrastructure/subscription.assembler.js';
+import { InvoiceAssembler } from '../infrastructure/invoice.assembler.js';
+import { apiContext, currentContextRevision, requireBusinessId } from '../../shared/infrastructure/api-context.js';
 
-const SIMULATED_BUSINESS_ID = "bus-1";
-
-// Monthly catalog prices in PEN and USD; no real charge.
-// Active employees and pending invitations occupy seats; administrators are excluded.
-const SIMULATED_PLANS = [
-    {
-        id: "demo-basic",
-        name: "Essential",
-        price: 50,
-        priceUsd: 15,
-        currency: "PEN",
-        billingCycle: "monthly",
-        maxEmployees: 4,
-        features: ["bracelets2", "incidentAlerts24h", "monthlyMaintenance"]
-    },
-    {
-        id: "demo-standard",
-        name: "Professional",
-        price: 100,
-        priceUsd: 30,
-        currency: "PEN",
-        billingCycle: "monthly",
-        maxEmployees: 8,
-        features: ["bracelets5", "priorityAlerts24h", "monthlyMaintenance", "localRiskReports"]
-    },
-    {
-        id: "demo-extended",
-        name: "Business",
-        price: 150,
-        priceUsd: 45,
-        currency: "PEN",
-        billingCycle: "monthly",
-        maxEmployees: 15,
-        features: ["bracelets8", "organizationPriority24h", "monthlyMaintenance", "advancedAlertsImplementation"]
+const api = new PaymentsApi();
+/** Subscription changes are only committed to the UI after server verification. */
+export const usePaymentsStore = defineStore('payments', () => {
+    const plans = ref([]), currentSubscription = ref(null), invoices = ref([]);
+    const activeEmployees = ref(0), reservedSeats = ref(0), seatUsageAvailable = ref(false);
+    const isLoading = ref(false), hasLoaded = ref(false), errorMessage = ref(null);
+    const checkoutBusy = ref(false), checkoutApproval = ref(null), checkoutOutcome = ref(null), checkout = ref(null);
+    let generation = 0, request = 0;
+    const capture = () => ({ generation, revision: currentContextRevision(), userId: apiContext.userId, businessId: apiContext.businessId });
+    const current = scope => scope.generation === generation && scope.revision === currentContextRevision()
+        && scope.userId === apiContext.userId && scope.businessId === apiContext.businessId;
+    const storageKey = scope => `instalert.payments.approval:${scope.userId}:${scope.businessId}`;
+    const currentPlan = computed(() => plans.value.find(item => item.id === currentSubscription.value?.planId) ?? null);
+    const assignedOperators = computed(() => activeEmployees.value + reservedSeats.value);
+    const memberLimit = computed(() => currentPlan.value?.maxEmployees ?? 0);
+    const isSimulated = computed(() => currentSubscription.value?.isSimulated === true);
+    const paymentHistory = computed(() => invoices.value.map(item => ({ reference: item.folio || item.id,
+        occurredAt: item.issuedAt, amount: item.amount, currency: item.currency, status: item.status })));
+    function savePending(scope, approval) {
+        try {
+            if (approval) sessionStorage.setItem(storageKey(scope), JSON.stringify(approval));
+            else sessionStorage.removeItem(storageKey(scope));
+        } catch { /* Server verification remains available without browser storage. */ }
     }
-];
-
-// Synthetic payment history retained through the legacy invoice adapter until backend integration.
-const SIMULATED_INVOICES = [
-    { id: "txn-2026-09", issuedAt: "2026-09-15T12:00:00Z", amount: 30, currency: "USD", status: "paid" },
-    { id: "txn-2026-08", issuedAt: "2026-08-15T12:00:00Z", amount: 30, currency: "USD", status: "paid" },
-    { id: "txn-2026-07", issuedAt: "2026-07-15T12:00:00Z", amount: 30, currency: "USD", status: "paid" }
-];
-
-/** Application service store for plans, subscription and billing. @returns {Object} Payments store. */
-export const usePaymentsStore = defineStore("payments", {
-    state: () => ({
-        plans: [],
-        currentSubscription: null,
-        paymentMethod: null,
-        invoices: [],
-        activeEmployees: 0,
-        reservedSeats: 0,
-        seatUsageAvailable: false,
-        errorMessage: null,
-        isLoading: false,
-        checkoutBusy: false,
-        checkoutApproval: null,
-        checkoutOutcome: null,
-        simulated: {
-            plans: true,
-            subscription: true,
-            billing: true
-        }
-    }),
-    getters: {
-        /** Read model for the payment history UI; references are internal until provider reconciliation. */
-        paymentHistory(state) {
-            return state.invoices.map(record => ({
-                reference: record.id,
-                occurredAt: record.issuedAt,
-                amount: record.amount,
-                currency: record.currency,
-                status: record.status
-            }));
-        },
-        currentPlan(state) {
-            return state.plans.find((plan) => plan.id === state.currentSubscription?.planId) ?? null;
-        },
-        memberLimit(state) {
-            return this.currentPlan?.maxEmployees ?? 0;
-        },
-        assignedOperators(state) {
-            return state.activeEmployees + state.reservedSeats;
-        },
-        isSimulated(state) {
-            return state.simulated.plans || state.simulated.subscription || state.simulated.billing;
-        }
-    },
-    actions: {
-        /** Clears transient approval state and the former demo checkout lock. */
-        resetPayPalCheckout() {
-            this.checkoutApproval = null;
-            this.checkoutOutcome = null;
-            this.checkoutBusy = false;
-            try { sessionStorage.removeItem('instalert.payments.sandbox-approval'); } catch { /* Storage can be unavailable. */ }
-        },
-        /** Loads the plan catalog, falling back to simulated data. @returns {Promise<void>} */
-        async fetchPlans() {
-            this.isLoading = true;
-            const api = new PaymentsApi();
-            try {
-                const response = await api.getPlans();
-                const dtos = Array.isArray(response.data) ? response.data : response.data?.plans ?? [];
-                if (dtos.length === 0) throw new Error("Empty plans collection");
-                this.plans = PlanAssembler.toDomainList(dtos);
-                this.simulated.plans = false;
-            } catch (err) {
-                this.plans = PlanAssembler.toDomainList(SIMULATED_PLANS);
-                this.simulated.plans = true;
-                console.warn("Payments plans fallback to simulated catalog.", err?.message ?? err);
-            } finally {
-                this.isLoading = false;
-            }
-        },
-        /** Loads the active subscription for a business. @param {string} businessId - Business identifier. @returns {Promise<void>} */
-        async fetchSubscription(businessId = SIMULATED_BUSINESS_ID) {
-            this.isLoading = true;
-            this.currentSubscription = null;
-            const api = new PaymentsApi();
-            try {
-                const response = await api.getSubscriptions(businessId);
-                const subscriptions = Array.isArray(response.data) ? response.data : response.data?.subscriptions;
-                if (!Array.isArray(subscriptions)) throw new Error('Invalid subscription response');
-                const active = subscriptions.filter(subscription => String(subscription.businessId) === String(businessId)
-                    && subscription.status === 'active');
-                if (active.length > 1) throw new Error('Multiple active subscriptions');
-                this.currentSubscription = active.length ? SubscriptionAssembler.toDomain(active[0]) : null;
-                this.simulated.subscription = false;
-            } catch {
-                this.errorMessage = 'payments.errors.subscriptionLoad';
-            } finally {
-                this.isLoading = false;
-            }
-        },
-        /** Loads plans, subscription, billing and seat usage. @param {string} businessId - Business identifier. @returns {Promise<void>} */
-        async fetchPaymentsData(businessId = SIMULATED_BUSINESS_ID) {
-            this.errorMessage = null;
-            await this.fetchPlans();
-            await this.fetchSubscription(businessId);
-            await this.fetchBilling();
-            await this.fetchActiveEmployeeCount(businessId);
-        },
-        /** Loads demo invoices. PayPal manages the funding source outside this application. */
-        async fetchBilling() {
-            this.isLoading = true;
-            const api = new PaymentsApi();
-            try {
-                const invoicesResponse = await api.getInvoices();
-                const invoiceDtos = Array.isArray(invoicesResponse.data)
-                    ? invoicesResponse.data
-                    : (invoicesResponse.data?.invoices ?? []);
-                this.invoices = InvoiceAssembler.toDomainList(invoiceDtos);
-                this.simulated.billing = false;
-            } catch (err) {
-                this.invoices = InvoiceAssembler.toDomainList(SIMULATED_INVOICES);
-                this.simulated.billing = true;
-                console.warn("Payments billing fallback to simulated data.", err?.message ?? err);
-            } finally {
-                this.isLoading = false;
-            }
-        },
-        /** Loads the seat usage for a business. @param {string} businessId - Business identifier. @returns {Promise<void>} */
-        async fetchActiveEmployeeCount(businessId = SIMULATED_BUSINESS_ID) {
-            this.seatUsageAvailable = false;
-            try {
-                const usage = await new PaymentsApi().getSeatUsage(businessId);
-                this.activeEmployees = usage.activeEmployees;
-                this.reservedSeats = usage.reservedSeats;
-                this.seatUsageAvailable = true;
-            } catch {
-                this.errorMessage = 'payments.errors.seatUsageLoad';
-            }
-        },
-        /** Rechecks the demo seat projection before opening the PayPal approval flow. */
-        async preparePayPalCheckout(planId) {
-            const plan = this.plans.find((p) => p.id === planId);
-            if (!plan || this.checkoutBusy) return false;
-            this.errorMessage = null;
-            this.checkoutOutcome = null;
-            this.checkoutBusy = true;
-            try {
-                await this.fetchActiveEmployeeCount(this.currentSubscription?.businessId ?? SIMULATED_BUSINESS_ID);
-                if (!this.seatUsageAvailable) return false;
-                if (plan.maxEmployees < this.assignedOperators) {
-                    this.checkoutOutcome = 'blocked';
-                    return false;
-                }
-                return true;
-            } finally {
-                this.checkoutBusy = false;
-            }
-        },
-        /** Stores browser approval evidence only; it cannot activate plans or update seat limits. */
-        recordPayPalApproval({ providerSubscriptionId, planId }) {
-            if (!providerSubscriptionId || !this.plans.some(plan => plan.id === planId)) {
-                this.setCheckoutOutcome('error');
-                return;
-            }
-            this.checkoutApproval = {
-                businessId: this.currentSubscription?.businessId ?? SIMULATED_BUSINESS_ID,
-                providerSubscriptionId, planId
-            };
-            this.checkoutBusy = false;
-            this.checkoutOutcome = 'approved';
-        },
-        setCheckoutOutcome(outcome) {
-            this.checkoutBusy = false;
-            this.checkoutOutcome = outcome;
-        },
-        /** Schedules the subscription cancellation at period end. @returns {Promise<boolean>} True when applied. */
-        async cancelSubscription() {
-            if (!this.currentSubscription || this.checkoutBusy) return false;
-            this.errorMessage = null;
-            const next = {
-                ...SubscriptionAssembler.toResource(this.currentSubscription),
-                cancelAtPeriodEnd: true
-            };
-            try {
-                const api = new PaymentsApi();
-                const response = await api.updateSubscription(next.id, next);
-                this.currentSubscription = SubscriptionAssembler.toDomain(response.data);
-                this.simulated.subscription = false;
-            } catch {
-                this.errorMessage = 'payments.errors.save';
-                return false;
-            }
+    function restorePending() {
+        try {
+            const value = JSON.parse(sessionStorage.getItem(storageKey(capture())) ?? 'null');
+            if (value && value.businessId === apiContext.businessId && value.userId === apiContext.userId
+                && typeof value.checkoutId === 'string' && typeof value.providerSubscriptionId === 'string'
+                && typeof value.planId === 'string') checkoutApproval.value = value;
+        } catch { /* Ignore unavailable or invalid storage. */ }
+    }
+    function resetContext() {
+        generation++; request++;
+        plans.value = []; currentSubscription.value = null; invoices.value = [];
+        activeEmployees.value = 0; reservedSeats.value = 0; seatUsageAvailable.value = false;
+        isLoading.value = false; hasLoaded.value = false; errorMessage.value = null;
+        checkoutBusy.value = false; checkoutApproval.value = null; checkoutOutcome.value = null; checkout.value = null;
+    }
+    watch(() => [apiContext.userId, apiContext.businessId, apiContext.status], resetContext, { flush: 'sync' });
+    function ownedSubscription(dto, scope) {
+        if (!dto || dto.businessId !== scope.businessId) throw new Error('Invalid subscription scope.');
+        return SubscriptionAssembler.toDomain(dto);
+    }
+    async function fetchPaymentsData() {
+        if (checkoutBusy.value) return false;
+        const scope = capture(), id = ++request;
+        const valid = () => current(scope) && request === id;
+        isLoading.value = true; errorMessage.value = null;
+        try {
+            const businessId = requireBusinessId();
+            const [catalog, subscription, billing, seats] = await Promise.all([
+                api.getPlans(), api.getSubscription(businessId), api.getBillingHistory(businessId), api.getSeatUsage(businessId),
+            ]);
+            const parsedPlans = PlanAssembler.toDomainList(catalog.data);
+            const parsedSubscription = subscription.status === 204 ? null : ownedSubscription(subscription.data, scope);
+            if (!Array.isArray(billing.data) || billing.data.some(item => item.businessId !== businessId)) throw new Error('Invalid billing history.');
+            const parsedBilling = InvoiceAssembler.toDomainList(billing.data);
+            if (![seats.data.activeEmployees, seats.data.reservedSeats].every(value => Number.isInteger(value) && value >= 0)) throw new Error('Invalid seat usage.');
+            if (!valid()) return false;
+            plans.value = parsedPlans; currentSubscription.value = parsedSubscription; invoices.value = parsedBilling;
+            activeEmployees.value = seats.data.activeEmployees; reservedSeats.value = seats.data.reservedSeats; seatUsageAvailable.value = true;
+            hasLoaded.value = true; restorePending(); return true;
+        } catch (error) {
+            if (valid()) errorMessage.value = error.apiError?.messageKey ?? 'payments.errors.subscriptionLoad';
+            return false;
+        } finally { if (valid()) isLoading.value = false; }
+    }
+    async function preparePayPalCheckout(planId) {
+        if (checkoutBusy.value || checkoutApproval.value || isLoading.value) return false;
+        const scope = capture(), plan = plans.value.find(item => item.id === planId);
+        if (!plan) return false;
+        errorMessage.value = null; checkoutOutcome.value = null; checkoutBusy.value = true;
+        try {
+            requireBusinessId();
+            const { data } = await api.getSeatUsage(scope.businessId);
+            if (!current(scope)) return false;
+            if (![data.activeEmployees, data.reservedSeats].every(value => Number.isInteger(value) && value >= 0)) throw new Error('Invalid seats.');
+            activeEmployees.value = data.activeEmployees; reservedSeats.value = data.reservedSeats; seatUsageAvailable.value = true;
+            if (assignedOperators.value > plan.maxEmployees) { checkoutOutcome.value = 'blocked'; return false; }
             return true;
+        } catch (error) {
+            if (current(scope)) { seatUsageAvailable.value = false; errorMessage.value = error.apiError?.messageKey ?? 'payments.errors.seatUsageLoad'; }
+            return false;
+        } finally { if (current(scope)) checkoutBusy.value = false; }
+    }
+    async function beginCheckout(planId) {
+        if (checkoutBusy.value || checkoutApproval.value) throw new Error('Checkout is unavailable.');
+        const scope = capture(); requireBusinessId(); checkoutBusy.value = true;
+        try {
+            const change = currentSubscription.value?.status === 'active' && !isSimulated.value;
+            const { data } = await api.beginCheckout(scope.businessId, planId, change);
+            if (!current(scope)) throw new Error('The selected account changed.');
+            if (data.planId !== planId || typeof data.checkoutId !== 'string' || !data.checkoutId
+                || typeof data.paypalPlanId !== 'string' || !data.paypalPlanId || !Number.isFinite(Date.parse(data.expiresAt))
+                || Date.parse(data.expiresAt) <= Date.now() || (!data.subscriptionId && data.customId !== data.checkoutId))
+                throw new Error('Invalid checkout response.');
+            checkout.value = { ...data, businessId: scope.businessId, userId: scope.userId }; return { ...data };
+        } catch (error) {
+            if (current(scope)) { checkoutBusy.value = false; errorMessage.value = error.apiError?.messageKey ?? 'payments.paypal.error'; }
+            throw error;
         }
     }
+    async function recordPayPalApproval({ providerSubscriptionId, checkoutId }) {
+        const pending = checkout.value;
+        if (!pending || pending.checkoutId !== checkoutId || !providerSubscriptionId
+            || pending.userId !== apiContext.userId || pending.businessId !== apiContext.businessId
+            || (pending.subscriptionId && pending.subscriptionId !== providerSubscriptionId)) return false;
+        checkoutApproval.value = { ...pending, providerSubscriptionId };
+        savePending(capture(), checkoutApproval.value);
+        checkoutBusy.value = false;
+        return verifyPending();
+    }
+    async function verifyPending() {
+        if (!checkoutApproval.value || checkoutBusy.value) return false;
+        const scope = capture(), approval = { ...checkoutApproval.value };
+        checkoutBusy.value = true; checkoutOutcome.value = 'verifying'; errorMessage.value = null;
+        let verified = false;
+        try {
+            requireBusinessId();
+            const { data } = await api.verify(scope.businessId, approval);
+            const subscription = ownedSubscription(data, scope);
+            if (subscription.planId !== approval.planId || subscription.status !== 'active' || subscription.isSimulated)
+                throw new Error('The subscription has not been verified.');
+            if (!current(scope)) return false;
+            currentSubscription.value = subscription; checkoutApproval.value = null; checkout.value = null;
+            savePending(scope, null); checkoutOutcome.value = 'approved'; verified = true;
+        } catch (error) {
+            if (current(scope)) {
+                checkoutOutcome.value = 'pending';
+                errorMessage.value = error.apiError?.messageKey ?? 'payments.errors.verification';
+            }
+        } finally { if (current(scope)) checkoutBusy.value = false; }
+        if (verified && current(scope)) await fetchPaymentsData();
+        return verified && current(scope);
+    }
+    function setCheckoutOutcome(value) {
+        checkoutBusy.value = false;
+        checkoutOutcome.value = checkoutApproval.value ? 'pending' : value;
+    }
+    async function cancelSubscription() {
+        if (!currentSubscription.value || checkoutBusy.value || isSimulated.value) return false;
+        const scope = capture(); checkoutBusy.value = true; errorMessage.value = null;
+        try {
+            requireBusinessId();
+            const { data } = await api.cancel(scope.businessId);
+            const saved = ownedSubscription(data, scope);
+            if (!current(scope)) return false;
+            currentSubscription.value = saved; return true;
+        } catch (error) {
+            if (current(scope)) errorMessage.value = error.apiError?.messageKey ?? 'payments.errors.save';
+            return false;
+        } finally { if (current(scope)) checkoutBusy.value = false; }
+    }
+    return { plans, currentSubscription, invoices, activeEmployees, reservedSeats, seatUsageAvailable, hasLoaded, isLoading,
+        errorMessage, checkoutBusy, checkoutApproval, checkoutOutcome, currentPlan, assignedOperators, memberLimit, isSimulated,
+        paymentHistory, fetchPaymentsData, preparePayPalCheckout, beginCheckout, recordPayPalApproval, verifyPending,
+        setCheckoutOutcome, cancelSubscription, resetContext };
 });

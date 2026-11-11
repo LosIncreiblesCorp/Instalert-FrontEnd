@@ -399,13 +399,15 @@
     "errors": {
       "subscriptionLoad": "No se pudo cargar la suscripción. Inténtalo nuevamente.",
       "seatUsageLoad": "No se pudieron consultar los cupos ocupados y reservados. Actualiza antes de cambiar de plan.",
-      "save": "No se pudo guardar el cambio de suscripción. Inténtalo nuevamente."
+      "save": "No se pudo guardar el cambio de suscripción. Inténtalo nuevamente.",
+      "verification": "Todavía no se pudo confirmar el pago. Puedes reintentar la verificación sin volver a pagar."
     },
     "status": {
       "active": "Activa",
       "past_due": "Vencida",
       "canceled": "Cancelada",
-      "trialing": "Prueba"
+      "trialing": "Prueba",
+      "expired": "Vencida"
     },
     "statusPaid": "Pagado",
     "tiers": {
@@ -457,17 +459,19 @@
       "selectedPlan": "Plan seleccionado",
       "checkoutHelp": "Completa la autorización de la suscripción en PayPal. Volverás a InstAlert al terminar.",
       "checkoutTitle": "Continuar con PayPal",
-      "sandboxNotice": "PayPal Sandbox: solo suscripciones de prueba. Los datos de suscripción de InstAlert, la cancelación y las facturas siguen siendo simulados.",
+      "sandboxNotice": "PayPal Sandbox utiliza pagos de prueba.",
       "loading": "Cargando PayPal…",
       "loadError": "No se pudo cargar PayPal. Revisa tu conexión e inténtalo nuevamente.",
       "configurationError": "PayPal no está disponible para este plan. Inténtalo más tarde.",
       "retry": "Reintentar",
-      "approved": "Se recibió la autorización en PayPal.",
+      "approved": "Pago verificado. Tu suscripción está activa.",
       "canceled": "Se canceló la autorización en PayPal. Tu plan actual no cambió.",
       "error": "PayPal no pudo completar la autorización. Tu plan actual no cambió.",
       "blocked": "Los cupos ocupados y reservados superan este plan. Selecciona otro.",
       "fundingHelp": "Gestiona la fuente de fondos desde tu cuenta de comprador Sandbox. InstAlert no solicita datos de tarjeta. Abrir PayPal no confirma aquí una actualización del medio de pago.",
-      "manageFunding": "Gestionar medios de pago de prueba en PayPal (abre otra pestaña)"
+      "manageFunding": "Gestionar medios de pago de prueba en PayPal (abre otra pestaña)",
+      "verifying": "Verificando el pago con el servidor...",
+      "pending": "Aprobación recibida. La verificación del pago está pendiente; no vuelvas a pagar."
     },
     "methodTitle": "Método de pago",
     "methodPrimary": "PRINCIPAL",
@@ -485,7 +489,12 @@
     "cancelSubscription": "Cancelar renovación",
     "confirmCancelTitle": "Cancelar suscripción",
     "confirmCancelMessage": "¿Programar la cancelación al fin del periodo? Mantienes el acceso hasta entonces.",
-    "cancelScheduled": "Cancelación programada para fin de periodo."
+    "cancelScheduled": "Cancelación programada para fin de periodo.",
+    "refresh": "Actualizar",
+    "retryVerification": "Volver a verificar el pago",
+    "demoSubscription": "El plan actual es de demostración. No corresponde a un pago confirmado por PayPal.",
+    "periodEnd": "Fin del período: {date}",
+    "planUnavailable": "No disponible por ahora"
   },
   "alerts": {
     "workflow": {
