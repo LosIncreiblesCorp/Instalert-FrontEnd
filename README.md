@@ -86,27 +86,42 @@ src/
 - Uses `useAlertStore` to orchestrate panic activation, grace-period countdown, report drafts and history queries.
 - Routes: base `alert-routes.js` (`alerts`) remapped to `/employee/*` in `src/router.js`, plus `/admin/alerts/history`.
 
+Alert uses the server's `POST alerts/panic-preparations` response to start the countdown. Cancelling removes the local preparation and sends no confirmation; no alert or incident report is created. Confirmation uses `POST alerts/panic` with the same preparation token on retries. A saved commerce location is used initially; device location requires browser permission. Manually changing a report address clears its old coordinates.
+
+Resolution (`POST alerts/{id}/resolution`), draft saving (`PUT alerts/{id}/report-draft`) and completion (`POST alerts/{id}/report-completion`) are separate commands. Draft saves are serialized and preserve later edits while a previous save is in flight. A completed panic remains resolved. Alert responses contain lifecycle data without event revisions; the store orders draft saves and rejects responses from an old account or commerce context. Non-panic reports use `POST alerts/reports`; submitted records are read-only.
+
+History follows the API pagination for the resolved commerce ID. Administrators can read the commerce's history; employees can resume only their own pending reports. The grace period is read/saved through `alert-preferences/{userId}`. Changing it can be saved explicitly or when starting the panic countdown. Preparations are retained in session storage for a reload under the same account and commerce; changing either clears timers, preparations and drafts, and old responses are discarded.
+
 ### Business Context
 - Owns the business profile, operational memberships and staff invitations.
 - Uses `Business`, `BusinessMember` and `StaffInvitation` entities.
-- Uses `useBusinessStore` for invitation create/delete and membership toggle use cases.
+- Uses `useBusinessStore` for commerce updates, invitations, employee details and membership activation/deactivation.
 - Routes in `business-routes.js`: `/admin/business`, `/admin/personnel`, `/admin/personnel/invitations/new`.
 
 ### Contacts Context
 - Manages employee emergency contacts.
 - Uses `EmergencyContact` entity and `useContactsStore` for fetch/create/update/delete.
 - Routes in `contacts-routes.js`: `/employee/contacts`, `/employee/contacts/new`, `/employee/contacts/:id/edit`.
+- Uses `GET/POST emergency-contacts` and `GET/PUT/DELETE emergency-contacts/{id}`. Ownership comes from the caller's `User-Id`; bodies contain only `fullName`, `relationship`, `phone`, `email` and `notes`.
+- Reads the shared demonstration account rather than a separate contact owner ID. Contact state is cleared when account or commerce changes; late requests cannot overwrite the new context or a more recently selected contact.
+- Names and relationships are required, phones are normalized to 7–15 digits with an optional leading `+`, email is optional and notes allow up to 140 characters. Empty email is sent as `null`.
+- Forms preserve entered values on errors and ask before leaving with unsaved changes. Server field errors are localized; an unavailable list is not presented as an empty successful result. Deletion requires the confirmation dialog; cancelling keeps the record.
+- The backend enforces active operational membership and contact ownership. This feature stores contact details; it does not create accounts or send email. Notification delivery is a separate integration.
 
 ### Mapping Context
-- Manages risk polygons, incident markers and business locations on a Mapbox map.
-- Uses `RiskZone`, `IncidentMarker` and `BusinessLocation` entities.
-- Uses `useMappingStore` to load zones/incidents and keep selection state.
-- Presentation splits container (`risk-map-page.vue`) from map primitives (`risk-map.vue`, `tactical-inspector.vue`, `zone-detail.vue`).
+- Queries `mapping/incidents`, `mapping/businesses` and `mapping/risk-zones` from the ASP.NET API.
+- The server resolves the commerce center and applies radius (100, 500 or 1000 meters), category and date filters.
+- Keeps alert kind separate from incident category. Risk-zone counts and classification windows are supplied by Mapping.
+- Refreshes every 15 seconds while the map page is visible. Account or commerce changes clear the snapshot and discard late responses; a failed refresh preserves the current snapshot.
+- Mapbox renders the geography. The explorer also makes incidents, businesses and zones available through keyboard navigation.
 
 ### Payments Context
-- Owns the plan catalog, subscriptions, transactions and employee limits associated with each plan.
-- Uses `Plan`, `Subscription` and `usePaymentsStore` for catalog and subscription workflows.
-- Presents monthly plans, PayPal Sandbox checkout, subscription status and payment history.
+- Loads the three monthly USD plans, current subscription, seat usage and billing history from the ASP.NET API.
+- Uses `plans`, `businesses/{id}/seats`, `businesses/{id}/subscription` and `businesses/{id}/billing-history`.
+- Opens checkout or a plan change through the backend. The returned provider plan and checkout correlation are passed to the PayPal Sandbox SDK.
+- Browser approval remains pending until server verification succeeds. Pending approval is retained per account and commerce in session storage; verification can be retried without paying again.
+- Uses the dedicated cancellation command. A development subscription is identified as demonstration data and cannot be canceled through PayPal.
+- No local catalog or payment-history fallback is used. Provider secrets stay on the server; only the Sandbox client ID belongs in Vite configuration.
 - Routes in `payments-routes.js`: `/admin/subscription`.
 
 ### Profiles Context
@@ -121,16 +136,21 @@ src/
 - Uses `Notification`, `NotificationPreferences`, `NotificationsApi`, assemblers and `useNotificationsStore`.
 - The header bell opens the inbox with an unread count, all/unread filters and read-state actions. A gear opens preferences in a modal dialog.
 - Nearby-alert preferences use radii of 100, 500 or 1000 meters (initially 500), measured from the business's saved location.
-- The current JSON Server flow refreshes in-app notices while the application is visible.
+- Uses `GET notifications?businessId=...&page=...&pageSize=100`, `POST notifications/{id}/reading` and `GET/PUT notification-preferences/{userId}?businessId=...`. Preferences send only `nearbyAlertsEnabled` and `nearbyRadiusMeters`; read timestamps are assigned by the server.
+- Loads the entire paginated inbox for the resolved commerce. The server selects recipients and measures distances; the browser does not create notifications or derive recipients from Alert resources.
+- Refreshes every 15 seconds while the application is visible and resumes immediately when the tab becomes visible. The header badge works across module pages. New unread arrivals after the initial load display a dismissible notice; dismissing it does not mark it as read.
+- Changing the demonstration account or commerce clears the inbox, preferences, notices and pending request state. Late responses cannot populate another account. A failed refresh preserves received data and shows an error; it is not treated as an empty inbox.
+- Preferences apply to future delivery and do not remove previously received notifications. Notices are delivery history and can remain after the source panic has been resolved.
+- Backend in-app generation requires `Workers__Enabled=true` to process committed alert events. External email remains a separate server transport; no provider key is exposed to the frontend.
 - Routes in `notifications-routes.js`: `/admin/notifications` and `/employee/notifications`.
 
 ### Dashboard Context
-- Owns read projections and monthly report snapshots; source records remain with their original contexts.
-- Uses DashboardSummary, MonthlyReport, DashboardApi, DashboardAssembler and useDashboardStore.
-- Provides current-month summaries by role with accessible charts, current alert state and team capacity where applicable.
-- The administrator opens saved monthly reports from Dashboard; each detail preserves its closing counts, charts and previous-month comparison.
-- Its infrastructure adapter composes JSON Server resources for local development; views consume store actions.
-- Routes in dashboard-routes.js: /admin/dashboard, /employee/dashboard, /admin/monthly-reports and /admin/monthly-reports/:reportId.
+- Reads the current-month projection from `GET businesses/{id}/dashboard`; metrics and series are calculated by the backend for the caller's role.
+- Administrators create immutable report snapshots using `POST businesses/{id}/reports` with inclusive `startDate` and `endDate` values (`YYYY-MM-DD`).
+- Reads saved reports from `GET businesses/{id}/reports` and `GET businesses/{id}/reports/{reportId}`. Multiple snapshots may use the same date range.
+- Report schema version 2 includes its requested dates, effective cutoff and a comparison with the preceding interval of equal duration. There is no automatic monthly closing job.
+- Clears data when the account or commerce changes, rejects late responses and retains the current summary if a refresh fails.
+- Existing route names are retained: `/admin/dashboard`, `/employee/dashboard`, `/admin/monthly-reports` and `/admin/monthly-reports/:reportId`.
 
 ### Shared Context
 Provides reusable infrastructure and presentation utilities.
@@ -160,43 +180,19 @@ Provides reusable infrastructure and presentation utilities.
 ## Running the Project
 
 ### Prerequisites
-- Node.js + npm installed (use versions compatible with Vite 8).
 
-### 1) Install dependencies
-```bash
+Node.js/npm and the ASP.NET backend running with its HTTP launch profile on port 5221. The two demonstration actors and their commerce must be available in the backend database.
+
+```powershell
 npm install
-```
-
-### 2) Start mock API server (`json-server`)
-From the project root:
-```bash
-npm run dev:api
-```
-
-This command works in PowerShell and starts JSON Server with the resource routes required by the frontend. Stop any existing JSON Server on port 3000 before running it. Starting with only `--watch db.json` omits the `/api/v1/*` rewrite and makes individual resource URLs fail.
-
-The server reads:
-- `server/db.json`
-- `server/routes.json` (maps `/api/v1/*` to root resources)
-
-Default local API base used by development env:
-- `http://localhost:3000/api/v1`
-
-### 3) Start the Vue app
-In a separate terminal, from the project root:
-```bash
 npm run dev
 ```
 
-### 4) Build for production
-```bash
-npm run build
-```
+Vite defaults to port 5173. The API connection is configured in `.env.development` as `http://localhost:5221/api/v1`.
 
-### 5) Preview production build
-```bash
-npm run preview
-```
+For a production build, supply the future ASP.NET API URL through `VITE_INSTALERT_PLATFORM_API_URL`, including `/api/v1`, then run `npm run build`. See the deployment configuration below. `npm run preview` serves the resulting build.
+
+The `server/` directory and JSON Server dependency remain for the module adapters that have not yet been integrated. They are not used by Shared, Alert, Business, Contacts, Notifications or Profiles. Those adapters will be adapted in separate features.
 
 ## Environment Variables
 Environment files included:
@@ -207,13 +203,12 @@ Main variables:
 - `VITE_INSTALERT_PLATFORM_API_URL`
 - `VITE_MAPBOX_API_KEY`
 - `VITE_PRIME_UI_LICENSE_KEY`
-- `VITE_PAYPAL_ENVIRONMENT`, `VITE_PAYPAL_CLIENT_ID` and the monthly PayPal plan ID variables configure Sandbox checkout.
+- `VITE_PAYPAL_ENVIRONMENT` and `VITE_PAYPAL_CLIENT_ID` configure Sandbox checkout. Provider plan IDs are returned by the backend checkout command.
 API resource paths are configured in both environment files:
 
 | Variable | Configured resource path |
 |---|---|
 | `VITE_ALERTS_ENDPOINT_PATH` | `alerts` |
-| `VITE_ALERT_PREFERENCES_ENDPOINT_PATH` | `alertPreferences` |
 | `VITE_BUSINESS_MEMBERS_ENDPOINT_PATH` | `business-members` |
 | `VITE_STAFF_INVITATIONS_ENDPOINT_PATH` | `staff-invitations` |
 | `VITE_BUSINESSES_ENDPOINT_PATH` | `businesses` |
@@ -223,21 +218,17 @@ API resource paths are configured in both environment files:
 | `VITE_SUBSCRIPTIONS_ENDPOINT_PATH` | `subscriptions` |
 | `VITE_PAYMENT_METHODS_ENDPOINT_PATH` | `payment-methods` |
 | `VITE_INVOICES_ENDPOINT_PATH` | `invoices` |
-| `VITE_USER_PROFILES_ENDPOINT_PATH` | `user-profiles` |
-| `VITE_USER_PREFERENCES_ENDPOINT_PATH` | `user-preferences` |
 | `VITE_NOTIFICATIONS_ENDPOINT_PATH` | `notifications` |
-| `VITE_NOTIFICATION_PREFERENCES_ENDPOINT_PATH` | `notification-preferences` |
 | `VITE_DASHBOARD_ENDPOINT_PATH` | `dashboard` |
 | `VITE_MONTHLY_REPORTS_ENDPOINT_PATH` | `monthly-reports` |
-| `VITE_EMERGENCY_CONTACTS_ENDPOINT_PATH` | `emergency-contacts` |
 
-The API base URL includes the API prefix when required; resource paths are relative to it. Development uses the local JSON Server at `http://localhost:3000/api/v1`; production uses the configured hosted mock URL.
+The API base URL includes `/api/v1`; resource paths are relative to it. Development uses the ASP.NET backend on port 5221. Production requires an explicit build-time API URL; the former hosted mock is not the deployment default.
 
 Missing API configuration raises an error rather than falling back to hard-coded resource names. Restart Vite after changing environment variables, or rebuild for production. All `VITE_*` values are exposed to the browser.
 
 Tip: if your API is running on a different port, update `VITE_INSTALERT_PLATFORM_API_URL` in `.env.development`.
 
-VITE_DASHBOARD_DATA_SOURCE=mock selects the local resource-composition adapter for Dashboard.
+Dashboard always consumes the ASP.NET API; it does not aggregate JSON Server collections in the browser.
 
 ## Routing Notes
 - Router exposes role-scoped trees: `/admin/*` (`administrator`) and `/employee/*` (`employee`). `/` shows the demonstration profile selector; `/admin` and `/employee` redirect to their respective dashboards.
@@ -254,21 +245,17 @@ The current frontend consumes the following adapter projections. HTTP access and
 
 | Consumer | Source owner | Adapter result consumed by the frontend |
 |---|---|---|
-| Business | Payments | `BusinessApi.getPlanLimits(businessId)` returns `{ maxEmployees, planName, subscriptionActive }`. |
+| Business | Business API | `GET businesses/{id}/seats` returns the server-calculated limit, active employees, reservations, available seats and subscription status. |
 | Payments | Business | `PaymentsApi.getSeatUsage(businessId)` returns `{ activeEmployees, reservedSeats }`; administrators are excluded and pending invitations reserve seats. |
 | Mapping | Business | Business location assemblers map `{ id, name, address, isVerified, latitude, longitude }` into Mapping's own location model. |
 
 JSON Server supplies raw collections; infrastructure adapters compose the snapshots consumed by their contexts. These frontend data shapes describe the current mock integration.
 
-The Business profile currently uses the following mock operations through `VITE_BUSINESSES_ENDPOINT_PATH`:
+Business and Profiles use the ASP.NET contracts directly. The commerce ID is resolved from the caller's context; registration sends no synthetic ID or audit metadata. Business updates use `PUT businesses/{id}`, and personal data uses `GET/PUT profiles/{userId}`. Preferences use `GET/PUT profiles/{userId}/preferences`.
 
-| Operation | Current mock contract |
-|---|---|
-| Load profile | `GET businesses/:id` returns a business resource. Only a `404` enables registration; connection/server failures show an error. |
-| Register | `POST businesses` sends the synthetic commerce ID, `taxId` as text, name, address, numeric coordinates and mock metadata. |
-| Edit | `PATCH businesses/:id` sends name, address, coordinates and `updatedAt`; it preserves the registered RUC, verification flag and unrelated stored fields. |
+Staff and invitations are queried under `businesses/{id}/members` and `businesses/{id}/invitations`. Invitation creation uses `POST businesses/{id}/invitations`; edits use `PUT staff-invitations/{id}`, while cancellation and resend use their dedicated POST commands. Membership edits use `PUT business-members/{id}`; activation/deactivation use dedicated POST commands. Memberships and invitation history are retained, with no deletion actions.
 
-The demonstration context uses `bus-1` and `demo-employee` as identifiers, which do not provide authentication or authorization. Address entry does not perform geocoding: the user selects the map point, and Business stores its coordinates for geographic projections.
+Only the fixed demonstration accounts are available in this delivery. Staff invitations reserve seats and request delivery, but they do not create access credentials or IAM accounts. Address entry does not perform geocoding: the user selects the map point, and Business stores its coordinates.
 
 ## Documentation
 - Domain and architecture references:
@@ -282,3 +269,28 @@ The demonstration context uses `bus-1` and `demo-employee` as identifiers, which
 - Preserve layer boundaries (presentation does not call raw HTTP clients directly).
 - Prefer explicit domain language in naming and docs.
 - Add or update docs when introducing new entities or use cases.
+
+
+## ASP.NET shared connection
+
+The shared HTTP client now uses the ASP.NET API. Development defaults to `http://localhost:5221/api/v1`, matching its HTTP launch profile; Vite uses port 5173. Starting JSON Server is not required for this connection. Alert, Business, Contacts, Notifications and Profiles use this connection; the other module adapters remain pending their respective integration features.
+
+The profile selector retains two fixed demonstration actors: administrator → `synthetic-admin`, employee → `synthetic-employee`. Every request reads the current actor and sends `User-Id` plus `Accept-Language` (`en-US` or `es-419`). This is a demonstration selector, without registration, passwords or IAM. Switching profiles clears the shared commerce context and rejects responses belonging to the previous actor.
+
+Before opening a role view, the router resolves its commerce through `GET businesses`. The context stores the returned ID and location; it does not assume `bus-1`. An empty employee result is checked against `GET business-members/me` to distinguish an inactive membership. Connection failures, missing/ambiguous assignments and inactive membership have localized messages and a retry action. `currentApiContext()` and `requireBusinessId()` are available to module adapters as they are integrated.
+
+Shared error normalization preserves the original HTTP response and adds `apiError` with status, domain code, field validation and a translation key; `getApiErrorMessage()` produces the localized message.
+
+### Deployment configuration
+
+No public ASP.NET URL is configured yet. Supply `VITE_INSTALERT_PLATFORM_API_URL` when building, including `/api/v1`. A production build without this value fails with a configuration message instead of silently targeting the hosted JSON mock. For a same-origin reverse proxy, set `/api/v1` only if that proxy has been configured.
+
+```powershell
+$env:VITE_INSTALERT_PLATFORM_API_URL = 'https://YOUR-BACKEND-HOST/api/v1'
+npm run build
+```
+
+On the demonstration backend, configure `Demo__Enabled=true` and `Cors__AllowedOrigins__0` with the exact frontend origin. Keep provider credentials on the server. These settings do not deploy either application.
+
+
+Shared, Alert, Business, Contacts, Notifications and Profiles are connected to the ASP.NET API. Payments, Mapping and Dashboard retain their pending integration work. IAM, employee account provisioning and checkout integration are outside these features.

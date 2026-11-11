@@ -8,6 +8,6 @@ export class UserProfileAssembler {
 
     static toChanges(profile) {
         return { firstName: profile.firstName, lastName: profile.lastName, dni: profile.dni,
-            phone: profile.phone, updatedAt: new Date().toISOString() };
+            phone: profile.phone };
     }
 }

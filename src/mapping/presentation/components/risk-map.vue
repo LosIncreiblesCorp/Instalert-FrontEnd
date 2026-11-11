@@ -6,10 +6,12 @@
 /** Mapbox presentation of heat zones supplied by Mapping and individual incident markers. */
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { incidentTitle } from '../mapping-format.js';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const props = defineProps({
+  center: { type: Object, required: true },
   riskZones: { type: Array, required: true },
   incidents: { type: Array, required: true },
   businesses: { type: Array, required: true },
@@ -68,7 +70,7 @@ function drawMapData() {
         entry = { id: resource.id, type, element, marker: new mapboxgl.Marker({ element }).setLngLat([resource.longitude, resource.latitude]).addTo(map) };
         markers.set(key, entry);
       }
-      const label = t('mapping.actions.openItem', { name: resource.title || resource.name || t('mapping.notRecorded') });
+      const label = t('mapping.actions.openItem', { name: type === 'incident' ? incidentTitle(resource, t) : resource.name || t('mapping.notRecorded') });
       entry.element.setAttribute('role', 'button');
       entry.element.setAttribute('aria-label', label);
       entry.element.title = label;
@@ -88,7 +90,7 @@ function updateLabels() {
   attribution?.setAttribute('title', t('mapping.actions.attribution'));
 }
 function onLoad() {
-  if (disposed) return;
+  if (disposed || ready) return;
   map.addSource('mapping-zones', { type: 'geojson', data: zoneData() });
   map.addLayer({ id: 'mapping-zone-fill', type: 'fill', source: 'mapping-zones', minzoom: 14,
     paint: { 'fill-color': riskColor, 'fill-opacity': 0.15 } });
@@ -118,6 +120,9 @@ function focusItem(item, type) {
 defineExpose({ focusItem });
 watch(() => [props.riskZones, props.incidents, props.businesses], drawMapData, { deep: true });
 watch(() => [props.selectedItemId, props.selectedType], updateSelection);
+watch(() => [props.center?.latitude, props.center?.longitude], () => {
+  if (map && props.center) map.easeTo({ center: [props.center.longitude, props.center.latitude], duration: 0 });
+});
 watch(locale, () => {
   updateLabels();
   drawMapData();
@@ -128,11 +133,11 @@ onMounted(() => {
     if (!token) { emit('map-error'); return; }
     mapboxgl.accessToken = token;
     map = new mapboxgl.Map({ container: mapElement.value, style: 'mapbox://styles/mapbox/streets-v12',
-      center: [-77.0428, -12.0464], zoom: 13, locale: {
+      center: [props.center.longitude, props.center.latitude], zoom: 14, locale: {
         'AttributionControl.ToggleAttribution': t('mapping.actions.attribution'), 'Map.Title': t('mapping.mapLabel'),
       } });
     updateLabels();
-    map.on('load', onLoad);
+    map.on('style.load', onLoad);
     map.on('error', () => { if (!disposed) emit('map-error'); });
     resizeObserver = new ResizeObserver(() => { if (!disposed) map.resize(); });
     resizeObserver.observe(mapElement.value);
@@ -152,8 +157,8 @@ onUnmounted(() => {
 .map-container { height: 100%; width: 100%; }
 .mapping-marker { display: flex; justify-content: center; align-items: center; cursor: pointer; padding: 0;
   border-radius: 50%; box-shadow: 0 2px 4px #0005; }
-.mapping-marker.marker-incident { background: white; border: 2px solid #dc2626; color: #dc2626; width: 28px; height: 28px; }
-.mapping-marker.marker-business { background: #2563eb; color: white; border: 2px solid white; width: 32px; height: 32px; }
-.mapping-marker.selected { outline: 3px solid #172033; outline-offset: 3px; z-index: 1; }
+.mapping-marker.marker-incident { z-index: 2; background: white; border: 2px solid #dc2626; color: #dc2626; width: 28px; height: 28px; }
+.mapping-marker.marker-business { z-index: 1; background: #2563eb; color: white; border: 2px solid white; width: 32px; height: 32px; }
+.mapping-marker.selected { outline: 3px solid #172033; outline-offset: 3px; z-index: 3; }
 .mapping-marker:focus-visible { outline: 3px solid #172033; outline-offset: 4px; }
 </style>

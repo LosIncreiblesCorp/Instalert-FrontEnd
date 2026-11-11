@@ -1,66 +1,20 @@
-import { BaseApi } from "../../shared/infrastructure/base-api.js";
-import { BaseEndpoint } from "../../shared/infrastructure/base-endpoint.js";
+import { BaseApi } from '../../shared/infrastructure/base-api.js';
 
-/**
- * @typedef {Object} BusinessSeatUsageSnapshot
- * @property {number} activeEmployees - Active operational memberships; excludes administrators.
- * @property {number} reservedSeats - Pending invitations reserving a seat.
- */
-
-export class PaymentsApi {
-    constructor() {
-        const baseApi = new BaseApi();
-        this.plansEndpoint = new BaseEndpoint(baseApi, import.meta.env.VITE_PLANS_ENDPOINT_PATH);
-        this.subscriptionsEndpoint = new BaseEndpoint(baseApi, import.meta.env.VITE_SUBSCRIPTIONS_ENDPOINT_PATH);
-        this.paymentMethodsEndpoint = new BaseEndpoint(baseApi, import.meta.env.VITE_PAYMENT_METHODS_ENDPOINT_PATH);
-        this.membersEndpoint = new BaseEndpoint(baseApi, import.meta.env.VITE_BUSINESS_MEMBERS_ENDPOINT_PATH);
-        this.invitationsEndpoint = new BaseEndpoint(baseApi, import.meta.env.VITE_STAFF_INVITATIONS_ENDPOINT_PATH);
-        this.invoicesEndpoint = new BaseEndpoint(baseApi, import.meta.env.VITE_INVOICES_ENDPOINT_PATH);
+export class PaymentsApi extends BaseApi {
+    subscriptionPath(businessId) { return `businesses/${encodeURIComponent(businessId)}/subscription`; }
+    getPlans() { return this.http.get('plans'); }
+    getSubscription(businessId) { return this.http.get(this.subscriptionPath(businessId)); }
+    getSeatUsage(businessId) { return this.http.get(`businesses/${encodeURIComponent(businessId)}/seats`); }
+    getBillingHistory(businessId) { return this.http.get(`businesses/${encodeURIComponent(businessId)}/billing-history`); }
+    beginCheckout(businessId, planId, change) {
+        return this.http.post(this.subscriptionPath(businessId) + (change ? '/plan-change' : '/checkout'), { planId });
     }
-
-    getPlans() {
-        return this.plansEndpoint.getAll();
+    verify(businessId, approval) {
+        return approval.subscriptionId
+            ? this.http.post(this.subscriptionPath(businessId) + '/plan-change/verification', { checkoutId: approval.checkoutId })
+            : this.http.post(this.subscriptionPath(businessId) + '/verification', {
+                checkoutId: approval.checkoutId, subscriptionId: approval.providerSubscriptionId,
+            });
     }
-
-    getSubscriptionById(id) {
-        return this.subscriptionsEndpoint.getById(id);
-    }
-
-    getSubscriptions(businessId) {
-        return this.subscriptionsEndpoint.http.get(this.subscriptionsEndpoint.endpointPath, { params: { businessId } });
-    }
-
-    /**
-     * Builds the frontend seat-usage projection from mock Business resources.
-     * @param {string|number} businessId - Commerce identifier.
-     * @returns {Promise<BusinessSeatUsageSnapshot>} Counts consumed by Payments without a Business store dependency.
-     */
-    async getSeatUsage(businessId) {
-        const http = this.subscriptionsEndpoint.http;
-        const [membersResponse, invitationsResponse] = await Promise.all([
-            http.get(this.membersEndpoint.endpointPath, { params: { businessId } }),
-            http.get(this.invitationsEndpoint.endpointPath, { params: { businessId } })
-        ]);
-        const members = Array.isArray(membersResponse.data) ? membersResponse.data : membersResponse.data?.members;
-        const invitations = Array.isArray(invitationsResponse.data) ? invitationsResponse.data : invitationsResponse.data?.invitations;
-        if (!Array.isArray(members) || !Array.isArray(invitations)) throw new Error('Invalid seat usage response');
-        const belongsToBusiness = record => String(record.businessId) === String(businessId);
-        return {
-            activeEmployees: members.filter(member => belongsToBusiness(member)
-                && member.role === 'Operative' && member.status === 'active').length,
-            reservedSeats: invitations.filter(invitation => belongsToBusiness(invitation) && invitation.status === 'pending').length
-        };
-    }
-
-    updateSubscription(id, resource) {
-        return this.subscriptionsEndpoint.update(id, resource);
-    }
-
-    getPaymentMethods() {
-        return this.paymentMethodsEndpoint.getAll();
-    }
-
-    getInvoices() {
-        return this.invoicesEndpoint.getAll();
-    }
+    cancel(businessId) { return this.http.post(this.subscriptionPath(businessId) + '/cancellation'); }
 }

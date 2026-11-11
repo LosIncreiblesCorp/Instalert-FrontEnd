@@ -4,6 +4,9 @@ import { Subscription } from "../domain/model/subscription.entity.js";
 export class SubscriptionAssembler {
     /** Converts a subscription DTO to domain. @param {Object} dto - Subscription resource. @returns {import('../domain/model/subscription.entity.js').Subscription} Domain subscription. */
     static toDomain(dto) {
+        if (!dto || typeof dto.id !== 'string' || typeof dto.businessId !== 'string' || typeof dto.planId !== 'string'
+            || typeof dto.status !== 'string' || typeof dto.cancelAtPeriodEnd !== 'boolean'
+            || (dto.currentPeriodEnd !== null && !Number.isFinite(Date.parse(dto.currentPeriodEnd)))) throw new Error('Invalid subscription resource.');
         return new Subscription({
             id: dto.id,
             businessId: dto.businessId,
@@ -11,7 +14,8 @@ export class SubscriptionAssembler {
             status: dto.status,
             currentPeriodEnd: dto.currentPeriodEnd,
             cancelAtPeriodEnd: dto.cancelAtPeriodEnd ?? false,
-            maxEmployees: dto.maxEmployees
+            maxEmployees: dto.maxEmployees,
+            isSimulated: dto.isSimulated === true
         });
     }
 

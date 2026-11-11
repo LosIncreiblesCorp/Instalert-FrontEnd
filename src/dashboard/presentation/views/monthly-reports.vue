@@ -1,23 +1,33 @@
 <template>
   <section class="monthly-page" aria-labelledby="monthly-title">
     <header class="page-header"><div><RouterLink :to="{ name: reportId ? 'admin-monthly-reports' : 'admin-dashboard' }" class="back-link"><i class="pi pi-arrow-left" aria-hidden="true"></i>{{ t(reportId ? 'dashboard.monthly.backToHistory' : 'dashboard.monthly.backToDashboard') }}</RouterLink>
-      <h1 ref="heading" id="monthly-title" tabindex="-1">{{ report ? t('dashboard.monthly.reportFor', { month: monthLabel(report.month) }) : t(reportId ? 'dashboard.monthly.detailTitle' : 'dashboard.monthly.title') }}</h1><p class="page-description">{{ t(reportId ? 'dashboard.monthly.detailHelp' : 'dashboard.monthly.historyHelp') }}</p></div>
+      <h1 ref="heading" id="monthly-title" tabindex="-1">{{ report ? rangeLabel(report) : t(reportId ? 'dashboard.monthly.detailTitle' : 'dashboard.monthly.title') }}</h1><p class="page-description">{{ t(reportId ? 'dashboard.monthly.detailHelp' : 'dashboard.monthly.historyHelp') }}</p></div>
       <pv-button type="button" icon="pi pi-refresh" :label="t('dashboard.refresh')" :loading="loading" :disabled="loading" @click="reload" />
     </header>
     <p v-if="loading" role="status" class="loading-note"><i class="pi pi-spin pi-spinner" aria-hidden="true"></i>{{ t('dashboard.monthly.loading') }}</p>
     <pv-message v-if="error" severity="error" :closable="false" role="alert">{{ t(error) }} <button type="button" class="text-link" :disabled="loading" @click="reload">{{ t('dashboard.retry') }}</button></pv-message>
     <template v-if="!reportId">
+      <form class="report-generator" @submit.prevent="generate">
+        <h2>{{ t('dashboard.reports.createTitle') }}</h2>
+        <div class="report-generator-fields">
+          <label for="report-start">{{ t('dashboard.reports.startDate') }}<input id="report-start" v-model="startDate" type="date" min="2000-01-01" :max="endDate || today" required :disabled="store.isGenerating" /></label>
+          <label for="report-end">{{ t('dashboard.reports.endDate') }}<input id="report-end" v-model="endDate" type="date" :min="startDate || '2000-01-01'" :max="today" required :disabled="store.isGenerating" /></label>
+          <pv-button type="submit" icon="pi pi-file" :label="t('dashboard.reports.generate')" :loading="store.isGenerating" :disabled="store.isGenerating" />
+        </div>
+        <p>{{ t('dashboard.reports.help') }}</p>
+        <pv-message v-if="store.generationError" severity="error" :closable="false" role="alert">{{ t(store.generationError) }}</pv-message>
+      </form>
       <div class="history-filter"><label for="report-month">{{ t('dashboard.monthly.filter') }}<input id="report-month" v-model="selectedMonth" type="month" min="2000-01" /></label><pv-button v-if="selectedMonth" type="button" text :label="t('dashboard.monthly.clearFilter')" @click="selectedMonth = ''" /></div>
       <div v-if="store.historyLoaded && !filteredReports.length" class="empty-card"><i class="pi pi-file" aria-hidden="true"></i><h2>{{ t(selectedMonth ? 'dashboard.monthly.noMatch' : 'dashboard.monthly.emptyTitle') }}</h2><p>{{ t('dashboard.monthly.emptyHelp') }}</p></div>
       <div v-else-if="filteredReports.length" class="report-list">
-        <article v-for="item in filteredReports" :key="item.id" class="report-card"><div class="report-icon" aria-hidden="true"><i class="pi pi-file"></i></div><div class="report-copy"><h2>{{ monthLabel(item.month) }}</h2><p>{{ t('dashboard.monthly.generatedAt', { date: formatDate(item.generatedAt) }) }}</p><span class="source-label">{{ t('dashboard.monthly.source.' + item.generationSource) }}</span></div><RouterLink :to="{ name: 'admin-monthly-report', params: { reportId: item.id } }" class="open-report">{{ t('dashboard.monthly.open') }}<span class="sr-only">: {{ monthLabel(item.month) }}</span><i class="pi pi-arrow-right" aria-hidden="true"></i></RouterLink></article>
+        <article v-for="item in filteredReports" :key="item.id" class="report-card"><div class="report-icon" aria-hidden="true"><i class="pi pi-file"></i></div><div class="report-copy"><h2>{{ rangeLabel(item) }}</h2><p>{{ t('dashboard.monthly.generatedAt', { date: formatDate(item.generatedAt) }) }}</p><span class="source-label">{{ t('dashboard.monthly.source.' + item.generationSource) }}</span></div><RouterLink :to="{ name: 'admin-monthly-report', params: { reportId: item.id } }" class="open-report">{{ t('dashboard.monthly.open') }}<span class="sr-only">: {{ rangeLabel(item) }}</span><i class="pi pi-arrow-right" aria-hidden="true"></i></RouterLink></article>
       </div>
     </template>
     <template v-else-if="report">
       <pv-message v-if="report.summary.warnings.length" severity="warn" :closable="false">{{ t('dashboard.monthly.partial') }}<ul><li v-for="warning in report.summary.warnings" :key="warning">{{ t('dashboard.warnings.' + warning) }}</li></ul></pv-message>
       <div class="report-metrics"><article><span>{{ t('dashboard.metrics.reports') }}</span><strong>{{ number(report.summary.metrics.reports) }}</strong><small>{{ t('dashboard.monthly.duringPeriod') }}</small></article><article><span>{{ t('dashboard.metrics.nearby') }}</span><strong>{{ number(report.summary.metrics.nearbyIncidents) }}</strong><small>{{ t('dashboard.filters.meters', { count: report.summary.radiusMeters }) }}</small></article><article><span>{{ t('dashboard.metrics.active') }}</span><strong>{{ number(report.summary.metrics.activeAlerts) }}</strong><small>{{ t('dashboard.monthly.atClosing') }}</small></article><article><span>{{ t('dashboard.metrics.pending') }}</span><strong>{{ number(report.summary.metrics.pendingReports) }}</strong><small>{{ t('dashboard.monthly.atClosing') }}</small></article></div>
       <section class="closing-summary" aria-labelledby="monthly-comparison-title"><h2 id="monthly-comparison-title">{{ t('dashboard.monthly.comparison') }}</h2>
-        <dl class="comparison-counts"><div><dt>{{ monthLabel(report.month) }}</dt><dd>{{ number(report.summary.metrics.reports) }}</dd></div><div><dt>{{ previousMonth }}</dt><dd>{{ number(report.summary.metrics.previousReports) }}</dd></div></dl>
+        <dl class="comparison-counts"><div><dt>{{ rangeLabel(report) }}</dt><dd>{{ number(report.summary.metrics.reports) }}</dd></div><div><dt>{{ previousMonth }}</dt><dd>{{ number(report.summary.metrics.previousReports) }}</dd></div></dl>
         <p class="comparison-value">{{ comparison }}</p><p>{{ t('dashboard.monthly.comparisonHelp') }}</p>
       </section>
       <div class="report-charts"><DashboardChart id="monthly-daily" type="line" :title="t('dashboard.charts.dailyTitle')" :description="t('dashboard.charts.dailyHelp')" :series="dailySeries" /><DashboardChart id="monthly-categories" horizontal :title="t('dashboard.charts.categoriesTitle')" :description="t('dashboard.charts.categoriesHelp')" :series="categorySeries" /><DashboardChart id="monthly-statuses" :title="t('dashboard.charts.statusTitle')" :description="t('dashboard.monthly.statusHelp')" :series="statusSeries" /><DashboardChart id="monthly-risk" :title="t('dashboard.charts.riskTitle')" :description="t('dashboard.charts.riskHelp')" :series="riskSeries" /></div>
@@ -28,19 +38,27 @@
 
 <script setup>
 import { ref, computed, watch, nextTick } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useDashboardStore } from '../../application/dashboard.store.js';
-import { dashboardTimeZone } from '../../domain/model/dashboard-summary.entity.js';
+import { apiContext } from '../../../shared/infrastructure/api-context.js';
+import { dashboardTimeZone, dashboardDateKey } from '../../domain/model/dashboard-summary.entity.js';
 import DashboardChart from '../components/dashboard-chart.vue';
-const route = useRoute(), store = useDashboardStore();
+const route = useRoute(), router = useRouter(), store = useDashboardStore();
 const { t, te, locale } = useI18n();
 const selectedMonth = ref(''), heading = ref(null);
+const today = dashboardDateKey(Date.now());
+const startDate = ref(today.slice(0, 7) + '-01'), endDate = ref(today);
+const rangeLabel = report => t('dashboard.periodRange', { start: formatDay(report.startDate + 'T12:00:00Z'), end: formatDay(report.endDate + 'T12:00:00Z') });
+async function generate() {
+  const id = await store.generateReport(startDate.value, endDate.value);
+  if (id) await router.push({ name: 'admin-monthly-report', params: { reportId: id } });
+}
 const reportId = computed(() => route.params.reportId ?? null);
 const report = computed(() => store.monthlyReport);
 const loading = computed(() => reportId.value ? store.isDetailLoading : store.isHistoryLoading);
 const error = computed(() => reportId.value ? store.detailError : store.historyError);
-const filteredReports = computed(() => store.monthlyReports.filter(item => !selectedMonth.value || item.month === selectedMonth.value));
+const filteredReports = computed(() => store.monthlyReports.filter(item => !selectedMonth.value || item.startDate.slice(0, 7) <= selectedMonth.value && item.endDate.slice(0, 7) >= selectedMonth.value));
 const number = value => value === null || value === undefined ? '—' : new Intl.NumberFormat(locale.value === 'es' ? 'es-419' : 'en-US').format(value);
 const formatDate = value => new Intl.DateTimeFormat(locale.value === 'es' ? 'es-419' : 'en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: dashboardTimeZone }).format(new Date(value));
 const formatDay = value => new Intl.DateTimeFormat(locale.value === 'es' ? 'es-419' : 'en-US', { dateStyle: 'medium', timeZone: dashboardTimeZone }).format(new Date(value));
@@ -51,7 +69,7 @@ const categorySeries = computed(() => report.value?.summary.categories?.map(row 
 const statusSeries = computed(() => report.value?.summary.statuses?.map(row => ({ label: translated('dashboard.status.', row.key), value: row.value })) ?? null);
 const colors = { low: '#10b981', medium: '#d97706', high: '#dc2626', unknown: '#64748b' };
 const riskSeries = computed(() => report.value?.summary.riskCounts?.map(row => ({ label: translated('dashboard.risk.', row.key), value: row.value, color: colors[row.key] })) ?? null);
-const previousMonth = computed(() => report.value ? new Intl.DateTimeFormat(locale.value === 'es' ? 'es-419' : 'en-US', { year: 'numeric', month: 'long', timeZone: dashboardTimeZone }).format(new Date(report.value.summary.period.previousStart)) : '');
+const previousMonth = computed(() => report.value ? t('dashboard.periodRange', { start: formatDay(report.value.summary.period.previousStart), end: formatDay(new Date(Date.parse(report.value.summary.period.previousEnd) - 1)) }) : '');
 const comparison = computed(() => {
   if (!report.value || report.value.summary.metrics.previousReports === null || report.value.summary.metrics.reports === null) return t('dashboard.comparisonUnavailable');
   const current = report.value.summary.metrics.reports, previous = report.value.summary.metrics.previousReports;
@@ -62,16 +80,21 @@ const comparison = computed(() => {
   return t(current > previous ? 'dashboard.monthly.increased' : 'dashboard.monthly.decreased', { value, month: previousMonth.value });
 });
 function reload() { return reportId.value ? store.loadMonthlyReport(reportId.value) : store.loadMonthlyReports(); }
-watch([() => route.meta.role, reportId], async ([role], previous, onCleanup) => {
+watch([() => apiContext.role, () => apiContext.userId, () => apiContext.businessId, () => apiContext.status, reportId], async ([role], previous, onCleanup) => {
   let current = true;
   onCleanup(() => { current = false; });
-  store.setContext(role);
   if (role !== 'administrator') return;
   await reload(); await nextTick(); if (current) heading.value?.focus();
 }, { immediate: true });
 </script>
 
 <style scoped>
+.report-generator { background: white; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; margin: 20px 0; }
+.report-generator h2 { font-size: 18px; margin-top: 0; }
+.report-generator p { color: #475569; font-size: 13px; line-height: 1.6; }
+.report-generator-fields { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px; }
+.report-generator-fields label { display: grid; gap: 8px; font-size: 13px; }
+.report-generator-fields input { min-height: 42px; border: 1px solid #cbd5e1; border-radius: 5px; padding: 8px; background: white; color: #172033; }
 .monthly-page { max-width: 1500px; margin: auto; padding: clamp(20px, 3vw, 36px); color: #172033; }
 .page-header { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; margin-bottom: 26px; } .back-link { display: inline-flex; align-items: center; gap: 7px; color: #1d4ed8; font-size: 12px; text-decoration: none; margin-bottom: 16px; }
 h1 { margin: 0; font-size: clamp(25px, 3vw, 32px); letter-spacing: -.035em; } h1:focus { outline: none; } .page-description { color: #64748b; font-size: 14px; line-height: 1.7; max-width: 650px; margin: 10px 0 0; }

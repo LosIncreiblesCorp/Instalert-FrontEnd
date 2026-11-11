@@ -21,11 +21,13 @@ export const IncidentCategory = Object.freeze({
 export class IncidentMarker {
 /** Creates an incident marker entity.
 * @param {Object} params - Incident marker fields. */
-    constructor({ id, title, description, type, status, latitude, longitude, reportedAt }) {
+    constructor({ id, title, description, type, category, businessId, status, latitude, longitude, reportedAt }) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.type = type;
+        this.category = category;
+        this.businessId = businessId;
         this.status = status;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -38,7 +40,7 @@ export class IncidentMarker {
     }
 
     matchesFilters({ category = 'all', since = null, until = null } = {}) {
-        if (category !== 'all' && this.type !== category) return false;
+        if (category !== 'all' && this.category !== category) return false;
         const timestamp = this.reportedAt?.getTime();
         if (since !== null && (!Number.isFinite(timestamp) || timestamp < since)) return false;
         if (until !== null && (!Number.isFinite(timestamp) || timestamp > until)) return false;

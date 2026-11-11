@@ -7,7 +7,7 @@ import { formatDate, formatMoney, planPrice } from "../payments-format.js";
 const props = defineProps({
   subscription: { type: Object, required: true },
   plan: { type: Object, default: null },
-  currency: { type: String, default: "PEN" },
+  currency: { type: String, default: "USD" },
   assignedOperators: { type: Number, default: 0 }
 });
 
@@ -63,8 +63,8 @@ const daysLeft = computed(() => {
             <p class="current-sub__rate-price">
               {{ rateText }} <span>{{ $t("payments.perMonth") }}</span>
             </p>
-            <p class="current-sub__rate-renew">
-              {{ $t("payments.renewal", { date: renewalDate, count: daysLeft }) }}
+            <p v-if="subscription.currentPeriodEnd" class="current-sub__rate-renew">
+              {{ $t(subscription.isActive && !subscription.cancelAtPeriodEnd ? "payments.renewal" : "payments.periodEnd", { date: renewalDate, count: daysLeft }) }}
             </p>
           </div>
         </div>

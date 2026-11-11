@@ -1,27 +1,19 @@
 import { EmergencyContact } from '../domain/model/emergency-contact.entity.js';
 
-/** Maps emergency-contact resources to domain entities.
-* @class EmergencyContactAssembler */
+/** Maps owned contact resources and sends only editable fields. */
 export class EmergencyContactAssembler {
-/** Converts one resource into a domain entity.
-* @param {Object} resource - Emergency-contact resource.
-* @returns {EmergencyContact} Mapped entity. */
-    static toEntityFromResource(resource) { return new EmergencyContact(resource); }
-
-/** Converts an HTTP response into an entity list.
-* @param {import('axios').AxiosResponse} response - Contacts collection response.
-* @returns {EmergencyContact[]} Mapped entities. */
-    static toEntitiesFromResponse(response) {
-        const resources = Array.isArray(response.data) ? response.data : response.data?.contacts;
-        if (!Array.isArray(resources)) throw new Error('contacts.errors.load');
-        return resources.map(resource => this.toEntityFromResource(resource));
+    static toEntityFromResource(resource) {
+        if (!resource || typeof resource.id !== 'string' || !resource.id || typeof resource.employeeId !== 'string'
+            || !resource.employeeId || !['fullName', 'relationship', 'phone', 'notes'].every(key => typeof resource[key] === 'string')
+            || (resource.email != null && typeof resource.email !== 'string')) throw new Error('contacts.errors.invalidResponse');
+        return new EmergencyContact(resource);
     }
-
-/** Converts a domain entity into a persistence resource.
-* @param {EmergencyContact} entity - Emergency-contact entity.
-* @returns {Object} Writable resource. */
+    static toEntitiesFromResponse(response) {
+        if (!Array.isArray(response.data)) throw new Error('contacts.errors.invalidResponse');
+        return response.data.map(resource => this.toEntityFromResource(resource));
+    }
     static toResourceFromEntity(entity) {
-        const { id, employeeId, fullName, relationship, phone, email, notes, createdAt, updatedAt } = entity;
-        return { ...(id == null ? {} : { id }), employeeId, fullName, relationship, phone, email, notes, createdAt, updatedAt };
+        const { fullName, relationship, phone, email, notes } = entity;
+        return { fullName, relationship, phone, email: email || null, notes };
     }
 }

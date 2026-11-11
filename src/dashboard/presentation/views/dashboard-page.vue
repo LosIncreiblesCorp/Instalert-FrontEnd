@@ -64,6 +64,7 @@ import { computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { useDashboardStore } from '../../application/dashboard.store.js';
+import { apiContext } from '../../../shared/infrastructure/api-context.js';
 import { dashboardTimeZone } from '../../domain/model/dashboard-summary.entity.js';
 import DashboardChart from '../components/dashboard-chart.vue';
 const route = useRoute(), router = useRouter(), store = useDashboardStore();
@@ -115,7 +116,7 @@ const cards = computed(() => {
   ];
 });
 function reload() { return store.loadSummary(); }
-watch(() => route.meta.role, role => { store.setContext(role); void reload(); }, { immediate: true });
+watch(() => [apiContext.userId, apiContext.businessId, apiContext.status], () => { void reload(); }, { immediate: true });
 </script>
 
 <style scoped>

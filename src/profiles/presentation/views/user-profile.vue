@@ -49,6 +49,7 @@ async function savePreferences() { await store.updatePreferences(selectedLocale.
 watch(() => route.meta.role, role => {
   store.setContext(role);
   store.loadProfile();
+  store.loadPreferences();
 }, { immediate: true });
 watch(() => store.profile, () => {
   Object.assign(form, profileValues());

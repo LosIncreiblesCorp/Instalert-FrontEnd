@@ -13,6 +13,7 @@ const props = defineProps({
   // UI-level guard only: the quota counts active employees.
   // The definitive validation belongs to the backend.
   blocked: { type: Boolean, default: false },
+  unavailable: { type: Boolean, default: false },
   assignedOperators: { type: Number, default: 0 }
 });
 
@@ -30,7 +31,7 @@ const detailsOpen = ref(false);
 const detailsId = computed(() => `plan-details-${props.plan.id}`);
 const blockedHintId = computed(() => `plan-blocked-${props.plan.id}`);
 
-const tierAliases = { 'demo-basic': 'basic', 'demo-standard': 'professional', 'demo-extended': 'enterprise' };
+const tierAliases = { essential: 'basic', professional: 'professional', business: 'enterprise' };
 const tierId = computed(() => tierAliases[props.plan.id] ?? props.plan.id);
 const tierKey = computed(() => `payments.tiers.${tierId.value}`);
 const eyebrow = computed(() => (te(`${tierKey.value}.eyebrow`) ? t(`${tierKey.value}.eyebrow`) : ""));
@@ -43,10 +44,11 @@ const displayPrice = computed(() =>
     formatMoney(rawPrice.value, props.currency, locale.value)
 );
 
-const isDisabled = computed(() => props.selected || props.selecting || props.blocked);
+const isDisabled = computed(() => props.selected || props.selecting || props.blocked || props.unavailable);
 
 const ctaLabel = computed(() => {
   if (props.selected) return t("payments.inUse");
+  if (props.unavailable) return t("payments.planUnavailable");
   if (props.blocked) return t("payments.planBlocked");
   if (props.accent) return t("payments.upgradePlan", { name: props.plan.name });
   return t("payments.changePlan");

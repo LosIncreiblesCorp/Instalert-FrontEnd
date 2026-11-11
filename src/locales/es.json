@@ -102,7 +102,8 @@
       "limitsUnavailable": "Información del plan no disponible",
       "emptyEmployees": "No hay empleados para mostrar",
       "emptyInvitations": "No hay invitaciones para mostrar",
-      "emptyHelp": "Prueba otra búsqueda o actualiza la lista."
+      "emptyHelp": "Prueba otra búsqueda o actualiza la lista.",
+      "subscriptionActive": "Suscripción activa"
     },
     "invitation": {
       "title": "Nueva invitación",
@@ -129,7 +130,6 @@
       "confirmTitle": "Confirmar acción",
       "activate": "Activar",
       "deactivate": "Desactivar",
-      "delete": "Eliminar",
       "resend": "Reenviar",
       "cancelInvitation": "Cancelar invitación",
       "refresh": "Actualizar"
@@ -137,20 +137,17 @@
     "confirmations": {
       "activate": "¿Activar la membresía de {name}? Ocupará un cupo.",
       "deactivate": "¿Desactivar la membresía de {name}? Liberará un cupo.",
-      "deleteMember": "¿Eliminar la membresía de {name}? Se eliminará su relación con el comercio.",
-      "cancelInvitation": "¿Cancelar la invitación pendiente de {name}? Se liberará su cupo reservado.",
-      "deleteInvitation": "¿Eliminar la invitación cancelada de {name}?"
+      "cancelInvitation": "¿Cancelar la invitación pendiente de {name}? Se liberará su cupo reservado."
     },
     "messages": {
       "invitationCreated": "Invitación creada. Aparece en la pestaña Invitaciones.",
       "invitationCancelled": "Invitación cancelada. Su cupo reservado está disponible.",
       "updated": "Cambios guardados.",
       "membershipUpdated": "Membresía actualizada.",
-      "deleted": "Registro eliminado.",
-      "resendRecorded": "Solicitud de reenvío registrada."
+      "resendRecorded": "Reenvío solicitado. El servicio de correo procesará la entrega."
     },
     "errors": {
-      "businessRequired": "Debes seleccionar un comercio.",
+      "businessRequired": "No se pudo identificar tu comercio. Actualiza e inténtalo nuevamente.",
       "nameInvalid": "Ingresa un nombre de entre 1 y 100 caracteres.",
       "emailInvalid": "Ingresa un correo electrónico válido.",
       "invalidState": "El registro tiene un estado inválido.",
@@ -161,10 +158,10 @@
       "notFound": "El registro ya no está disponible. Actualiza la lista.",
       "administratorProtected": "Esta acción está disponible solo para empleados.",
       "invitationNotPending": "Solo se pueden editar, cancelar o reenviar invitaciones pendientes.",
-      "cancelBeforeDelete": "Cancela la invitación antes de eliminarla. No se pueden eliminar invitaciones aceptadas aquí.",
       "load": "No se pudo cargar el personal o el plan. Actualiza e inténtalo nuevamente.",
       "save": "No se pudo guardar el cambio. Inténtalo nuevamente.",
-      "overCapacity": "Los cupos ocupados y reservados superan el límite del plan. Libera cupos antes de agregar más."
+      "overCapacity": "Los cupos ocupados y reservados superan el límite del plan. Libera cupos antes de agregar más.",
+      "refreshAfterSave": "El cambio se guardó, pero no se pudo actualizar la lista. Actualízala antes de hacer otro cambio."
     }
   },
   "roles": {
@@ -180,7 +177,8 @@
       "24h": "Últimas 24h",
       "7d": "7 días",
       "30d": "30 días",
-      "all": "Todas las fechas"
+      "all": "Todas las fechas",
+      "radius": "Radio de búsqueda"
     },
     "incidentCategories": {
       "robbery": "Robo",
@@ -220,7 +218,8 @@
       "noLocation": "Este registro no tiene coordenadas válidas disponibles.",
       "unlocated": "Registros sin ubicación o límites de zona válidos: {count}. Consulta sus datos disponibles en Explorar datos del mapa.",
       "selectionFiltered": "El incidente seleccionado está fuera de los filtros actuales.",
-      "unavailable": "Este registro ya no está disponible. Actualiza los datos e inténtalo nuevamente."
+      "unavailable": "Este registro ya no está disponible. Actualiza los datos e inténtalo nuevamente.",
+      "noBusinessLocation": "Guarda la ubicación del comercio para explorar los incidentes cercanos."
     },
     "legend": {
       "title": "SIMBOLOGÍA DEL MAPA",
@@ -259,7 +258,16 @@
       "noZoneGeometry": "No están disponibles los límites de esta zona. No se pueden asociar reportes geográficamente.",
       "zoneReports": "Incidentes en la zona",
       "noZoneReports": "No hay incidentes en esta zona que coincidan con los filtros actuales.",
-      "readOnly": "Consulta de datos geográficos"
+      "readOnly": "Consulta de datos geográficos",
+      "classificationCount": "Incidentes usados para la clasificación: {count}",
+      "classificationWindow": "Período de clasificación: del {start} al {end}. Los filtros del mapa no cambian este período."
+    },
+    "zoneName": "Concentración de incidentes",
+    "kinds": {
+      "panic": "Alerta de pánico",
+      "past-incident": "Evento pasado",
+      "suspicious-activity": "Actividad sospechosa",
+      "other-situation": "Otra situación"
     }
   },
   "navigation": {
@@ -332,7 +340,8 @@
       "phoneHelp": "Ingresa entre 7 y 15 dígitos. Puedes incluir el código de país, por ejemplo +51.",
       "optional": "Opcional",
       "characters": "{count}/{max} caracteres",
-      "requiredHelp": "Los campos marcados con * son obligatorios."
+      "requiredHelp": "Los campos marcados con * son obligatorios.",
+      "unsavedChanges": "¿Salir de esta página y descartar los cambios del contacto sin guardar?"
     },
     "actions": {
       "add": "Agregar contacto",
@@ -353,7 +362,6 @@
       "deleted": "Contacto de emergencia eliminado."
     },
     "errors": {
-      "ownerRequired": "No se pudo identificar al empleado.",
       "nameInvalid": "Ingresa un nombre de entre 1 y 100 caracteres.",
       "relationshipInvalid": "Ingresa una relación de entre 1 y 60 caracteres.",
       "phoneInvalid": "Ingresa un teléfono válido de 7 a 15 dígitos, con código de país + opcional.",
@@ -361,7 +369,9 @@
       "notesInvalid": "Las notas pueden tener hasta 140 caracteres.",
       "notFound": "Este contacto ya no está disponible. Vuelve a tu lista de contactos.",
       "load": "No se pudieron cargar tus contactos. Actualiza e inténtalo nuevamente.",
-      "save": "No se pudo guardar el cambio. Inténtalo nuevamente."
+      "save": "No se pudo guardar el cambio. Inténtalo nuevamente.",
+      "invalidResponse": "El servicio devolvió datos de contacto inválidos. Actualiza e inténtalo nuevamente.",
+      "conflict": "El contacto cambió durante la operación. Revisa los datos actuales e inténtalo nuevamente."
     }
   },
   "payments": {
@@ -389,13 +399,15 @@
     "errors": {
       "subscriptionLoad": "No se pudo cargar la suscripción. Inténtalo nuevamente.",
       "seatUsageLoad": "No se pudieron consultar los cupos ocupados y reservados. Actualiza antes de cambiar de plan.",
-      "save": "No se pudo guardar el cambio de suscripción. Inténtalo nuevamente."
+      "save": "No se pudo guardar el cambio de suscripción. Inténtalo nuevamente.",
+      "verification": "Todavía no se pudo confirmar el pago. Puedes reintentar la verificación sin volver a pagar."
     },
     "status": {
       "active": "Activa",
       "past_due": "Vencida",
       "canceled": "Cancelada",
-      "trialing": "Prueba"
+      "trialing": "Prueba",
+      "expired": "Vencida"
     },
     "statusPaid": "Pagado",
     "tiers": {
@@ -447,17 +459,19 @@
       "selectedPlan": "Plan seleccionado",
       "checkoutHelp": "Completa la autorización de la suscripción en PayPal. Volverás a InstAlert al terminar.",
       "checkoutTitle": "Continuar con PayPal",
-      "sandboxNotice": "PayPal Sandbox: solo suscripciones de prueba. Los datos de suscripción de InstAlert, la cancelación y las facturas siguen siendo simulados.",
+      "sandboxNotice": "PayPal Sandbox utiliza pagos de prueba.",
       "loading": "Cargando PayPal…",
       "loadError": "No se pudo cargar PayPal. Revisa tu conexión e inténtalo nuevamente.",
       "configurationError": "PayPal no está disponible para este plan. Inténtalo más tarde.",
       "retry": "Reintentar",
-      "approved": "Se recibió la autorización en PayPal.",
+      "approved": "Pago verificado. Tu suscripción está activa.",
       "canceled": "Se canceló la autorización en PayPal. Tu plan actual no cambió.",
       "error": "PayPal no pudo completar la autorización. Tu plan actual no cambió.",
       "blocked": "Los cupos ocupados y reservados superan este plan. Selecciona otro.",
       "fundingHelp": "Gestiona la fuente de fondos desde tu cuenta de comprador Sandbox. InstAlert no solicita datos de tarjeta. Abrir PayPal no confirma aquí una actualización del medio de pago.",
-      "manageFunding": "Gestionar medios de pago de prueba en PayPal (abre otra pestaña)"
+      "manageFunding": "Gestionar medios de pago de prueba en PayPal (abre otra pestaña)",
+      "verifying": "Verificando el pago con el servidor...",
+      "pending": "Aprobación recibida. La verificación del pago está pendiente; no vuelvas a pagar."
     },
     "methodTitle": "Método de pago",
     "methodPrimary": "PRINCIPAL",
@@ -475,7 +489,12 @@
     "cancelSubscription": "Cancelar renovación",
     "confirmCancelTitle": "Cancelar suscripción",
     "confirmCancelMessage": "¿Programar la cancelación al fin del periodo? Mantienes el acceso hasta entonces.",
-    "cancelScheduled": "Cancelación programada para fin de periodo."
+    "cancelScheduled": "Cancelación programada para fin de periodo.",
+    "refresh": "Actualizar",
+    "retryVerification": "Volver a verificar el pago",
+    "demoSubscription": "El plan actual es de demostración. No corresponde a un pago confirmado por PayPal.",
+    "periodEnd": "Fin del período: {date}",
+    "planUnavailable": "No disponible por ahora"
   },
   "alerts": {
     "workflow": {
@@ -493,6 +512,7 @@
         "increase": "Aumentar segundos de gracia",
         "decrease": "Disminuir segundos de gracia",
         "saved": "Preferencia guardada.",
+        "save": "Guardar periodo de gracia",
         "failed": "No se pudo guardar la preferencia.",
         "invalid": "Ingresa un número entero entre 1 y 60."
       },
@@ -670,8 +690,10 @@
       "home": { "back": "Volver a Alertas" },
       "actions": { "retry": "Reintentar" },
       "errors": {
-        "requestFailed": "No se pudo comunicar con el servicio de alertas. Verifica que JSON Server esté ejecutándose e inténtalo de nuevo.",
-        "activationTitle": "No se pudo registrar la alerta activa"
+        "requestFailed": "No se pudo comunicar con el servicio de alertas. Se conservan tus cambios; inténtalo nuevamente.",
+        "activationTitle": "No se pudo registrar la alerta activa",
+        "invalidResponse": "El servicio de alertas devolvió una respuesta inválida. Actualiza e inténtalo nuevamente.",
+        "transition": "El estado de la alerta cambió o la preparación venció. Actualiza o inicia otra cuenta regresiva."
       }
     },
     "title": "Alertas",
@@ -985,7 +1007,7 @@
       "firstName": "Ingresa tus nombres con un máximo de 100 caracteres.",
       "lastName": "Ingresa tus apellidos con un máximo de 100 caracteres.",
       "dni": "Ingresa exactamente ocho dígitos.",
-      "phone": "Usa dígitos, espacios, +, paréntesis o guiones, con un máximo de 30 caracteres."
+      "phone": "Ingresa de 7 a 15 dígitos, opcionalmente con + al inicio. Puedes usar espacios, paréntesis y guiones."
     },
     "errors": {
       "profileMissing": "No hay un perfil personal disponible para esta cuenta.",
@@ -1008,7 +1030,7 @@
     "radius": "Radio de recepción",
     "radiusHelp": "La distancia se mide desde la ubicación guardada de tu negocio. Guardar cambios no elimina las notificaciones que ya recibiste.",
     "meters": "{value} m",
-    "businessCenter": "Ubicación de referencia: {name}. Usa las coordenadas guardadas en el perfil del negocio.",
+    "businessCenter": "Ubicación de referencia: {address}. Usa las coordenadas guardadas en el perfil del negocio.",
     "centerUnavailable": "La ubicación del negocio no está disponible. La recepción de alertas cercanas necesita coordenadas válidas en el perfil del negocio.",
     "discard": "Descartar cambios",
     "save": "Guardar preferencias",
@@ -1023,7 +1045,7 @@
     },
     "loadingInbox": "Cargando notificaciones…",
     "nearbyTitle": "Alerta activa cercana",
-    "nearbyMessage": "Se reportó una alerta activa cerca de tu negocio. Consulta la sección de alertas para conocer su estado actual.",
+    "nearbyMessage": "Se confirmó una alerta de pánico cerca de tu negocio. Este aviso registra su recepción; la situación puede haber cambiado desde entonces.",
     "generalTitle": "Aviso de InstAlert",
     "unread": "Sin leer",
     "read": "Leída",
@@ -1041,8 +1063,9 @@
       "preferencesLoad": "No se pudieron cargar tus preferencias de notificación. Inténtalo nuevamente.",
       "preferencesSave": "No se pudieron guardar tus preferencias. Tu configuración anterior sigue activa.",
       "invalidPreferences": "Elige un radio disponible y una preferencia de notificación válida.",
-      "feedLoad": "No se pudieron actualizar las notificaciones o la recepción de alertas cercanas. Revisa la conexión e inténtalo nuevamente.",
-      "markRead": "No se pudo marcar la notificación como leída. Inténtalo nuevamente."
+      "feedLoad": "No se pudieron actualizar las notificaciones. Revisa la conexión e inténtalo nuevamente.",
+      "markRead": "No se pudo marcar la notificación como leída. Inténtalo nuevamente.",
+      "invalidResponse": "El servicio devolvió datos de notificación inválidos. Actualiza e inténtalo nuevamente."
     }
   },
   "dashboard": {
@@ -1178,22 +1201,24 @@
       "summary": "No se pudo cargar o actualizar el dashboard. Los datos anteriores, si se muestran, conservan su fecha de actualización.",
       "history": "No se pudieron cargar o actualizar los reportes mensuales.",
       "reportMissing": "Este reporte mensual ya no está disponible.",
-      "detail": "No se pudo cargar el reporte mensual."
+      "detail": "No se pudo cargar el reporte mensual.",
+      "invalidRange": "Elige un rango válido que termine hoy o antes.",
+      "generate": "No se pudo generar el reporte. Intenta de nuevo."
     },
     "monthly": {
-      "title": "Reportes mensuales",
-      "detailTitle": "Detalle del reporte mensual",
-      "backToHistory": "Volver a reportes mensuales",
+      "title": "Reportes guardados",
+      "detailTitle": "Detalle del reporte",
+      "backToHistory": "Volver a reportes guardados",
       "backToDashboard": "Volver al dashboard",
-      "historyHelp": "Consulta los cierres mensuales guardados de tu negocio.",
-      "detailHelp": "Indicadores conservados para el periodo y la fecha de cierre del reporte.",
+      "historyHelp": "Consulta los reportes guardados o crea uno para un rango de fechas.",
+      "detailHelp": "Este reporte conserva la información disponible en su fecha de corte.",
       "statusHelp": "Estado de los reportes del periodo conservado al cierre.",
-      "loading": "Cargando reportes mensuales…",
+      "loading": "Cargando reportes…",
       "filter": "Filtrar por mes",
       "clearFilter": "Mostrar todos los meses",
-      "emptyTitle": "Aún no hay reportes mensuales",
+      "emptyTitle": "Aún no hay reportes guardados",
       "noMatch": "No hay reporte para este mes",
-      "emptyHelp": "Aquí aparecerán los cierres mensuales disponibles con sus indicadores guardados y fecha de generación.",
+      "emptyHelp": "Genera un reporte con el rango de fechas de arriba.",
       "open": "Ver reporte",
       "reportFor": "Reporte mensual · {month}",
       "generatedAt": "Generado: {date}",
@@ -1202,8 +1227,8 @@
       "partial": "Este reporte guardado identifica datos de origen no disponibles.",
       "duringPeriod": "Durante el periodo del reporte",
       "atClosing": "Al cierre",
-      "comparison": "Reportes registrados frente al mes anterior",
-      "comparisonHelp": "La variación compara el total de reportes registrados en ambos meses.",
+      "comparison": "Reportes registrados frente al intervalo anterior",
+      "comparisonHelp": "El intervalo anterior tiene la misma duración efectiva que este reporte.",
       "source": {
         "scheduled": "Cierre programado",
         "manual": "Solicitado por el administrador"
@@ -1211,11 +1236,38 @@
       "increased": "Se registraron un {value} % más de reportes que en {month}.",
       "decreased": "Se registraron un {value} % menos de reportes que en {month}.",
       "unchanged": "Se registró la misma cantidad de reportes que en {month}.",
-      "bothZero": "No se registraron reportes en ninguno de los dos meses.",
+      "bothZero": "No se registraron reportes en ninguno de los dos intervalos.",
       "noBaseline": "En {month} no se registraron reportes; no se calcula una variación porcentual.",
       "lessThanPointOne": "<0,1"
     },
     "summaryNearby": "Mes actual · a 500 metros",
-    "thisMonth": "Este mes"
+    "thisMonth": "Este mes",
+    "reports": {
+      "createTitle": "Crear un reporte",
+      "startDate": "Fecha inicial",
+      "endDate": "Fecha final",
+      "generate": "Generar reporte",
+      "help": "Ambas fechas se incluyen. Cada reporte guarda una instantánea y se compara con el intervalo anterior de igual duración."
+    }
+  },
+  "api": {
+    "connection": {
+      "loading": "Conectando con tu comercio…",
+      "retry": "Reintentar conexión",
+      "missing": "Esta cuenta de demostración no tiene un comercio asignado. Revisa los datos de demostración.",
+      "inactive": "Tu membresía está inactiva. Pide a tu administrador que la reactive.",
+      "ambiguous": "Esta cuenta de demostración está asociada a más de un comercio. Revisa los datos de demostración."
+    },
+    "errors": {
+      "validation": "Revisa la información ingresada.",
+      "unauthenticated": "La API no reconoció la cuenta de demostración seleccionada.",
+      "forbidden": "Esta cuenta de demostración no puede realizar esa operación.",
+      "notFound": "El recurso o la operación solicitada no está disponible.",
+      "conflict": "Los datos cambiaron o la operación no corresponde a su estado actual. Actualiza e inténtalo nuevamente.",
+      "busy": "Hay demasiadas solicitudes. Espera un momento e inténtalo nuevamente.",
+      "unavailable": "No se pudo conectar con la API o está temporalmente indisponible. Inténtalo nuevamente.",
+      "timeout": "La API tardó demasiado en responder. Inténtalo nuevamente.",
+      "unexpected": "No se pudo completar la solicitud. Inténtalo nuevamente."
+    }
   }
 }

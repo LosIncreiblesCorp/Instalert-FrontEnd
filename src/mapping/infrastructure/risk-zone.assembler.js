@@ -12,7 +12,10 @@ export class RiskZoneAssembler {
             id: dto.id,
             name: dto.name,
             riskLevel: dto.riskLevel,
-            bounds: dto.bounds
+            bounds: dto.bounds,
+            incidentCount: dto.incidentCount,
+            windowStart: dto.windowStart,
+            windowEnd: dto.windowEnd
         });
     }
 

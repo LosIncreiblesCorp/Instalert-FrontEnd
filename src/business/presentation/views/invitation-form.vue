@@ -67,7 +67,7 @@ async function createInvitation() {
 
             <div class="form-actions">
                 <pv-button type="submit" icon="pi pi-plus" :label="t('business.invitation.create')" :loading="store.isSaving"
-                    :disabled="busy || store.availableSeats === null || store.availableSeats === 0" />
+                    :disabled="busy || !store.personnelLoaded || !store.planLimits?.subscriptionActive || store.availableSeats === null || store.availableSeats === 0" />
                 <pv-button type="button" outlined :label="t('business.actions.cancel')" :disabled="store.isSaving"
                     @click="router.push({ name: 'admin-personnel' })" />
                 <pv-button v-if="store.errorMessage" type="button" text :label="t('business.actions.refresh')"

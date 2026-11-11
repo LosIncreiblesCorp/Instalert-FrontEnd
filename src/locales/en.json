@@ -102,7 +102,8 @@
       "limitsUnavailable": "Plan information unavailable",
       "emptyEmployees": "No employees to display",
       "emptyInvitations": "No invitations to display",
-      "emptyHelp": "Try a different search or refresh the list."
+      "emptyHelp": "Try a different search or refresh the list.",
+      "subscriptionActive": "Active subscription"
     },
     "invitation": {
       "title": "New invitation",
@@ -129,7 +130,6 @@
       "confirmTitle": "Confirm action",
       "activate": "Activate",
       "deactivate": "Deactivate",
-      "delete": "Delete",
       "resend": "Resend",
       "cancelInvitation": "Cancel invitation",
       "refresh": "Refresh"
@@ -137,20 +137,17 @@
     "confirmations": {
       "activate": "Activate the membership of {name}? This will occupy one seat.",
       "deactivate": "Deactivate the membership of {name}? This will free one seat.",
-      "deleteMember": "Delete the membership of {name}? This removes their association with the business.",
-      "cancelInvitation": "Cancel the pending invitation for {name}? This will release its reserved seat.",
-      "deleteInvitation": "Delete the cancelled invitation for {name}?"
+      "cancelInvitation": "Cancel the pending invitation for {name}? This will release its reserved seat."
     },
     "messages": {
       "invitationCreated": "Invitation created. It is listed under Invitations.",
       "invitationCancelled": "Invitation cancelled. Its reserved seat is now available.",
       "updated": "Changes saved.",
       "membershipUpdated": "Membership updated.",
-      "deleted": "Record deleted.",
-      "resendRecorded": "Resend request recorded."
+      "resendRecorded": "Resend requested. Delivery will be processed by the email service."
     },
     "errors": {
-      "businessRequired": "A business must be selected.",
+      "businessRequired": "Your business could not be resolved. Refresh and try again.",
       "nameInvalid": "Enter a name between 1 and 100 characters.",
       "emailInvalid": "Enter a valid email address.",
       "invalidState": "The record has an invalid state.",
@@ -161,10 +158,10 @@
       "notFound": "The record is no longer available. Refresh the list.",
       "administratorProtected": "This action is available only for employees.",
       "invitationNotPending": "Only pending invitations can be edited, cancelled or resent.",
-      "cancelBeforeDelete": "Cancel the invitation before deleting it. Accepted invitations cannot be deleted here.",
       "load": "Unable to load staff or plan information. Please refresh and try again.",
       "save": "Unable to save the change. Please try again.",
-      "overCapacity": "Occupied and reserved seats exceed the current plan limit. Free seats before adding more."
+      "overCapacity": "Occupied and reserved seats exceed the current plan limit. Free seats before adding more.",
+      "refreshAfterSave": "The change was saved, but the list could not be refreshed. Refresh before making another change."
     }
   },
   "roles": {
@@ -180,7 +177,8 @@
       "24h": "Last 24h",
       "7d": "7 days",
       "30d": "30 days",
-      "all": "All dates"
+      "all": "All dates",
+      "radius": "Search radius"
     },
     "incidentCategories": {
       "robbery": "Robbery",
@@ -220,7 +218,8 @@
       "noLocation": "No valid coordinates are available for this record.",
       "unlocated": "Records without a valid location or zone boundary: {count}. Consult their available details in Explore map data.",
       "selectionFiltered": "The selected incident is outside the current filters.",
-      "unavailable": "This record is no longer available. Refresh the data and try again."
+      "unavailable": "This record is no longer available. Refresh the data and try again.",
+      "noBusinessLocation": "Save the business location to explore nearby incidents."
     },
     "legend": {
       "title": "MAP LEGEND",
@@ -259,7 +258,16 @@
       "noZoneGeometry": "The zone boundary is unavailable. Reports cannot be associated geographically.",
       "zoneReports": "Incidents in the zone",
       "noZoneReports": "No incidents in this zone match the current filters.",
-      "readOnly": "Geographical read projection"
+      "readOnly": "Geographical read projection",
+      "classificationCount": "Incidents used for classification: {count}",
+      "classificationWindow": "Classification window: {start} to {end}. Map filters do not change this window."
+    },
+    "zoneName": "Incident concentration",
+    "kinds": {
+      "panic": "Panic alert",
+      "past-incident": "Past incident",
+      "suspicious-activity": "Suspicious activity",
+      "other-situation": "Other situation"
     }
   },
   "navigation": {
@@ -332,7 +340,8 @@
       "phoneHelp": "Enter 7–15 digits. You can include the country code, for example +51.",
       "optional": "Optional",
       "characters": "{count}/{max} characters",
-      "requiredHelp": "Fields marked with * are required."
+      "requiredHelp": "Fields marked with * are required.",
+      "unsavedChanges": "Leave this page and discard your unsaved contact changes?"
     },
     "actions": {
       "add": "Add contact",
@@ -353,7 +362,6 @@
       "deleted": "Emergency contact deleted."
     },
     "errors": {
-      "ownerRequired": "The employee could not be identified.",
       "nameInvalid": "Enter a name between 1 and 100 characters.",
       "relationshipInvalid": "Enter a relationship between 1 and 60 characters.",
       "phoneInvalid": "Enter a valid phone number with 7–15 digits and an optional + country code.",
@@ -361,7 +369,9 @@
       "notesInvalid": "Notes can contain up to 140 characters.",
       "notFound": "This contact is no longer available. Return to your contacts list.",
       "load": "Unable to load your contacts. Please refresh and try again.",
-      "save": "Unable to save the change. Please try again."
+      "save": "Unable to save the change. Please try again.",
+      "invalidResponse": "The service returned invalid contact data. Refresh and try again.",
+      "conflict": "The contact changed during the operation. Review the latest details and try again."
     }
   },
   "payments": {
@@ -389,13 +399,15 @@
     "errors": {
       "subscriptionLoad": "Unable to load the subscription. Please try again.",
       "seatUsageLoad": "Unable to check occupied and reserved seats. Refresh before changing plans.",
-      "save": "Unable to save the subscription change. Please try again."
+      "save": "Unable to save the subscription change. Please try again.",
+      "verification": "Payment could not be confirmed yet. You can retry verification without paying again."
     },
     "status": {
       "active": "Active",
       "past_due": "Past due",
       "canceled": "Canceled",
-      "trialing": "Trial"
+      "trialing": "Trial",
+      "expired": "Expired"
     },
     "statusPaid": "Paid",
     "tiers": {
@@ -447,17 +459,19 @@
       "selectedPlan": "Selected plan",
       "checkoutHelp": "Complete the subscription authorization in PayPal. You will return to InstAlert when you finish.",
       "checkoutTitle": "Continue with PayPal",
-      "sandboxNotice": "PayPal Sandbox: test subscriptions only. InstAlert subscription data, cancellation and invoices are still simulated.",
+      "sandboxNotice": "PayPal Sandbox uses test payments.",
       "loading": "Loading PayPal…",
       "loadError": "Unable to load PayPal. Check your connection and try again.",
       "configurationError": "PayPal is not available for this plan. Please try again later.",
       "retry": "Retry",
-      "approved": "Authorization received in PayPal.",
+      "approved": "Payment verified. Your subscription is active.",
       "canceled": "PayPal approval was canceled. Your current plan has not changed.",
       "error": "PayPal could not complete approval. Your current plan has not changed.",
       "blocked": "Seat usage exceeds this plan capacity. Choose another plan.",
       "fundingHelp": "Manage the funding source in your Sandbox buyer account. InstAlert does not collect card details. Opening PayPal does not confirm a payment method update here.",
-      "manageFunding": "Manage test payment methods in PayPal (opens a new tab)"
+      "manageFunding": "Manage test payment methods in PayPal (opens a new tab)",
+      "verifying": "Verifying the payment with the server...",
+      "pending": "Approval received. Payment verification is pending; do not pay again."
     },
     "methodTitle": "Payment method",
     "methodPrimary": "PRIMARY",
@@ -475,7 +489,12 @@
     "cancelSubscription": "Cancel renewal",
     "confirmCancelTitle": "Cancel subscription",
     "confirmCancelMessage": "Schedule cancellation at period end? You keep access until then.",
-    "cancelScheduled": "Cancellation scheduled for end of period."
+    "cancelScheduled": "Cancellation scheduled for end of period.",
+    "refresh": "Refresh",
+    "retryVerification": "Verify payment again",
+    "demoSubscription": "The current plan is demonstration data. It is not a confirmed PayPal payment.",
+    "periodEnd": "Period end: {date}",
+    "planUnavailable": "Not available right now"
   },
   "alerts": {
     "workflow": {
@@ -493,6 +512,7 @@
         "increase": "Increase grace period",
         "decrease": "Decrease grace period",
         "saved": "Preference saved.",
+        "save": "Save grace period",
         "failed": "The preference could not be saved.",
         "invalid": "Enter a whole number from 1 to 60."
       },
@@ -670,8 +690,10 @@
       "home": { "back": "Back to Alerts" },
       "actions": { "retry": "Retry" },
       "errors": {
-        "requestFailed": "Could not reach the alert service. Check that JSON Server is running and try again.",
-        "activationTitle": "The active alert could not be registered"
+        "requestFailed": "Unable to reach the alert service. Your changes are preserved; try again.",
+        "activationTitle": "The active alert could not be registered",
+        "invalidResponse": "The alert service returned an invalid response. Refresh and try again.",
+        "transition": "The alert state changed or the preparation expired. Refresh or start a new countdown."
       }
     },
     "title": "Alerts",
@@ -985,7 +1007,7 @@
       "firstName": "Enter a first name of up to 100 characters.",
       "lastName": "Enter a last name of up to 100 characters.",
       "dni": "Enter exactly eight digits.",
-      "phone": "Use digits, spaces, +, parentheses or hyphens, up to 30 characters."
+      "phone": "Enter 7 to 15 digits, optionally starting with +. Spaces, parentheses and hyphens are allowed."
     },
     "errors": {
       "profileMissing": "No personal profile is available for this account.",
@@ -1008,7 +1030,7 @@
     "radius": "Reception radius",
     "radiusHelp": "Distance is measured from your business’s saved location. Saving changes does not delete notifications already received.",
     "meters": "{value} m",
-    "businessCenter": "Reference location: {name}. Uses the coordinates saved in the business profile.",
+    "businessCenter": "Reference location: {address}. Uses the coordinates saved in the business profile.",
     "centerUnavailable": "The business location is unavailable. Nearby alert delivery needs valid coordinates in the business profile.",
     "discard": "Discard changes",
     "save": "Save preferences",
@@ -1023,7 +1045,7 @@
     },
     "loadingInbox": "Loading notifications…",
     "nearbyTitle": "Nearby active alert",
-    "nearbyMessage": "An active alert was reported near your business. Check the alerts section for its current status.",
+    "nearbyMessage": "A panic alert was confirmed near your business. This notice records its delivery; the situation may have changed since then.",
     "generalTitle": "InstAlert update",
     "unread": "Unread",
     "read": "Read",
@@ -1041,8 +1063,9 @@
       "preferencesLoad": "Your notification preferences could not be loaded. Try again.",
       "preferencesSave": "Your preferences could not be saved. Your previous settings are still active.",
       "invalidPreferences": "Choose an available radius and a valid notification preference.",
-      "feedLoad": "Notifications or nearby alert delivery could not be refreshed. Check the connection and try again.",
-      "markRead": "The notification could not be marked as read. Try again."
+      "feedLoad": "Notifications could not be refreshed. Check the connection and try again.",
+      "markRead": "The notification could not be marked as read. Try again.",
+      "invalidResponse": "The service returned invalid notification data. Refresh and try again."
     }
   },
   "dashboard": {
@@ -1178,22 +1201,24 @@
       "summary": "Could not load or refresh the dashboard. Previously loaded data, if shown, retains its update time.",
       "history": "Could not load or refresh monthly reports.",
       "reportMissing": "This monthly report is no longer available.",
-      "detail": "Could not load the monthly report."
+      "detail": "Could not load the monthly report.",
+      "invalidRange": "Choose a valid date range ending today or earlier.",
+      "generate": "The report could not be generated. Please try again."
     },
     "monthly": {
-      "title": "Monthly reports",
-      "detailTitle": "Monthly report detail",
-      "backToHistory": "Back to monthly reports",
+      "title": "Saved reports",
+      "detailTitle": "Report detail",
+      "backToHistory": "Back to saved reports",
       "backToDashboard": "Back to dashboard",
-      "historyHelp": "Consult the saved monthly closings for your business.",
-      "detailHelp": "Indicators preserved for the report’s period and closing date.",
+      "historyHelp": "Consult saved reports or create one for a date range.",
+      "detailHelp": "This report preserves the information available at its cutoff time.",
       "statusHelp": "Status of the period’s reports preserved at closing.",
-      "loading": "Loading monthly reports…",
+      "loading": "Loading reports…",
       "filter": "Filter by month",
       "clearFilter": "Show all months",
-      "emptyTitle": "No monthly reports yet",
+      "emptyTitle": "No saved reports yet",
       "noMatch": "No report for this month",
-      "emptyHelp": "Available monthly closings will appear here with their saved indicators and generation date.",
+      "emptyHelp": "Generate a report using the date range above.",
       "open": "View report",
       "reportFor": "Monthly report · {month}",
       "generatedAt": "Generated {date}",
@@ -1203,7 +1228,7 @@
       "duringPeriod": "During the report period",
       "atClosing": "At closing",
       "comparison": "Registered reports compared with the previous month",
-      "comparisonHelp": "The change compares the total number of reports registered in both months.",
+      "comparisonHelp": "The previous interval has the same effective duration as this report.",
       "source": {
         "scheduled": "Scheduled closing",
         "manual": "Requested by administrator"
@@ -1211,11 +1236,38 @@
       "increased": "{value}% more reports were registered than in {month}.",
       "decreased": "{value}% fewer reports were registered than in {month}.",
       "unchanged": "The same number of reports was registered as in {month}.",
-      "bothZero": "No reports were registered in either month.",
+      "bothZero": "No reports were registered in either interval.",
       "noBaseline": "No reports were registered in {month}; a percentage change is not calculated.",
       "lessThanPointOne": "<0.1"
     },
     "summaryNearby": "Current month · within 500 meters",
-    "thisMonth": "This month"
+    "thisMonth": "This month",
+    "reports": {
+      "createTitle": "Create a report",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "generate": "Generate report",
+      "help": "Both dates are included. Each report saves a snapshot and compares it with the preceding interval of the same duration."
+    }
+  },
+  "api": {
+    "connection": {
+      "loading": "Connecting to your business…",
+      "retry": "Retry connection",
+      "missing": "No business is assigned to this demo account. Check the demonstration data.",
+      "inactive": "Your membership is inactive. Ask your administrator to reactivate it.",
+      "ambiguous": "This demo account is associated with more than one business. Check the demonstration data."
+    },
+    "errors": {
+      "validation": "Check the information you entered.",
+      "unauthenticated": "The selected demo account was not recognized by the API.",
+      "forbidden": "This demo account cannot perform that operation.",
+      "notFound": "The requested resource or operation is unavailable.",
+      "conflict": "The data changed or the operation conflicts with its current state. Refresh and try again.",
+      "busy": "Too many requests. Wait a moment and try again.",
+      "unavailable": "The API could not be reached or is temporarily unavailable. Try again.",
+      "timeout": "The API took too long to respond. Try again.",
+      "unexpected": "The request could not be completed. Try again."
+    }
   }
 }

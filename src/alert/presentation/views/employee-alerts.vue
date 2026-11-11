@@ -6,6 +6,7 @@ import { storeToRefs } from 'pinia';
 import { useConfirm } from 'primevue';
 import { useI18n } from 'vue-i18n';
 import useAlertStore from '../../application/alert.store.js';
+import { currentApiContext, currentContextRevision } from '../../../shared/infrastructure/api-context.js';
 import { AlertRecordKind, AlertRecordStatus, PanicReportStatus } from '../../domain/model/alert-record.entity.js';
 import {
   MAX_PANIC_GRACE_PERIOD_SECONDS,
@@ -35,6 +36,7 @@ const {
   isSaving,
   isInitialized,
   isActivatingPanic,
+  isPreparingPanic,
   errorMessage,
   noticeMessage,
   hasUnsavedReportDraft,
@@ -60,6 +62,7 @@ const historyKind = ref('all');
 const latestReportDate = ref(new Date());
 const currentTime = ref(Date.now());
 let elapsedTimeInterval = null;
+let mounted = true;
 
 const activeElapsedTime = computed(() => {
   const activatedAt = new Date(activePanicRecord.value?.activatedAt ?? '').getTime();
@@ -120,7 +123,6 @@ const statusFilterOptions = computed(() => [
   AlertRecordStatus.COMPLETED,
   AlertRecordStatus.SUBMITTED,
   AlertRecordStatus.RESOLVED,
-  AlertRecordStatus.FALSE_ALARM,
 ].map((value) => ({ value, label: t(`alerts.workflow.statuses.${value}`) })));
 
 const panicCategory = computed({
@@ -139,7 +141,7 @@ const panicDescription = computed({
 });
 const panicLocation = computed({
   get: () => selectedRecord.value?.location ?? '',
-  set: (value) => store.updatePanicReportDraft({ location: value }),
+  set: (value) => store.updatePanicReportDraft({ location: value, latitude: null, longitude: null }),
 });
 const reportCategory = computed({
   get: () => reportDraft.value.category,
@@ -151,7 +153,7 @@ const reportCategory = computed({
 const reportLocation = computed({
   get: () => reportDraft.value.location,
   set: (value) => {
-    store.updateReportDraft({ location: value });
+    store.updateReportDraft({ location: value, latitude: null, longitude: null });
     reportValidationError.value = false;
   },
 });
@@ -216,6 +218,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  mounted = false;
   window.clearInterval(elapsedTimeInterval);
 });
 
@@ -263,7 +266,10 @@ function requestCurrentLocation(target) {
     return;
   }
 
+  const revision = currentContextRevision();
+  const businessId = currentApiContext().businessId;
   navigator.geolocation.getCurrentPosition((position) => {
+    if (!mounted || revision !== currentContextRevision() || businessId !== currentApiContext().businessId) return;
     const { latitude, longitude } = position.coords;
     const location = {
       location: `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`,
@@ -277,6 +283,7 @@ function requestCurrentLocation(target) {
 
     locationFeedback.value = 'ready';
   }, () => {
+    if (!mounted || revision !== currentContextRevision() || businessId !== currentApiContext().businessId) return;
     locationFeedback.value = 'unavailable';
   }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 });
 }
@@ -296,7 +303,7 @@ async function startPanic() {
   if (preferenceSavePromise && !await preferenceSavePromise) return;
   if (Number(gracePeriodDraft.value) !== preferences.value.panicGracePeriodSeconds
     && !await saveGracePeriod()) return;
-  if (store.startPanicCountdown()) void preloadLocationIfAlreadyAllowed('panic');
+  if (await store.startPanicCountdown()) void preloadLocationIfAlreadyAllowed('panic');
 }
 
 /** Validates and saves the grace period draft preference. @returns {Promise<boolean>} True when saved. */
@@ -408,6 +415,7 @@ async function completePanicReport() {
 
 /** Route guard deciding whether the current view can be left. @returns {Promise<boolean>} True when navigation may continue. */
 async function canLeaveCurrentView() {
+  if (isSaving.value || isActivatingPanic.value) return false;
   if (isHistoryOnly.value) return true;
   if (hasUnsavedReportDraft.value) {
     if (!await confirmDiscardReport()) return false;
@@ -460,7 +468,7 @@ onBeforeRouteUpdate(canLeaveCurrentView);
 
     <div v-if="errorMessage" class="service-message" role="alert">
       <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-      <span>{{ t('alerts.workflow.errors.requestFailed') }}</span>
+      <span>{{ t(errorMessage) }}</span>
       <pv-button
         v-if="isHistoryOnly || !isInitialized"
         :label="t('alerts.workflow.actions.retry')"
@@ -491,7 +499,8 @@ onBeforeRouteUpdate(canLeaveCurrentView);
             class="panic-trigger"
             :aria-label="t('alerts.workflow.panic.activate')"
             aria-describedby="panic-help"
-            :disabled="isLoading || isActivatingPanic || Boolean(activePanicRecord)"
+            :disabled="isLoading || isSaving || isActivatingPanic || Boolean(activePanicRecord)"
+            :loading="isPreparingPanic"
             @click="startPanic"
           >
             <span class="panic-symbol"><i class="pi pi-bell" aria-hidden="true"></i></span>
@@ -517,9 +526,11 @@ onBeforeRouteUpdate(canLeaveCurrentView);
               button-layout="horizontal"
               increment-icon="pi pi-plus"
               decrement-icon="pi pi-minus"
-              @blur="saveGracePeriod"
               @keydown.enter="saveGracePeriod"
             />
+            <pv-button v-if="Number(gracePeriodDraft) !== preferences.panicGracePeriodSeconds" severity="secondary" size="small"
+              icon="pi pi-check" :label="t('alerts.workflow.preference.save')" :disabled="isSaving || isLoading"
+              @click="saveGracePeriod" />
             <small id="grace-period-range">{{ t('alerts.workflow.preference.compactRange') }}</small>
           </div>
         </section>
@@ -552,6 +563,7 @@ onBeforeRouteUpdate(canLeaveCurrentView);
                 :label="t(`alerts.workflow.reportKinds.${kind}.action`)"
                 icon="pi pi-arrow-right"
                 icon-pos="right"
+                :disabled="isSaving || isActivatingPanic"
                 text
                 @click="startReport(kind)"
               />
@@ -599,8 +611,8 @@ onBeforeRouteUpdate(canLeaveCurrentView);
       <section v-else-if="currentView === 'activation-error'" class="result-card result-card--error" role="alert">
         <span class="result-icon"><i class="pi pi-exclamation-triangle" aria-hidden="true"></i></span>
         <h2>{{ t('alerts.workflow.errors.activationTitle') }}</h2>
-        <p>{{ t('alerts.workflow.errors.requestFailed') }}</p>
-        <pv-button :label="t('alerts.workflow.actions.retry')" icon="pi pi-refresh" @click="store.retryPanicActivation" />
+        <p>{{ t(errorMessage || 'alerts.workflow.errors.requestFailed') }}</p>
+        <pv-button :label="t('alerts.workflow.actions.retry')" icon="pi pi-refresh" :disabled="isActivatingPanic || isPreparingPanic" :loading="isActivatingPanic || isPreparingPanic" @click="store.retryPanicActivation" />
       </section>
 
       <section v-else-if="currentView === 'active'" class="active-view" aria-labelledby="active-title">
@@ -669,7 +681,7 @@ onBeforeRouteUpdate(canLeaveCurrentView);
               <label for="panic-location">{{ t('alerts.workflow.form.location') }}</label>
               <pv-button icon="pi pi-map-marker" :label="t('alerts.workflow.location.useCurrent')" text @click="requestCurrentLocation('panic-report')" />
             </div>
-            <pv-input-text id="panic-location" v-model="panicLocation" :placeholder="t('alerts.workflow.location.manualPlaceholder')" />
+            <pv-input-text id="panic-location" v-model="panicLocation" maxlength="250" :placeholder="t('alerts.workflow.location.manualPlaceholder')" />
             <small v-if="locationFeedback === 'requesting'">{{ t('alerts.workflow.location.requesting') }}</small>
             <small v-else-if="locationFeedback === 'ready'">{{ t('alerts.workflow.location.ready') }}</small>
             <small v-if="locationFeedback === 'unavailable'">{{ t('alerts.workflow.location.manualHelp') }}</small>
@@ -681,7 +693,7 @@ onBeforeRouteUpdate(canLeaveCurrentView);
               v-model="panicDescription"
               rows="5"
               auto-resize
-              :maxlength="1000"
+              :maxlength="2000"
               :placeholder="t('alerts.workflow.form.descriptionPlaceholder')"
             />
             <small class="field-hint">{{ t('alerts.workflow.panicReport.autosave') }}</small>
@@ -728,7 +740,7 @@ onBeforeRouteUpdate(canLeaveCurrentView);
               <label for="report-location">{{ t('alerts.workflow.form.location') }} <span aria-hidden="true">*</span></label>
               <pv-button icon="pi pi-map-marker" :label="t('alerts.workflow.location.useCurrent')" text @click="requestCurrentLocation('report')" />
             </div>
-            <pv-input-text id="report-location" v-model="reportLocation" :placeholder="t('alerts.workflow.location.manualPlaceholder')" />
+            <pv-input-text id="report-location" v-model="reportLocation" maxlength="250" :placeholder="t('alerts.workflow.location.manualPlaceholder')" />
             <small v-if="locationFeedback === 'requesting'">{{ t('alerts.workflow.location.requesting') }}</small>
             <small v-else-if="locationFeedback === 'ready'">{{ t('alerts.workflow.location.ready') }}</small>
             <small v-if="locationFeedback === 'unavailable'">{{ t('alerts.workflow.location.manualHelp') }}</small>
@@ -762,7 +774,7 @@ onBeforeRouteUpdate(canLeaveCurrentView);
               v-model="reportDescription"
               rows="5"
               auto-resize
-              :maxlength="1000"
+              :maxlength="2000"
               :placeholder="t('alerts.workflow.form.descriptionPlaceholder')"
             />
             <small class="field-hint">{{ t('alerts.workflow.form.noAttachments') }}</small>
@@ -851,7 +863,7 @@ onBeforeRouteUpdate(canLeaveCurrentView);
         <dl class="record-fields">
           <div><dt>{{ t('alerts.workflow.form.category') }}</dt><dd>{{ titleForCategory(selectedRecord.category) }}</dd></div>
           <div><dt>{{ t('alerts.workflow.form.location') }}</dt><dd>{{ selectedRecord.location || t('alerts.workflow.location.notAvailable') }}</dd></div>
-          <div><dt>{{ t('alerts.workflow.form.moment') }}</dt><dd>{{ formatReportMoment(selectedRecord.moment) }}</dd></div>
+          <div><dt>{{ t('alerts.workflow.form.moment') }}</dt><dd>{{ formatReportMoment(selectedRecord.moment || selectedRecord.activatedAt) }}</dd></div>
           <div><dt>{{ t('alerts.workflow.history.createdAt') }}</dt><dd>{{ formatDate(selectedRecord.createdAt) }}</dd></div>
           <div v-if="selectedRecord.resolvedAt"><dt>{{ t('alerts.workflow.history.resolvedAt') }}</dt><dd>{{ formatDate(selectedRecord.resolvedAt) }}</dd></div>
           <div v-if="selectedRecord.reportStatus"><dt>{{ t('alerts.workflow.history.reportStatus') }}</dt><dd>{{ reportStatusLabel(selectedRecord.reportStatus) }}</dd></div>
@@ -862,7 +874,7 @@ onBeforeRouteUpdate(canLeaveCurrentView);
         <div class="form-actions">
           <pv-button :label="t('alerts.workflow.history.back')" icon="pi pi-arrow-left" severity="secondary" text @click="closeHistoryRecord" />
           <pv-button
-            v-if="!isHistoryOnly && selectedRecord.hasPendingPanicReport"
+            v-if="!isHistoryOnly && selectedRecord.hasPendingPanicReport && selectedRecord.employeeId === currentApiContext().userId"
             :label="t('alerts.workflow.pending.action')"
             icon="pi pi-file-edit"
             @click="store.resumePanicReport(selectedRecord.id)"
@@ -1109,7 +1121,6 @@ onBeforeRouteUpdate(canLeaveCurrentView);
 .status-badge--completed,
 .status-badge--submitted { color: #176d4e; background: #ddf5e9; }
 .status-badge--resolved { color: #1d4f91; background: #e4efff; }
-.status-badge--false-alarm { color: #525b68; background: #edf0f4; }
 .form-card,
 .record-detail { display: grid; gap: 18px; padding: clamp(18px, 3vw, 26px); border: 1px solid var(--alert-line); border-radius: 14px; background: #fff; }
 .form-field { display: grid; gap: 8px; }
