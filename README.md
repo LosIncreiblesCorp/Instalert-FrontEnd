@@ -115,9 +115,12 @@ History follows the API pagination for the resolved commerce ID. Administrators 
 - Presentation splits container (`risk-map-page.vue`) from map primitives (`risk-map.vue`, `tactical-inspector.vue`, `zone-detail.vue`).
 
 ### Payments Context
-- Owns the plan catalog, subscriptions, transactions and employee limits associated with each plan.
-- Uses `Plan`, `Subscription` and `usePaymentsStore` for catalog and subscription workflows.
-- Presents monthly plans, PayPal Sandbox checkout, subscription status and payment history.
+- Loads the three monthly USD plans, current subscription, seat usage and billing history from the ASP.NET API.
+- Uses `plans`, `businesses/{id}/seats`, `businesses/{id}/subscription` and `businesses/{id}/billing-history`.
+- Opens checkout or a plan change through the backend. The returned provider plan and checkout correlation are passed to the PayPal Sandbox SDK.
+- Browser approval remains pending until server verification succeeds. Pending approval is retained per account and commerce in session storage; verification can be retried without paying again.
+- Uses the dedicated cancellation command. A development subscription is identified as demonstration data and cannot be canceled through PayPal.
+- No local catalog or payment-history fallback is used. Provider secrets stay on the server; only the Sandbox client ID belongs in Vite configuration.
 - Routes in `payments-routes.js`: `/admin/subscription`.
 
 ### Profiles Context
@@ -199,7 +202,7 @@ Main variables:
 - `VITE_INSTALERT_PLATFORM_API_URL`
 - `VITE_MAPBOX_API_KEY`
 - `VITE_PRIME_UI_LICENSE_KEY`
-- `VITE_PAYPAL_ENVIRONMENT`, `VITE_PAYPAL_CLIENT_ID` and the monthly PayPal plan ID variables configure Sandbox checkout.
+- `VITE_PAYPAL_ENVIRONMENT` and `VITE_PAYPAL_CLIENT_ID` configure Sandbox checkout. Provider plan IDs are returned by the backend checkout command.
 API resource paths are configured in both environment files:
 
 | Variable | Configured resource path |
