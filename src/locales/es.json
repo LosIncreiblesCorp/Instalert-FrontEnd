@@ -164,7 +164,8 @@
       "nameHelp": "Obligatorio. Ingresa un nombre de hasta 100 caracteres.",
       "quotaSummary": "{available} de {limit} cupos disponibles",
       "create": "Crear invitación",
-      "back": "Volver a Personal"
+      "back": "Volver a Personal",
+      "accountHelp": "El empleado recibe una contraseña temporal válida por 24 horas. Si el correo es incorrecto, cancela la invitación y crea otra."
     },
     "statuses": {
       "active": "Activo",

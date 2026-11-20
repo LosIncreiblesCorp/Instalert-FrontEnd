@@ -164,7 +164,8 @@
       "nameHelp": "Required. Enter a name of up to 100 characters.",
       "quotaSummary": "{available} of {limit} seats available",
       "create": "Create invitation",
-      "back": "Back to staff"
+      "back": "Back to staff",
+      "accountHelp": "The employee receives a temporary password valid for 24 hours. If the email is incorrect, cancel the invitation and create another one."
     },
     "statuses": {
       "active": "Active",

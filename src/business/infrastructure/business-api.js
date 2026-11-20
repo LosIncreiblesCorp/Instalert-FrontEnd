@@ -9,9 +9,7 @@ export class BusinessApi extends BaseApi {
     getInvitations(businessId) { return this.http.get(`businesses/${encodeURIComponent(businessId)}/invitations`); }
     getSeats(businessId) { return this.http.get(`businesses/${encodeURIComponent(businessId)}/seats`); }
     createInvitation(businessId, resource) { return this.http.post(`businesses/${encodeURIComponent(businessId)}/invitations`, resource); }
-    updateInvitation(id, resource) { return this.http.put(`staff-invitations/${encodeURIComponent(id)}`, resource); }
     cancelInvitation(id) { return this.http.post(`staff-invitations/${encodeURIComponent(id)}/cancellation`); }
     resendInvitation(id) { return this.http.post(`staff-invitations/${encodeURIComponent(id)}/resend`); }
-    updateMember(id, resource) { return this.http.put(`business-members/${encodeURIComponent(id)}`, resource); }
     setMemberActive(id, active) { return this.http.post(`business-members/${encodeURIComponent(id)}/${active ? 'activation' : 'deactivation'}`); }
 }
