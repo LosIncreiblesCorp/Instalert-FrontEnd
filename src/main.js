@@ -36,8 +36,8 @@ app
     .component('pv-select', Select)
     .component('pv-select-button', SelectButton)
     .component('pv-textarea', Textarea)
-    .use(router)
     .use(pinia)
+    .use(router)
 
 watch(i18n.global.locale, (locale) => {
     const selectedLocale = supportedLocales.includes(locale) ? locale : 'en'

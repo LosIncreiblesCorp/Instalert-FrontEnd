@@ -15,11 +15,61 @@
     "goBack": "Volver",
     "calendar": {
       "firstDayOfWeek": 1,
-      "dayNames": ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
-      "dayNamesShort": ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"],
-      "dayNamesMin": ["do", "lu", "ma", "mi", "ju", "vi", "sá"],
-      "monthNames": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
-      "monthNamesShort": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
+      "dayNames": [
+        "domingo",
+        "lunes",
+        "martes",
+        "miércoles",
+        "jueves",
+        "viernes",
+        "sábado"
+      ],
+      "dayNamesShort": [
+        "dom",
+        "lun",
+        "mar",
+        "mié",
+        "jue",
+        "vie",
+        "sáb"
+      ],
+      "dayNamesMin": [
+        "do",
+        "lu",
+        "ma",
+        "mi",
+        "ju",
+        "vi",
+        "sá"
+      ],
+      "monthNames": [
+        "enero",
+        "febrero",
+        "marzo",
+        "abril",
+        "mayo",
+        "junio",
+        "julio",
+        "agosto",
+        "septiembre",
+        "octubre",
+        "noviembre",
+        "diciembre"
+      ],
+      "monthNamesShort": [
+        "ene",
+        "feb",
+        "mar",
+        "abr",
+        "may",
+        "jun",
+        "jul",
+        "ago",
+        "sep",
+        "oct",
+        "nov",
+        "dic"
+      ],
       "today": "Hoy",
       "clear": "Limpiar",
       "aria": {
@@ -40,7 +90,8 @@
         "prevMinute": "Minuto anterior",
         "nextMinute": "Minuto siguiente"
       }
-    }
+    },
+    "signOut": "Cerrar sesión"
   },
   "business": {
     "profile": {
@@ -687,8 +738,12 @@
         "confirm": "Descartar reporte",
         "keepEditing": "Seguir editando"
       },
-      "home": { "back": "Volver a Alertas" },
-      "actions": { "retry": "Reintentar" },
+      "home": {
+        "back": "Volver a Alertas"
+      },
+      "actions": {
+        "retry": "Reintentar"
+      },
       "errors": {
         "requestFailed": "No se pudo comunicar con el servicio de alertas. Se conservan tus cambios; inténtalo nuevamente.",
         "activationTitle": "No se pudo registrar la alerta activa",
@@ -1269,5 +1324,41 @@
       "timeout": "La API tardó demasiado en responder. Inténtalo nuevamente.",
       "unexpected": "No se pudo completar la solicitud. Inténtalo nuevamente."
     }
+  },
+  "iam": {
+    "brandMessage": "Seguridad entre comercios",
+    "signInTitle": "Bienvenido de nuevo",
+    "registerTitle": "Crea tu cuenta de administrador",
+    "signInDescription": "Inicia sesión para gestionar tu comercio o continuar una invitación.",
+    "registerDescription": "Crea tu cuenta, registra tu comercio y elige una suscripción.",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "passwordHint": "Usa entre 10 y 72 caracteres, con una letra y un número.",
+    "createAccount": "Crear cuenta",
+    "signIn": "Iniciar sesión",
+    "existingAccount": "¿Ya tienes una cuenta? Inicia sesión",
+    "newAccount": "Registrar tu comercio",
+    "employeeInvitation": "Los empleados ingresan mediante una invitación de su administrador.",
+    "changePasswordTitle": "Establece tu contraseña personal",
+    "changePasswordDescription": "Reemplaza tu contraseña temporal antes de continuar.",
+    "currentPassword": "Contraseña actual o temporal",
+    "newPassword": "Nueva contraseña",
+    "savePassword": "Guardar contraseña",
+    "errors": {
+      "credentials": "El correo o la contraseña son incorrectos.",
+      "emailRegistered": "Este correo ya tiene una cuenta. Inicia sesión.",
+      "validation": "Revisa los datos y los requisitos de contraseña.",
+      "unavailable": "No se pudo conectar con el servicio. Vuelve a intentarlo.",
+      "passwordMismatch": "Las contraseñas no coinciden."
+    },
+    "loadingSession": "Cargando tu sesión…",
+    "changePasswordAction": "Cambiar contraseña",
+    "returnToApplication": "Volver a la aplicación",
+    "personalPasswordDescription": "Elige una nueva contraseña para proteger tu cuenta.",
+    "sessionExpired": "Tu sesión venció. Inicia sesión para continuar.",
+    "setupTitle": "Completa tu cuenta",
+    "setupDescription": "Tu cuenta está guardada. Completa tu comercio, perfil personal y suscripción para acceder a InstAlert.",
+    "retrySession": "Consultar estado de la cuenta"
   }
 }

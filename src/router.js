@@ -8,6 +8,9 @@ import contactsRoutes from "./contacts/presentation/contacts-routes.js";
 import { profilesRoutes } from "./profiles/presentation/profiles-routes.js";
 import { notificationsRoutes } from "./notifications/presentation/notifications-routes.js";
 import { dashboardRoutes } from "./dashboard/presentation/dashboard-routes.js";
+import { useIamStore } from './iam/application/iam.store.js';
+import { accessToken } from './iam/infrastructure/session.js';
+import pinia from './pinia.js';
 import { configureRole, prepareBusinessContext } from './shared/infrastructure/api-context.js';
 import { BaseApi } from './shared/infrastructure/base-api.js';
 
@@ -27,10 +30,12 @@ const employeeAlertRoutes = alertRoutes.map((route) => ({
 const routes = [
   {
     path: "/",
-    name: "profile-selection",
-    component: () => import("./shared/presentation/views/profile-selection.vue"),
-    meta: { standalone: true, title: "common.chooseProfile" },
+    redirect: '/sign-in',
   },
+  { path: '/sign-in', name: 'sign-in', component: () => import('./iam/presentation/views/sign-in.vue'), meta: { standalone: true, guest: true, title: 'iam.signInTitle' } },
+  { path: '/sign-up', name: 'sign-up', component: () => import('./iam/presentation/views/sign-up.vue'), meta: { standalone: true, guest: true, title: 'iam.registerTitle' } },
+  { path: '/change-password', name: 'change-password', component: () => import('./iam/presentation/views/change-password.vue'), meta: { standalone: true, requiresAuth: true, title: 'iam.changePasswordAction' } },
+  { path: '/account/setup', name: 'session-setup', component: () => import('./iam/presentation/views/session-setup.vue'), meta: { standalone: true, requiresAuth: true, onboarding: true, title: 'iam.setupTitle' } },
   { path: "/admin", redirect: { name: "admin-dashboard" } },
   {
     path: "/admin/risk-map",
@@ -91,10 +96,31 @@ const router = createRouter({
 
 /** Updates the document title on each navigation. @param {import('vue-router').RouteLocationNormalized} to - Target route. @param {import('vue-router').RouteLocationNormalized} from - Current route. @returns {void} */
 router.beforeEach(async (to) => {
-  // Set the page title
+  const iam = useIamStore(pinia);
+  await iam.initialize();
   document.title = `InstAlert | ${i18n.global.t(to.meta.title ?? "common.appName")}`;
-  configureRole(to.meta.role);
+  const signedIn = Boolean(accessToken());
+  const setup = () => ({ name: iam.error || iam.user.role !== 'administrator' || !router.hasRoute('onboarding') ? 'session-setup' : 'onboarding' });
+  const home = () => ({ name: iam.user.role === 'administrator' ? 'admin-dashboard' : 'employee-dashboard' });
+  if (to.meta.guest) {
+    if (!signedIn) return true;
+    return iam.user.mustChangePassword ? { name: 'change-password' } : iam.user.hasApplicationAccess ? home() : setup();
+  }
+  if (!signedIn) return { name: 'sign-in' };
+  if (to.name === 'change-password') return true;
+  if (!(await iam.refreshSession())) return accessToken() ? to.name === 'session-setup' || { name: 'session-setup' } : { name: 'sign-in' };
+  if (iam.user.mustChangePassword) return { name: 'change-password' };
+  if (to.meta.role && to.meta.role !== iam.user.role) return iam.user.hasApplicationAccess ? home() : setup();
+  if (!iam.user.hasApplicationAccess) {
+    if (!to.meta.onboarding) return setup();
+    if (to.name === 'session-setup' && iam.user.role === 'administrator' && router.hasRoute('onboarding') && !iam.error) return { name: 'onboarding' };
+    return true;
+  }
+  if (to.meta.onboarding) return home();
+  if (to.meta.role && to.meta.role !== iam.user.role) return home();
+  configureRole(iam.user.role);
   if (to.meta.role) await prepareBusinessContext(new BaseApi().http);
+  return true;
 });
 
 export default router;
