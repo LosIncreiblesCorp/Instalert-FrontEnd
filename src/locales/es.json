@@ -1360,5 +1360,22 @@
     "setupTitle": "Completa tu cuenta",
     "setupDescription": "Tu cuenta está guardada. Completa tu comercio, perfil personal y suscripción para acceder a InstAlert.",
     "retrySession": "Consultar estado de la cuenta"
+  },
+  "onboarding": {
+    "eyebrow": "Configuración de cuenta",
+    "title": "Bienvenido a InstAlert",
+    "description": "Completa los datos de tu comercio y tu perfil personal para comenzar.",
+    "stepsLabel": "Progreso de configuración de la cuenta",
+    "steps": {
+      "business": "Tu comercio",
+      "personal-profile": "Perfil personal",
+      "subscription": "Suscripción"
+    },
+    "checking": "Consultando tu cuenta…",
+    "detailsSaved": "Tus datos están guardados",
+    "paymentRequired": "Tu comercio y tu perfil personal están completos. Necesitas una suscripción activa antes de ingresar a InstAlert.",
+    "checkStatus": "Consultar estado de suscripción",
+    "savedNote": "Tu avance está guardado. Puedes cerrar sesión y continuar después.",
+    "resume": "Continúa con la configuración de tu cuenta."
   }
 }
