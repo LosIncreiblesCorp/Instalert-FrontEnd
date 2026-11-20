@@ -60,9 +60,9 @@ export async function createPayPalButtons({ getCheckout, beforeApprove, onApprov
         createSubscription: async (_data, actions) => {
             checkout = await getCheckout();
             if (!isCurrent()) throw new Error('The selected account changed.');
-            return checkout.subscriptionId
+            return checkout.customId === null
                 ? actions.subscription.revise(checkout.subscriptionId, { plan_id: checkout.paypalPlanId })
-                : actions.subscription.create({ plan_id: checkout.paypalPlanId, custom_id: checkout.customId });
+                : checkout.subscriptionId;
         },
         onApprove: async data => {
             if (!isCurrent()) return;

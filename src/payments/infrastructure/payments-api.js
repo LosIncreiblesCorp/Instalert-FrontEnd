@@ -10,11 +10,12 @@ export class PaymentsApi extends BaseApi {
         return this.http.post(this.subscriptionPath(businessId) + (change ? '/plan-change' : '/checkout'), { planId });
     }
     verify(businessId, approval) {
-        return approval.subscriptionId
+        return approval.customId === null
             ? this.http.post(this.subscriptionPath(businessId) + '/plan-change/verification', { checkoutId: approval.checkoutId })
             : this.http.post(this.subscriptionPath(businessId) + '/verification', {
                 checkoutId: approval.checkoutId, subscriptionId: approval.providerSubscriptionId,
             });
     }
+    resume(businessId) { return this.http.post(this.subscriptionPath(businessId) + '/renewal'); }
     cancel(businessId) { return this.http.post(this.subscriptionPath(businessId) + '/cancellation'); }
 }
