@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref, watch } from "vue";
-import { RouterLink, RouterView, useRoute } from "vue-router";
+import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import instalertLogo from "../../../assets/instalert-logo.svg";
 import { apiContext } from '../../infrastructure/api-context.js';
@@ -8,6 +8,12 @@ import ApiConnectionState from './api-connection-state.vue';
 import { useNotificationsStore } from '../../../notifications/application/notifications.store.js';
 import NotificationNotice from '../../../notifications/presentation/components/notification-notice.vue';
 
+import { useIamStore } from '../../../iam/application/iam.store.js';
+const iam = useIamStore(), router = useRouter();
+async function signOut() {
+  try { await iam.signOut(); } catch { /* The local session is cleared even when the service is unavailable. */ }
+  await router.replace({ name: 'sign-in' });
+}
 const notifications = useNotificationsStore();
 const unreadNotifications = computed(() => notifications.unreadCount);
 
@@ -121,6 +127,7 @@ function closeMobileNavigation() {
           <span class="profile-label">{{ t("common.profile") }}</span>
         </RouterLink>
       </div>
+      <pv-button text icon="pi pi-sign-out" :label="t('common.signOut')" @click="signOut" />
     </header>
 
     <pv-button

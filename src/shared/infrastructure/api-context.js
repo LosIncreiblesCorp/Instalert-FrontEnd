@@ -1,18 +1,26 @@
 import { reactive, readonly } from 'vue';
+import { currentSession } from '../../iam/infrastructure/session.js';
 
-const demoUsers = Object.freeze({ administrator: 'synthetic-admin', employee: 'synthetic-employee' });
 const state = reactive({ role: null, userId: null, businessId: null, businessLocation: null, status: 'idle', error: null });
 export const apiContext = readonly(state);
 let revision = 0;
 let pending;
 
-/** The profile selector chooses a fixed demonstration actor, without authentication. */
-export function configureRole(role) {
-    const selected = Object.hasOwn(demoUsers, role) ? role : null;
-    if (state.role === selected) return;
+/** Resolve scope from the authenticated session; route metadata never assigns an identity. */
+export function setAuthenticatedContext(value = {}) {
+    const role = ['administrator', 'employee'].includes(value.role) ? value.role : null;
+    const userId = typeof value.userId === 'string' ? value.userId : null;
+    const businessId = typeof value.businessId === 'string' ? value.businessId : null;
+    if (state.userId === userId && state.role === role && state.businessId === businessId) return;
     revision++;
     pending = null;
-    Object.assign(state, { role: selected, userId: demoUsers[selected] ?? null, businessId: null, businessLocation: null, status: 'idle', error: null });
+    Object.assign(state, { role, userId, businessId, businessLocation: null,
+        status: businessId ? 'ready' : userId ? 'missing' : 'idle', error: null });
+}
+export function configureRole(role) {
+    const session = currentSession();
+    if (session.role !== role) return;
+    setAuthenticatedContext({ role: session.role, userId: session.userId, businessId: session.businessId });
 }
 
 export const currentApiContext = () => ({ ...state });
@@ -21,7 +29,7 @@ export const currentContextRevision = () => revision;
 /** Resolve the commerce through Business, retaining its database-generated ID. */
 export async function prepareBusinessContext(http, { refresh = false } = {}) {
     if (!state.userId) return null;
-    if (!refresh && state.status === 'ready') return state.businessId;
+    if (!refresh && state.status === 'ready' && state.businessLocation) return state.businessId;
     if (pending?.revision === revision) return pending.request;
     const requestRevision = revision;
     const current = () => revision === requestRevision;

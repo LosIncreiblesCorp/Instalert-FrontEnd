@@ -15,11 +15,61 @@
     "goBack": "Go back",
     "calendar": {
       "firstDayOfWeek": 1,
-      "dayNames": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-      "dayNamesShort": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-      "dayNamesMin": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
-      "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-      "monthNamesShort": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      "dayNames": [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ],
+      "dayNamesShort": [
+        "Sun",
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat"
+      ],
+      "dayNamesMin": [
+        "Su",
+        "Mo",
+        "Tu",
+        "We",
+        "Th",
+        "Fr",
+        "Sa"
+      ],
+      "monthNames": [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      "monthNamesShort": [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+      ],
       "today": "Today",
       "clear": "Clear",
       "aria": {
@@ -40,7 +90,8 @@
         "prevMinute": "Previous minute",
         "nextMinute": "Next minute"
       }
-    }
+    },
+    "signOut": "Sign out"
   },
   "business": {
     "profile": {
@@ -687,8 +738,12 @@
         "confirm": "Discard report",
         "keepEditing": "Keep editing"
       },
-      "home": { "back": "Back to Alerts" },
-      "actions": { "retry": "Retry" },
+      "home": {
+        "back": "Back to Alerts"
+      },
+      "actions": {
+        "retry": "Retry"
+      },
       "errors": {
         "requestFailed": "Unable to reach the alert service. Your changes are preserved; try again.",
         "activationTitle": "The active alert could not be registered",
@@ -1269,5 +1324,41 @@
       "timeout": "The API took too long to respond. Try again.",
       "unexpected": "The request could not be completed. Try again."
     }
+  },
+  "iam": {
+    "brandMessage": "Connected commerce safety",
+    "signInTitle": "Welcome back",
+    "registerTitle": "Create your administrator account",
+    "signInDescription": "Sign in to manage your commerce or continue an invitation.",
+    "registerDescription": "Set up your account, register your commerce and choose a subscription.",
+    "email": "Email address",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "passwordHint": "Use 10–72 characters, including a letter and a number.",
+    "createAccount": "Create account",
+    "signIn": "Sign in",
+    "existingAccount": "Already have an account? Sign in",
+    "newAccount": "Register your commerce",
+    "employeeInvitation": "Employees join through an invitation from their commerce administrator.",
+    "changePasswordTitle": "Set your personal password",
+    "changePasswordDescription": "Replace your temporary password before continuing.",
+    "currentPassword": "Current or temporary password",
+    "newPassword": "New password",
+    "savePassword": "Save password",
+    "errors": {
+      "credentials": "The email or password is incorrect.",
+      "emailRegistered": "This email already has an account. Sign in instead.",
+      "validation": "Review the information and password requirements.",
+      "unavailable": "We could not reach the service. Try again.",
+      "passwordMismatch": "The passwords do not match."
+    },
+    "loadingSession": "Loading your session…",
+    "changePasswordAction": "Change password",
+    "returnToApplication": "Return to the application",
+    "personalPasswordDescription": "Choose a new password to protect your account.",
+    "sessionExpired": "Your session has expired. Sign in to continue.",
+    "setupTitle": "Finish setting up your account",
+    "setupDescription": "Your account is saved. Complete your business, personal profile and subscription to access InstAlert.",
+    "retrySession": "Check account status"
   }
 }
