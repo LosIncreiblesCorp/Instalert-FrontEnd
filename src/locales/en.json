@@ -546,7 +546,11 @@
     "retryVerification": "Verify payment again",
     "demoSubscription": "The current plan is demonstration data. It is not a confirmed PayPal payment.",
     "periodEnd": "Period end: {date}",
-    "planUnavailable": "Not available right now"
+    "planUnavailable": "Not available right now",
+    "choosePlanTitle": "Choose your subscription",
+    "choosePlanDescription": "Choose a plan and complete your payment with PayPal. Your account opens after the server confirms the payment.",
+    "resumeRenewal": "Resume renewal",
+    "choosePlan": "Choose {name}"
   },
   "alerts": {
     "workflow": {

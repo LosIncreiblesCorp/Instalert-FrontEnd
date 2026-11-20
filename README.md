@@ -293,4 +293,6 @@ npm run build
 On the demonstration backend, configure `Demo__Enabled=true` and `Cors__AllowedOrigins__0` with the exact frontend origin. Keep provider credentials on the server. These settings do not deploy either application.
 
 
-Shared, Alert, Business, Contacts, Notifications and Profiles are connected to the ASP.NET API. Payments, Mapping and Dashboard retain their pending integration work. IAM, employee account provisioning and checkout integration are outside these features.
+Administrator registration and sign-in use IAM bearer sessions. Account setup continues through the commerce, personal profile and subscription. The three plans and checkout are supplied by the API. PayPal approval alone does not unlock the application: the server must verify the payment and the refreshed IAM session must grant access.
+
+Configure `VITE_PAYPAL_ENVIRONMENT=sandbox` and `VITE_PAYPAL_CLIENT_ID` using the same Sandbox application as the backend. These are public frontend settings; the client secret stays on the server. The server creates the pending subscription and returns its ID to the PayPal SDK. Pending payments can be retried from the page and reconciled by the backend without a webhook. Cancellation retains the paid period, and renewal can be resumed before expiry. Employee account provisioning and identity integration in the remaining modules are separate features.

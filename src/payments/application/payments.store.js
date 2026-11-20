@@ -101,7 +101,8 @@ export const usePaymentsStore = defineStore('payments', () => {
             if (!current(scope)) throw new Error('The selected account changed.');
             if (data.planId !== planId || typeof data.checkoutId !== 'string' || !data.checkoutId
                 || typeof data.paypalPlanId !== 'string' || !data.paypalPlanId || !Number.isFinite(Date.parse(data.expiresAt))
-                || Date.parse(data.expiresAt) <= Date.now() || (!data.subscriptionId && data.customId !== data.checkoutId))
+                || Date.parse(data.expiresAt) <= Date.now() || typeof data.subscriptionId !== 'string' || !data.subscriptionId
+                || (data.customId !== null && data.customId !== data.checkoutId))
                 throw new Error('Invalid checkout response.');
             checkout.value = { ...data, businessId: scope.businessId, userId: scope.userId }; return { ...data };
         } catch (error) {
@@ -146,6 +147,20 @@ export const usePaymentsStore = defineStore('payments', () => {
         checkoutBusy.value = false;
         checkoutOutcome.value = checkoutApproval.value ? 'pending' : value;
     }
+    async function resumeSubscription() {
+        if (!currentSubscription.value?.cancelAtPeriodEnd || checkoutBusy.value) return false;
+        const scope = capture(); checkoutBusy.value = true; errorMessage.value = null;
+        try {
+            requireBusinessId();
+            const { data } = await api.resume(scope.businessId);
+            const saved = ownedSubscription(data, scope);
+            if (!current(scope)) return false;
+            currentSubscription.value = saved; return true;
+        } catch (error) {
+            if (current(scope)) errorMessage.value = error.apiError?.messageKey ?? 'payments.errors.save';
+            return false;
+        } finally { if (current(scope)) checkoutBusy.value = false; }
+    }
     async function cancelSubscription() {
         if (!currentSubscription.value || checkoutBusy.value || isSimulated.value) return false;
         const scope = capture(); checkoutBusy.value = true; errorMessage.value = null;
@@ -163,5 +178,5 @@ export const usePaymentsStore = defineStore('payments', () => {
     return { plans, currentSubscription, invoices, activeEmployees, reservedSeats, seatUsageAvailable, hasLoaded, isLoading,
         errorMessage, checkoutBusy, checkoutApproval, checkoutOutcome, currentPlan, assignedOperators, memberLimit, isSimulated,
         paymentHistory, fetchPaymentsData, preparePayPalCheckout, beginCheckout, recordPayPalApproval, verifyPending,
-        setCheckoutOutcome, cancelSubscription, resetContext };
+        setCheckoutOutcome, cancelSubscription, resumeSubscription, resetContext };
 });

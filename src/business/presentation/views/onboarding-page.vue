@@ -6,6 +6,7 @@ import { useIamStore } from '../../../iam/application/iam.store.js';
 import LanguageSwitcher from '../../../shared/presentation/components/language-switcher.vue';
 import BusinessProfile from './business-profile.vue';
 import UserProfile from '../../../profiles/presentation/views/user-profile.vue';
+import SubscriptionPage from '../../../payments/presentation/views/subscription-page.vue';
 const { t } = useI18n(), router = useRouter(), iam = useIamStore();
 const refreshing = ref(false), heading = ref(null);
 const steps = ['business', 'personal-profile', 'subscription'];
@@ -44,13 +45,7 @@ async function signOut() { try { await iam.signOut(); } catch {} await router.re
       <p v-if="refreshing" role="status">{{ t('onboarding.checking') }}</p>
       <BusinessProfile v-if="step==='business'" @saved="refresh" />
       <UserProfile v-else-if="step==='personal-profile'" @saved="refresh" />
-      <section v-else-if="step==='subscription'" class="subscription-step" aria-labelledby="subscription-step-title">
-        <span class="success-icon"><i class="pi pi-check" aria-hidden="true" /></span>
-        <h2 id="subscription-step-title">{{ t('onboarding.detailsSaved') }}</h2>
-        <p>{{ t('onboarding.paymentRequired') }}</p>
-        <div class="saved-business"><i class="pi pi-building" aria-hidden="true" /><span>{{ iam.user.business?.name }}</span></div>
-        <pv-button outlined icon="pi pi-refresh" :label="t('onboarding.checkStatus')" :loading="refreshing" @click="refresh" />
-      </section>
+      <SubscriptionPage v-else-if="step==='subscription'" onboarding @verified="refresh" />
       <section v-else class="subscription-step"><p>{{ t('onboarding.resume') }}</p><pv-button :label="t('onboarding.checkStatus')" @click="refresh" /></section>
       <p class="saved-note"><i class="pi pi-lock" aria-hidden="true" /> {{ t('onboarding.savedNote') }}</p>
     </main>

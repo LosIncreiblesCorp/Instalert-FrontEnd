@@ -14,6 +14,8 @@ import PayPalSubscriptionButton from "../components/paypal-subscription-button.v
 
 import { apiContext } from '../../../shared/infrastructure/api-context.js';
 
+const props = defineProps({ onboarding: Boolean });
+const emit = defineEmits(['verified']);
 const paymentsStore = usePaymentsStore();
 const { locale, t } = useI18n();
 const confirm = useConfirm();
@@ -25,7 +27,9 @@ const notice = ref("");
 const currency = "USD";
 let checkoutTrigger = null;
 onBeforeRouteLeave(() => !paymentsStore.checkoutBusy);
-watch(() => paymentsStore.checkoutOutcome, outcome => { if (outcome === 'approved') selectingPlanId.value = null; });
+watch(() => paymentsStore.checkoutOutcome, outcome => {
+  if (outcome === 'approved') { selectingPlanId.value = null; if (props.onboarding) emit('verified'); }
+});
 
 function restoreCheckoutFocus() {
   if (checkoutTrigger instanceof HTMLElement && checkoutTrigger.isConnected) {
@@ -62,7 +66,10 @@ function refreshPending() {
 }
 let verificationTimer;
 onMounted(() => {
-  void paymentsStore.fetchPaymentsData().then(refreshPending);
+  void paymentsStore.fetchPaymentsData().then(() => {
+    refreshPending();
+    if (props.onboarding && paymentsStore.currentSubscription?.isActive && !paymentsStore.isSimulated) emit('verified');
+  });
   verificationTimer = window.setInterval(refreshPending, 15000);
   document.addEventListener('visibilitychange', refreshPending);
 });
@@ -72,7 +79,10 @@ onUnmounted(() => {
 });
 watch(() => [apiContext.userId, apiContext.businessId, apiContext.status], () => {
   selectingPlanId.value = null; notice.value = '';
-  void paymentsStore.fetchPaymentsData().then(refreshPending);
+  void paymentsStore.fetchPaymentsData().then(() => {
+    refreshPending();
+    if (props.onboarding && paymentsStore.currentSubscription?.isActive && !paymentsStore.isSimulated) emit('verified');
+  });
 });
 
 /** Opens checkout after checking plan availability. @param {string} planId - Plan identifier. */
@@ -111,8 +121,8 @@ function handleCancelClick() {
   <div class="subscription-page">
     <header class="subscription-page__header">
       <div class="subscription-page__titles">
-        <h1 class="subscription-page__title">{{ $t("payments.title") }}</h1>
-        <p class="subscription-page__subtitle">{{ $t("payments.subtitle") }}</p>
+        <h1 class="subscription-page__title">{{ $t(onboarding ? "payments.choosePlanTitle" : "payments.title") }}</h1>
+        <p class="subscription-page__subtitle">{{ $t(onboarding ? "payments.choosePlanDescription" : "payments.subtitle") }}</p>
       </div>
     </header>
 
@@ -126,7 +136,7 @@ function handleCancelClick() {
     <p v-if="paymentsStore.isLoading" class="subscription-page__state" role="status">
       {{ $t("payments.loading") }}
     </p>
-    <p v-else-if="paymentsStore.hasLoaded && !paymentsStore.currentSubscription" class="subscription-page__state" role="alert">
+    <p v-else-if="!onboarding && paymentsStore.hasLoaded && !paymentsStore.currentSubscription" class="subscription-page__state" role="status">
       {{ $t("payments.empty") }}
     </p>
 
@@ -157,6 +167,7 @@ function handleCancelClick() {
               v-for="plan in paymentsStore.plans"
               :key="plan.id"
               :plan="plan"
+              :initial="!paymentsStore.currentSubscription?.isActive"
               :selected="plan.id === paymentsStore.currentSubscription?.planId && paymentsStore.currentSubscription?.isActive && !paymentsStore.isSimulated"
               :selecting="paymentsStore.checkoutBusy || openingCheckout"
               :currency="currency"
@@ -198,9 +209,9 @@ function handleCancelClick() {
         </template>
       </Dialog>
 
-      <BillingHistory :payments="paymentsStore.paymentHistory" />
+      <BillingHistory v-if="!onboarding" :payments="paymentsStore.paymentHistory" />
 
-      <section v-if="paymentsStore.currentSubscription" class="pause-banner" :aria-label="$t('payments.pauseTitle')">
+      <section v-if="!onboarding && paymentsStore.currentSubscription" class="pause-banner" :aria-label="$t('payments.pauseTitle')">
                 <span class="pause-banner__icon" aria-hidden="true">
                     <i class="pi pi-shield"></i>
                 </span>
@@ -208,6 +219,9 @@ function handleCancelClick() {
           <h3 class="pause-banner__title">{{ $t("payments.pauseTitle") }}</h3>
           <p class="pause-banner__text">{{ $t("payments.pauseText") }}</p>
         </div>
+        <pv-button v-if="paymentsStore.currentSubscription.cancelAtPeriodEnd && paymentsStore.currentSubscription.isActive"
+            :label="$t('payments.resumeRenewal')" :loading="paymentsStore.checkoutBusy"
+            @click="paymentsStore.resumeSubscription()" />
         <pv-button
             class="pause-banner__action"
             type="button"
