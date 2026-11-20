@@ -1359,7 +1359,17 @@
     "sessionExpired": "Your session has expired. Sign in to continue.",
     "setupTitle": "Finish setting up your account",
     "setupDescription": "Your account is saved. Complete your business, personal profile and subscription to access InstAlert.",
-    "retrySession": "Check account status"
+    "retrySession": "Check account status",
+    "employeeSetup": {
+      "title": "Complete your employee account",
+      "help": "Complete your personal profile, then accept your commerce invitation.",
+      "empty": "No pending invitation was found. Contact your administrator to request one or have it resent.",
+      "commerce": "Commerce reference: {id}",
+      "accept": "Accept invitation",
+      "inactive": "Your commerce access is disabled. Contact your administrator to reactivate it.",
+      "subscriptionInactive": "Your commerce subscription is not active. Contact your administrator.",
+      "error": "Unable to load or accept the invitation. Refresh and try again."
+    }
   },
   "onboarding": {
     "eyebrow": "Account setup",

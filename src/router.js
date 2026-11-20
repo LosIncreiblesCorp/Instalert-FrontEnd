@@ -35,6 +35,7 @@ const routes = [
   { path: '/sign-in', name: 'sign-in', component: () => import('./iam/presentation/views/sign-in.vue'), meta: { standalone: true, guest: true, title: 'iam.signInTitle' } },
   { path: '/sign-up', name: 'sign-up', component: () => import('./iam/presentation/views/sign-up.vue'), meta: { standalone: true, guest: true, title: 'iam.registerTitle' } },
   { path: '/change-password', name: 'change-password', component: () => import('./iam/presentation/views/change-password.vue'), meta: { standalone: true, requiresAuth: true, title: 'iam.changePasswordAction' } },
+  { path: '/employee/onboarding', name: 'employee-onboarding', component: () => import('./iam/presentation/views/employee-onboarding.vue'), meta: { standalone: true, requiresAuth: true, onboarding: true, role: 'employee', title: 'iam.employeeSetup.title' } },
   { path: '/account/setup', name: 'session-setup', component: () => import('./iam/presentation/views/session-setup.vue'), meta: { standalone: true, requiresAuth: true, onboarding: true, title: 'iam.setupTitle' } },
   { path: "/admin", redirect: { name: "admin-dashboard" } },
   {
@@ -100,7 +101,7 @@ router.beforeEach(async (to) => {
   await iam.initialize();
   document.title = `InstAlert | ${i18n.global.t(to.meta.title ?? "common.appName")}`;
   const signedIn = Boolean(accessToken());
-  const setup = () => ({ name: iam.error || iam.user.role !== 'administrator' || !router.hasRoute('onboarding') ? 'session-setup' : 'onboarding' });
+  const setup = () => ({ name: iam.error ? 'session-setup' : iam.user.role === 'employee' ? 'employee-onboarding' : router.hasRoute('onboarding') ? 'onboarding' : 'session-setup' });
   const home = () => ({ name: iam.user.role === 'administrator' ? 'admin-dashboard' : 'employee-dashboard' });
   if (to.meta.guest) {
     if (!signedIn) return true;
@@ -113,6 +114,7 @@ router.beforeEach(async (to) => {
   if (to.meta.role && to.meta.role !== iam.user.role) return iam.user.hasApplicationAccess ? home() : setup();
   if (!iam.user.hasApplicationAccess) {
     if (!to.meta.onboarding) return setup();
+    if (to.name === 'session-setup' && iam.user.role === 'employee' && !iam.error) return { name: 'employee-onboarding' };
     if (to.name === 'session-setup' && iam.user.role === 'administrator' && router.hasRoute('onboarding') && !iam.error) return { name: 'onboarding' };
     return true;
   }

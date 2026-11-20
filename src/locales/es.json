@@ -1359,7 +1359,17 @@
     "sessionExpired": "Tu sesión venció. Inicia sesión para continuar.",
     "setupTitle": "Completa tu cuenta",
     "setupDescription": "Tu cuenta está guardada. Completa tu comercio, perfil personal y suscripción para acceder a InstAlert.",
-    "retrySession": "Consultar estado de la cuenta"
+    "retrySession": "Consultar estado de la cuenta",
+    "employeeSetup": {
+      "title": "Completa tu cuenta de empleado",
+      "help": "Completa tu perfil personal y luego acepta la invitación de tu comercio.",
+      "empty": "No se encontró una invitación pendiente. Contacta a tu administrador para solicitarla o pedir que la reenvíe.",
+      "commerce": "Referencia del comercio: {id}",
+      "accept": "Aceptar invitación",
+      "inactive": "Tu acceso al comercio está deshabilitado. Contacta a tu administrador para reactivarlo.",
+      "subscriptionInactive": "La suscripción de tu comercio no está vigente. Contacta a tu administrador.",
+      "error": "No se pudo cargar o aceptar la invitación. Actualiza e inténtalo nuevamente."
+    }
   },
   "onboarding": {
     "eyebrow": "Configuración de cuenta",
