@@ -1360,5 +1360,22 @@
     "setupTitle": "Finish setting up your account",
     "setupDescription": "Your account is saved. Complete your business, personal profile and subscription to access InstAlert.",
     "retrySession": "Check account status"
+  },
+  "onboarding": {
+    "eyebrow": "Account setup",
+    "title": "Welcome to InstAlert",
+    "description": "Complete your business and personal details to get started.",
+    "stepsLabel": "Account setup progress",
+    "steps": {
+      "business": "Your business",
+      "personal-profile": "Personal profile",
+      "subscription": "Subscription"
+    },
+    "checking": "Checking your account…",
+    "detailsSaved": "Your details are saved",
+    "paymentRequired": "Your business and personal profile are complete. An active subscription is required before you can enter InstAlert.",
+    "checkStatus": "Check subscription status",
+    "savedNote": "Your progress is saved. You can sign out and continue later.",
+    "resume": "Continue setting up your account."
   }
 }
