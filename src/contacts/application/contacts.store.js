@@ -1,3 +1,4 @@
+import { accessToken, currentSession } from '../../iam/infrastructure/session.js';
 import { ref, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { EmergencyContact } from '../domain/model/emergency-contact.entity.js';
@@ -10,7 +11,7 @@ const editableFields = values => ({ fullName: values.fullName, relationship: val
     phone: values.phone, email: values.email, notes: values.notes });
 const validationKeys = { fullName: 'nameInvalid', relationship: 'relationshipInvalid', phone: 'phoneInvalid', email: 'emailInvalid', notes: 'notesInvalid' };
 
-/** Personal contacts scoped to the selected operational employee. */
+/** Personal contacts belong to the authenticated employee. */
 export default defineStore('contacts', () => {
     const contacts = ref([]);
     const selectedContact = ref(null);
@@ -24,16 +25,16 @@ export default defineStore('contacts', () => {
     let readRequest = 0;
     const scope = () => ({ generation, revision: currentContextRevision(), userId: apiContext.userId, businessId: apiContext.businessId });
     const current = value => value.generation === generation && value.revision === currentContextRevision()
-        && value.userId === apiContext.userId && value.businessId === apiContext.businessId;
+        && currentSession().hasApplicationAccess && value.userId === apiContext.userId && value.businessId === apiContext.businessId;
     function clearValidation() { fieldErrors.value = {}; }
     function clearMessages() { errorMessage.value = null; noticeMessage.value = null; clearValidation(); }
     function resetContext() {
         generation++; readRequest++; contacts.value = []; selectedContact.value = null;
         isLoading.value = false; isSaving.value = false; loaded.value = false; clearMessages();
     }
-    watch(() => [apiContext.userId, apiContext.businessId], resetContext, { flush: 'sync' });
+    watch(() => [apiContext.userId, apiContext.businessId, currentSession().hasApplicationAccess, currentSession().role], resetContext, { flush: 'sync' });
     function requireEmployee() {
-        if (apiContext.role !== 'employee' || !apiContext.userId) throw new Error('api.errors.forbidden');
+        if (currentSession().role !== 'employee' || !currentSession().hasApplicationAccess || !accessToken() || !apiContext.userId) throw new Error('api.errors.forbidden');
         requireBusinessId();
     }
     function owned(resource, captured) {

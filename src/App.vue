@@ -23,6 +23,9 @@ const profiles = useProfilesStore();
 useAlertStore();
 watch(() => apiContext.userId, () => profiles.setContext(apiContext.role), { immediate: true, flush: 'sync' });
 const route = useRoute();
+watch(() => currentSession().hasApplicationAccess, (allowed, previous) => {
+  if (!allowed && previous && route.meta.role && !route.meta.standalone) router.replace({ name: 'session-setup' });
+});
 const notifications = useNotificationsStore();
 watch(() => [apiContext.userId, apiContext.businessId, apiContext.status, route.meta.role, route.meta.standalone], () => {
   notifications.stopPolling();

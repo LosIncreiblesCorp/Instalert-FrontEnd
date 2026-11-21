@@ -1,7 +1,16 @@
+import { useIamStore } from '../../iam/application/iam.store.js';
 import { BaseApi } from '../../shared/infrastructure/base-api.js';
 
 /** Contact ownership is derived by the server from the current caller. */
 export class ContactsApi extends BaseApi {
+    constructor() {
+        super();
+        this.http.interceptors.response.use(undefined, async error => {
+            if (error.response?.status === 403) await useIamStore().refreshSession();
+            throw error;
+        });
+    }
+
     getContacts() { return this.http.get('emergency-contacts'); }
     getContact(id) { return this.http.get(`emergency-contacts/${encodeURIComponent(id)}`); }
     createContact(resource) { return this.http.post('emergency-contacts', resource); }
