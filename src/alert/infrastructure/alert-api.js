@@ -1,8 +1,17 @@
+import { useIamStore } from '../../iam/application/iam.store.js';
 import { BaseApi } from '../../shared/infrastructure/base-api.js';
 import { currentApiContext, requireBusinessId } from '../../shared/infrastructure/api-context.js';
 
 /** Explicit Alert commands; status, identity and timestamps are assigned by the server. */
 export class AlertApi extends BaseApi {
+    constructor() {
+        super();
+        this.http.interceptors.response.use(undefined, async error => {
+            if (error.response?.status === 403) await useIamStore().refreshSession();
+            throw error;
+        });
+    }
+
     async getAlerts() {
         const businessId = requireBusinessId();
         const data = [];
