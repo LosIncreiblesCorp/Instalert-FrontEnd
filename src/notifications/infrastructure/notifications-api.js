@@ -1,7 +1,16 @@
+import { useIamStore } from '../../iam/application/iam.store.js';
 import { BaseApi } from '../../shared/infrastructure/base-api.js';
 
 /** The server determines recipients, distance and delivery time. */
 export class NotificationsApi extends BaseApi {
+    constructor() {
+        super();
+        this.http.interceptors.response.use(undefined, async error => {
+            if (error.response?.status === 403) await useIamStore().refreshSession();
+            throw error;
+        });
+    }
+
     getNotifications(businessId, page = 1, pageSize = 100) {
         return this.http.get('notifications', { params: { businessId, page, pageSize } });
     }
