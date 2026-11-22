@@ -184,25 +184,11 @@ export default defineStore('business', () => {
             await api.createInvitation(businessId, StaffInvitationAssembler.toResourceFromEntity(invitation));
         }, 'business.messages.invitationCreated');
     }
-    function updateInvitation(id, values) {
-        return runCommand(async () => {
-            const invitation = new StaffInvitation({ ...getPendingInvitation(id), ...values }).validate();
-            assertUniqueEmail(invitation.email, null, id);
-            await api.updateInvitation(id, StaffInvitationAssembler.toResourceFromEntity(invitation));
-        }, 'business.messages.updated');
-    }
     function cancelInvitation(id) {
         return runCommand(async () => { getPendingInvitation(id); await api.cancelInvitation(id); }, 'business.messages.invitationCancelled');
     }
     function resendInvitation(id) {
         return runCommand(async () => { getPendingInvitation(id); await api.resendInvitation(id); }, 'business.messages.resendRecorded');
-    }
-    function updateMember(id, values) {
-        return runCommand(async () => {
-            const member = new BusinessMember({ ...getMember(id), ...values }).validate();
-            assertUniqueEmail(member.email, id);
-            await api.updateMember(id, BusinessMemberAssembler.toResourceFromEntity(member));
-        }, 'business.messages.updated');
     }
     function toggleMembership(id) {
         return runCommand(async () => {
@@ -214,5 +200,5 @@ export default defineStore('business', () => {
     return { profile, profileLoaded, isProfileLoading, isProfileSaving, profileError, profileNotice, loadProfile, saveProfile,
         members, employees, invitations, planLimits, personnelLoaded, occupiedSeats, reservedSeats, availableSeats,
         isLoading, isSaving, errorMessage, noticeMessage, clearMessages, loadPersonnel,
-        createInvitation, updateInvitation, cancelInvitation, resendInvitation, updateMember, toggleMembership };
+        createInvitation, cancelInvitation, resendInvitation, toggleMembership };
 });

@@ -1,6 +1,11 @@
 // Lazy-loaded components
 const businessRoutes = [
   {
+    path: '/onboarding', name: 'onboarding',
+    component: () => import('./views/onboarding-page.vue'),
+    meta: { role: 'administrator', standalone: true, requiresAuth: true, onboarding: true, title: 'onboarding.title' },
+  },
+  {
     path: "/admin/business",
     name: "admin-business-profile",
     component: () => import("./views/business-profile.vue"),

@@ -3,7 +3,7 @@
     <risk-map v-if="mappingStore.center" :center="mappingStore.center" :inert="selectedItem && narrowScreen ? true : undefined" ref="mapView" :key="mapKey" :risk-zones="mappingStore.riskZones" :incidents="filteredIncidents" :businesses="mappingStore.businesses"
       :selected-item-id="selection?.id ?? null" :selected-type="selection?.type ?? ''"
       @zone-selected="selectItem('zone', $event)" @incident-selected="selectItem('incident', $event)" @business-selected="selectItem('business', $event)"
-      @map-ready="mapReady = true; mapError = false" @map-error="mapError = true" />
+      @map-ready="onMapReady" @map-error="mapError = true" />
     <div class="floating-top-bar">
       <div class="filters-card" role="group" :aria-label="t('mapping.filters.label')">
         <div class="time-filters" role="group" :aria-label="t('mapping.filters.period')">
@@ -70,6 +70,8 @@
 /** Filters, accessible selection and loading states for the geographical projection. */
 import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
+import { currentSession } from '../../../iam/infrastructure/session.js';
 import { useMappingStore } from '../../application/mapping.store.js';
 import { apiContext } from '../../../shared/infrastructure/api-context.js';
 import { IncidentCategory } from '../../domain/model/incident-marker.entity.js';
@@ -77,10 +79,15 @@ import { incidentTitle, zoneName } from '../mapping-format.js';
 import RiskMap from '../components/risk-map.vue';
 import TacticalInspector from '../components/tactical-inspector.vue';
 const mappingStore = useMappingStore();
+const route = useRoute();
+const requestedAlertId = computed(() => typeof route.query.alertId === 'string'
+  && route.query.alertId.trim() && route.query.alertId.length <= 80 ? route.query.alertId : null);
+let pendingAlertId = requestedAlertId.value;
+let openingNotification = 0;
 const { t } = useI18n();
 const selection = ref(null);
 const selectionMessage = ref('');
-const timeFilter = ref('24h');
+const timeFilter = ref(requestedAlertId.value ? 'all' : '24h');
 const incidentTypeFilter = ref('all');
 const periods = ['24h', '7d', '30d', 'all'];
 const radiusMeters = ref(1000);
@@ -111,6 +118,33 @@ watch([selectedItem, selection], ([item, current]) => {
     closeInspector();
   }
 });
+async function onMapReady() {
+  mapReady.value = true; mapError.value = false;
+  await nextTick();
+  if (selectedItem.value) mapView.value?.focusItem(selectedItem.value, selection.value.type);
+}
+async function openRequestedAlert() {
+  const id = pendingAlertId;
+  if (!id || mappingStore.isLoading || !mappingStore.hasLoaded || mappingStore.error) return;
+  pendingAlertId = null;
+  if (!filteredIncidents.value.some(item => String(item.id) === id)) {
+    selectionMessage.value = 'mapping.feedback.notificationUnavailable';
+    return;
+  }
+  await selectItem('incident', id);
+  if (selectedItem.value?.status === 'resolved') selectionMessage.value = 'mapping.feedback.notificationResolved';
+}
+watch(() => [mappingStore.hasLoaded, mappingStore.isLoading], () => { void openRequestedAlert(); });
+watch(requestedAlertId, async id => {
+  const attempt = ++openingNotification;
+  pendingAlertId = id;
+  await closeInspector();
+  if (!id) return;
+  timeFilter.value = 'all'; incidentTypeFilter.value = 'all'; radiusMeters.value = 1000;
+  await nextTick();
+  await reloadData();
+  if (attempt === openingNotification) await openRequestedAlert();
+});
 async function selectItem(type, id) {
   if (!selection.value) returnFocus = document.activeElement;
   selection.value = { type, id };
@@ -128,9 +162,13 @@ async function closeInspector() {
   else explorerButton.value?.focus();
 }
 function clearFilters() { timeFilter.value = 'all'; incidentTypeFilter.value = 'all'; }
-function reloadData() { return mappingStore.fetchMapData({ radiusMeters: radiusMeters.value, category: incidentTypeFilter.value, period: timeFilter.value }); }
-function refreshVisible() { if (!document.hidden && !mappingStore.isLoading) void reloadData(); }
-watch([timeFilter, incidentTypeFilter, radiusMeters, () => apiContext.userId, () => apiContext.businessId, () => apiContext.status], () => {
+async function reloadData() {
+  const loaded = await mappingStore.fetchMapData({ radiusMeters: radiusMeters.value, category: incidentTypeFilter.value, period: timeFilter.value });
+  if (loaded) await openRequestedAlert();
+  return loaded;
+}
+function refreshVisible() { if (!document.hidden && !mappingStore.isLoading && currentSession().hasApplicationAccess) void reloadData(); }
+watch([timeFilter, incidentTypeFilter, radiusMeters, () => apiContext.userId, () => apiContext.businessId, () => apiContext.status, () => currentSession().hasApplicationAccess], () => {
   void closeInspector();
   void reloadData();
 });

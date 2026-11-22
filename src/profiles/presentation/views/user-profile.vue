@@ -6,6 +6,7 @@ import { UserProfile } from '../../domain/model/user-profile.entity.js';
 import { useProfilesStore } from '../../application/profiles.store.js';
 
 const route = useRoute();
+const emit = defineEmits(['saved']);
 const store = useProfilesStore();
 const { t } = useI18n();
 const form = reactive({ firstName: '', lastName: '', dni: '', phone: '' });
@@ -42,14 +43,14 @@ async function saveProfile() {
     document.getElementById(`profile-${firstError}`)?.focus();
     return;
   }
-  await store.updateProfile({ ...form });
+  if (await store.updateProfile({ ...form })) emit('saved');
 }
 async function savePreferences() { await store.updatePreferences(selectedLocale.value); }
 
 watch(() => route.meta.role, role => {
   store.setContext(role);
   store.loadProfile();
-  store.loadPreferences();
+  store.loadPreferences({ applyLocale: !route.meta.onboarding });
 }, { immediate: true });
 watch(() => store.profile, () => {
   Object.assign(form, profileValues());

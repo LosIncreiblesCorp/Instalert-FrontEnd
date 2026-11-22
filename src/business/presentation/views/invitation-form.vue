@@ -38,7 +38,7 @@ async function createInvitation() {
             @click="router.push({ name: 'admin-personnel' })" />
         <header class="page-heading">
             <h1 id="invitation-title">{{ t('business.invitation.title') }}</h1>
-            <p>{{ t('business.invitation.description') }}</p>
+            <p>{{ t('business.invitation.description') }} {{ t('business.invitation.accountHelp') }}</p>
         </header>
 
         <form class="invitation-surface" novalidate @submit.prevent="createInvitation">

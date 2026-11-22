@@ -1,3 +1,4 @@
+import { accessToken, currentSession } from '../../iam/infrastructure/session.js';
 import { computed, ref, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { AlertPreferences, DEFAULT_PANIC_GRACE_PERIOD_SECONDS } from '../domain/model/alert-preferences.entity.js';
@@ -53,11 +54,11 @@ export default defineStore('alert', () => {
         ? `instalert:${apiContext.userId}:${apiContext.businessId}:panic-preparation` : null;
     let storageKey = keyForContext();
     const scope = () => ({ generation, revision: currentContextRevision(), businessId: apiContext.businessId });
-    const current = value => value.generation === generation && value.revision === currentContextRevision() && value.businessId === apiContext.businessId;
+    const current = value => value.generation === generation && value.revision === currentContextRevision() && currentSession().hasApplicationAccess && value.businessId === apiContext.businessId;
     function message(error) {
         if (error.apiError?.code === 'already_completed') return 'alerts.workflow.results.alreadyCompleted';
         if (error.apiError?.code === 'transition') return 'alerts.workflow.errors.transition';
-        return error.apiError?.messageKey ?? (error.message?.startsWith('alerts.') ? error.message : 'alerts.workflow.errors.requestFailed');
+        return error.apiError?.messageKey ?? (/^(alerts\.|api\.)/.test(error.message) ? error.message : 'alerts.workflow.errors.requestFailed');
     }
     function replaceRecord(record) {
         const index = alertRecords.value.findIndex(item => item.id === record.id);
@@ -93,7 +94,7 @@ export default defineStore('alert', () => {
         isLoading.value = false; isInitialized.value = false; isPreparingPanic.value = false; isActivatingPanic.value = false;
         isCompletingReport.value = false; writes.value = 0; errorMessage.value = null; noticeMessage.value = null;
     }
-    watch(() => [apiContext.userId, apiContext.businessId], resetContext, { flush: 'sync' });
+    watch(() => [apiContext.userId, apiContext.businessId, currentSession().hasApplicationAccess, currentSession().role], resetContext, { flush: 'sync' });
     function updateCountdown() {
         if (countdownDeadline.value === null) return;
         remainingSeconds.value = Math.max(0, Math.ceil((countdownDeadline.value - Date.now()) / 1000));
@@ -130,6 +131,7 @@ export default defineStore('alert', () => {
         const captured = scope(); isLoading.value = true; errorMessage.value = null;
         const request = (async () => {
             try {
+                if (!accessToken() || !currentSession().hasApplicationAccess) throw new Error('api.errors.forbidden');
                 requireBusinessId();
                 const [, response] = await Promise.all([loadAlertRecords(captured), api.getAlertPreferences()]);
                 if (!current(captured)) return false;
@@ -182,7 +184,7 @@ export default defineStore('alert', () => {
         return pendingLocationSave;
     }
     async function startPanicCountdown(location = apiContext.businessLocation ?? {}) {
-        if (!isInitialized.value || isSaving.value || isActivatingPanic.value || activePanicRecord.value || countdownDeadline.value) return false;
+        if (!currentSession().hasApplicationAccess || !isInitialized.value || isSaving.value || isActivatingPanic.value || activePanicRecord.value || countdownDeadline.value) return false;
         const captured = scope(); isPreparingPanic.value = true; errorMessage.value = null; noticeMessage.value = null;
         try {
             const selectedLocation = locationDetails(location);
@@ -249,7 +251,7 @@ export default defineStore('alert', () => {
             const response = await api.resolvePanic(id);
             if (!current(captured)) return false;
             replaceRecord(readRecord(response, captured.businessId)); selectedRecordId.value = id;
-            currentView.value = 'panic-report'; return true;
+            currentView.value = 'panic-report'; defaultPanicReportLocation(); return true;
         } catch (error) { if (current(captured)) errorMessage.value = message(error); return false; }
         finally { if (current(captured)) writes.value--; }
     }
@@ -302,10 +304,15 @@ export default defineStore('alert', () => {
         if ((draftRevisions.get(id) ?? 0) !== (savedDraftRevisions.get(id) ?? 0)) return persistPanicReportDraft(id);
         return pendingDraftSave;
     }
+    function defaultPanicReportLocation() {
+        const record = selectedRecord.value, location = apiContext.businessLocation;
+        if (record && location && (!Number.isFinite(record.latitude) || !Number.isFinite(record.longitude)))
+            updatePanicReportDraft(locationDetails(location));
+    }
     function resumePanicReport(id) {
         const record = alertRecords.value.find(item => item.id === id);
         if (!record?.hasPendingPanicReport || record.employeeId !== apiContext.userId) return false;
-        selectedRecordId.value = id; currentView.value = 'panic-report'; noticeMessage.value = null; return true;
+        selectedRecordId.value = id; currentView.value = 'panic-report'; defaultPanicReportLocation(); noticeMessage.value = null; return true;
     }
     async function deferPanicReport() {
         const captured = scope();
@@ -330,7 +337,7 @@ export default defineStore('alert', () => {
         } finally { if (current(captured)) isCompletingReport.value = false; }
     }
     function startReport(kind) {
-        if (isSaving.value || isActivatingPanic.value || !isInitialized.value || kind === 'panic' || !Object.values(AlertRecordKind).includes(kind)) return false;
+        if (!currentSession().hasApplicationAccess || isSaving.value || isActivatingPanic.value || !isInitialized.value || kind === 'panic' || !Object.values(AlertRecordKind).includes(kind)) return false;
         reportKind.value = kind; reportDraft.value = { ...blankDraft(), ...locationDetails(apiContext.businessLocation ?? {}) };
         currentView.value = 'report-form'; errorMessage.value = null; noticeMessage.value = null; return true;
     }

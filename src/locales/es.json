@@ -15,11 +15,61 @@
     "goBack": "Volver",
     "calendar": {
       "firstDayOfWeek": 1,
-      "dayNames": ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
-      "dayNamesShort": ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"],
-      "dayNamesMin": ["do", "lu", "ma", "mi", "ju", "vi", "sá"],
-      "monthNames": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
-      "monthNamesShort": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
+      "dayNames": [
+        "domingo",
+        "lunes",
+        "martes",
+        "miércoles",
+        "jueves",
+        "viernes",
+        "sábado"
+      ],
+      "dayNamesShort": [
+        "dom",
+        "lun",
+        "mar",
+        "mié",
+        "jue",
+        "vie",
+        "sáb"
+      ],
+      "dayNamesMin": [
+        "do",
+        "lu",
+        "ma",
+        "mi",
+        "ju",
+        "vi",
+        "sá"
+      ],
+      "monthNames": [
+        "enero",
+        "febrero",
+        "marzo",
+        "abril",
+        "mayo",
+        "junio",
+        "julio",
+        "agosto",
+        "septiembre",
+        "octubre",
+        "noviembre",
+        "diciembre"
+      ],
+      "monthNamesShort": [
+        "ene",
+        "feb",
+        "mar",
+        "abr",
+        "may",
+        "jun",
+        "jul",
+        "ago",
+        "sep",
+        "oct",
+        "nov",
+        "dic"
+      ],
       "today": "Hoy",
       "clear": "Limpiar",
       "aria": {
@@ -40,7 +90,8 @@
         "prevMinute": "Minuto anterior",
         "nextMinute": "Minuto siguiente"
       }
-    }
+    },
+    "signOut": "Cerrar sesión"
   },
   "business": {
     "profile": {
@@ -113,7 +164,8 @@
       "nameHelp": "Obligatorio. Ingresa un nombre de hasta 100 caracteres.",
       "quotaSummary": "{available} de {limit} cupos disponibles",
       "create": "Crear invitación",
-      "back": "Volver a Personal"
+      "back": "Volver a Personal",
+      "accountHelp": "El empleado recibe una contraseña temporal válida por 24 horas. Si el correo es incorrecto, cancela la invitación y crea otra."
     },
     "statuses": {
       "active": "Activo",
@@ -217,6 +269,8 @@
       "noZones": "No hay zonas de riesgo disponibles.",
       "noLocation": "Este registro no tiene coordenadas válidas disponibles.",
       "unlocated": "Registros sin ubicación o límites de zona válidos: {count}. Consulta sus datos disponibles en Explorar datos del mapa.",
+      "notificationUnavailable": "Esta alerta ya no está activa o no está disponible en el mapa dentro del alcance permitido.",
+      "notificationResolved": "Esta alerta fue resuelta. Se muestra su reporte disponible.",
       "selectionFiltered": "El incidente seleccionado está fuera de los filtros actuales.",
       "unavailable": "Este registro ya no está disponible. Actualiza los datos e inténtalo nuevamente.",
       "noBusinessLocation": "Guarda la ubicación del comercio para explorar los incidentes cercanos."
@@ -494,7 +548,11 @@
     "retryVerification": "Volver a verificar el pago",
     "demoSubscription": "El plan actual es de demostración. No corresponde a un pago confirmado por PayPal.",
     "periodEnd": "Fin del período: {date}",
-    "planUnavailable": "No disponible por ahora"
+    "planUnavailable": "No disponible por ahora",
+    "choosePlanTitle": "Elige tu suscripción",
+    "choosePlanDescription": "Elige un plan y completa el pago con PayPal. Tu cuenta se habilita cuando el servidor confirma el pago.",
+    "resumeRenewal": "Reactivar renovación",
+    "choosePlan": "Elegir {name}"
   },
   "alerts": {
     "workflow": {
@@ -604,7 +662,10 @@
         "requesting": "Obteniendo la ubicación actual…",
         "ready": "Ubicación actual registrada; puedes editarla.",
         "manualHelp": "No se pudo obtener la ubicación. Puedes escribir una referencia manualmente.",
-        "notAvailable": "Ubicación no disponible"
+        "notAvailable": "Ubicación no disponible",
+        "mapLabel": "Mapa de ubicación del incidente",
+        "markerLabel": "Ubicación seleccionada del incidente",
+        "mapHelp": "La ubicación inicial es la de tu negocio. Haz clic en el mapa o arrastra el marcador para elegir otro punto. Con el teclado, mueve el mapa con las flechas y selecciona Usar el centro del mapa."
       },
       "form": {
         "category": "Tipo de incidente",
@@ -687,8 +748,12 @@
         "confirm": "Descartar reporte",
         "keepEditing": "Seguir editando"
       },
-      "home": { "back": "Volver a Alertas" },
-      "actions": { "retry": "Reintentar" },
+      "home": {
+        "back": "Volver a Alertas"
+      },
+      "actions": {
+        "retry": "Reintentar"
+      },
       "errors": {
         "requestFailed": "No se pudo comunicar con el servicio de alertas. Se conservan tus cambios; inténtalo nuevamente.",
         "activationTitle": "No se pudo registrar la alerta activa",
@@ -1056,6 +1121,7 @@
     "emptyHelp": "Los avisos que recibas aparecerán aquí.",
     "newNotification": "Nueva notificación",
     "dismiss": "Cerrar aviso",
+    "viewOnMap": "Ver alerta en el mapa",
     "viewNotifications": "Ver notificaciones",
     "bellLabel": "Notificaciones, {count} sin leer",
     "unsavedChanges": "¿Descartar los cambios sin guardar en tus preferencias de notificación?",
@@ -1269,5 +1335,68 @@
       "timeout": "La API tardó demasiado en responder. Inténtalo nuevamente.",
       "unexpected": "No se pudo completar la solicitud. Inténtalo nuevamente."
     }
+  },
+  "iam": {
+    "brandMessage": "Seguridad entre comercios",
+    "signInTitle": "Bienvenido de nuevo",
+    "registerTitle": "Crea tu cuenta de administrador",
+    "signInDescription": "Inicia sesión para gestionar tu comercio o continuar una invitación.",
+    "registerDescription": "Crea tu cuenta, registra tu comercio y elige una suscripción.",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "passwordHint": "Usa entre 10 y 72 caracteres, con una letra y un número.",
+    "createAccount": "Crear cuenta",
+    "signIn": "Iniciar sesión",
+    "existingAccount": "¿Ya tienes una cuenta? Inicia sesión",
+    "newAccount": "Registrar tu comercio",
+    "employeeInvitation": "Los empleados ingresan mediante una invitación de su administrador.",
+    "changePasswordTitle": "Establece tu contraseña personal",
+    "changePasswordDescription": "Reemplaza tu contraseña temporal antes de continuar.",
+    "currentPassword": "Contraseña actual o temporal",
+    "newPassword": "Nueva contraseña",
+    "savePassword": "Guardar contraseña",
+    "errors": {
+      "credentials": "El correo o la contraseña son incorrectos.",
+      "emailRegistered": "Este correo ya tiene una cuenta. Inicia sesión.",
+      "validation": "Revisa los datos y los requisitos de contraseña.",
+      "unavailable": "No se pudo conectar con el servicio. Vuelve a intentarlo.",
+      "passwordMismatch": "Las contraseñas no coinciden."
+    },
+    "loadingSession": "Cargando tu sesión…",
+    "changePasswordAction": "Cambiar contraseña",
+    "returnToApplication": "Volver a la aplicación",
+    "personalPasswordDescription": "Elige una nueva contraseña para proteger tu cuenta.",
+    "sessionExpired": "Tu sesión venció. Inicia sesión para continuar.",
+    "setupTitle": "Completa tu cuenta",
+    "setupDescription": "Tu cuenta está guardada. Completa tu comercio, perfil personal y suscripción para acceder a InstAlert.",
+    "retrySession": "Consultar estado de la cuenta",
+    "employeeSetup": {
+      "title": "Completa tu cuenta de empleado",
+      "help": "Completa tu perfil personal y luego acepta la invitación de tu comercio.",
+      "empty": "No se encontró una invitación pendiente. Contacta a tu administrador para solicitarla o pedir que la reenvíe.",
+      "commerce": "Referencia del comercio: {id}",
+      "accept": "Aceptar invitación",
+      "inactive": "Tu acceso al comercio está deshabilitado. Contacta a tu administrador para reactivarlo.",
+      "subscriptionInactive": "La suscripción de tu comercio no está vigente. Contacta a tu administrador.",
+      "error": "No se pudo cargar o aceptar la invitación. Actualiza e inténtalo nuevamente."
+    }
+  },
+  "onboarding": {
+    "eyebrow": "Configuración de cuenta",
+    "title": "Bienvenido a InstAlert",
+    "description": "Completa los datos de tu comercio y tu perfil personal para comenzar.",
+    "stepsLabel": "Progreso de configuración de la cuenta",
+    "steps": {
+      "business": "Tu comercio",
+      "personal-profile": "Perfil personal",
+      "subscription": "Suscripción"
+    },
+    "checking": "Consultando tu cuenta…",
+    "detailsSaved": "Tus datos están guardados",
+    "paymentRequired": "Tu comercio y tu perfil personal están completos. Necesitas una suscripción activa antes de ingresar a InstAlert.",
+    "checkStatus": "Consultar estado de suscripción",
+    "savedNote": "Tu avance está guardado. Puedes cerrar sesión y continuar después.",
+    "resume": "Continúa con la configuración de tu cuenta."
   }
 }

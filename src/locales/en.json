@@ -15,11 +15,61 @@
     "goBack": "Go back",
     "calendar": {
       "firstDayOfWeek": 1,
-      "dayNames": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-      "dayNamesShort": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-      "dayNamesMin": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
-      "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-      "monthNamesShort": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      "dayNames": [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ],
+      "dayNamesShort": [
+        "Sun",
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat"
+      ],
+      "dayNamesMin": [
+        "Su",
+        "Mo",
+        "Tu",
+        "We",
+        "Th",
+        "Fr",
+        "Sa"
+      ],
+      "monthNames": [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      "monthNamesShort": [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+      ],
       "today": "Today",
       "clear": "Clear",
       "aria": {
@@ -40,7 +90,8 @@
         "prevMinute": "Previous minute",
         "nextMinute": "Next minute"
       }
-    }
+    },
+    "signOut": "Sign out"
   },
   "business": {
     "profile": {
@@ -113,7 +164,8 @@
       "nameHelp": "Required. Enter a name of up to 100 characters.",
       "quotaSummary": "{available} of {limit} seats available",
       "create": "Create invitation",
-      "back": "Back to staff"
+      "back": "Back to staff",
+      "accountHelp": "The employee receives a temporary password valid for 24 hours. If the email is incorrect, cancel the invitation and create another one."
     },
     "statuses": {
       "active": "Active",
@@ -217,6 +269,8 @@
       "noZones": "No risk zones are available.",
       "noLocation": "No valid coordinates are available for this record.",
       "unlocated": "Records without a valid location or zone boundary: {count}. Consult their available details in Explore map data.",
+      "notificationUnavailable": "This alert is no longer active or is unavailable on the map within the permitted area.",
+      "notificationResolved": "This alert has been resolved. Its available report is shown.",
       "selectionFiltered": "The selected incident is outside the current filters.",
       "unavailable": "This record is no longer available. Refresh the data and try again.",
       "noBusinessLocation": "Save the business location to explore nearby incidents."
@@ -494,7 +548,11 @@
     "retryVerification": "Verify payment again",
     "demoSubscription": "The current plan is demonstration data. It is not a confirmed PayPal payment.",
     "periodEnd": "Period end: {date}",
-    "planUnavailable": "Not available right now"
+    "planUnavailable": "Not available right now",
+    "choosePlanTitle": "Choose your subscription",
+    "choosePlanDescription": "Choose a plan and complete your payment with PayPal. Your account opens after the server confirms the payment.",
+    "resumeRenewal": "Resume renewal",
+    "choosePlan": "Choose {name}"
   },
   "alerts": {
     "workflow": {
@@ -604,7 +662,10 @@
         "requesting": "Getting your current location…",
         "ready": "Current location recorded; you can edit it.",
         "manualHelp": "Location could not be retrieved. You can enter a reference manually.",
-        "notAvailable": "Location unavailable"
+        "notAvailable": "Location unavailable",
+        "mapLabel": "Incident location map",
+        "markerLabel": "Selected incident location",
+        "mapHelp": "Starts at your business location. Click the map or drag the marker to choose another point. With the keyboard, move the map using the arrow keys, then select Use map center."
       },
       "form": {
         "category": "Incident type",
@@ -687,8 +748,12 @@
         "confirm": "Discard report",
         "keepEditing": "Keep editing"
       },
-      "home": { "back": "Back to Alerts" },
-      "actions": { "retry": "Retry" },
+      "home": {
+        "back": "Back to Alerts"
+      },
+      "actions": {
+        "retry": "Retry"
+      },
       "errors": {
         "requestFailed": "Unable to reach the alert service. Your changes are preserved; try again.",
         "activationTitle": "The active alert could not be registered",
@@ -1056,6 +1121,7 @@
     "emptyHelp": "Received updates will appear here.",
     "newNotification": "New notification",
     "dismiss": "Dismiss notice",
+    "viewOnMap": "View alert on map",
     "viewNotifications": "View notifications",
     "bellLabel": "Notifications, {count} unread",
     "unsavedChanges": "Discard your unsaved notification preferences?",
@@ -1269,5 +1335,68 @@
       "timeout": "The API took too long to respond. Try again.",
       "unexpected": "The request could not be completed. Try again."
     }
+  },
+  "iam": {
+    "brandMessage": "Connected commerce safety",
+    "signInTitle": "Welcome back",
+    "registerTitle": "Create your administrator account",
+    "signInDescription": "Sign in to manage your commerce or continue an invitation.",
+    "registerDescription": "Set up your account, register your commerce and choose a subscription.",
+    "email": "Email address",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "passwordHint": "Use 10–72 characters, including a letter and a number.",
+    "createAccount": "Create account",
+    "signIn": "Sign in",
+    "existingAccount": "Already have an account? Sign in",
+    "newAccount": "Register your commerce",
+    "employeeInvitation": "Employees join through an invitation from their commerce administrator.",
+    "changePasswordTitle": "Set your personal password",
+    "changePasswordDescription": "Replace your temporary password before continuing.",
+    "currentPassword": "Current or temporary password",
+    "newPassword": "New password",
+    "savePassword": "Save password",
+    "errors": {
+      "credentials": "The email or password is incorrect.",
+      "emailRegistered": "This email already has an account. Sign in instead.",
+      "validation": "Review the information and password requirements.",
+      "unavailable": "We could not reach the service. Try again.",
+      "passwordMismatch": "The passwords do not match."
+    },
+    "loadingSession": "Loading your session…",
+    "changePasswordAction": "Change password",
+    "returnToApplication": "Return to the application",
+    "personalPasswordDescription": "Choose a new password to protect your account.",
+    "sessionExpired": "Your session has expired. Sign in to continue.",
+    "setupTitle": "Finish setting up your account",
+    "setupDescription": "Your account is saved. Complete your business, personal profile and subscription to access InstAlert.",
+    "retrySession": "Check account status",
+    "employeeSetup": {
+      "title": "Complete your employee account",
+      "help": "Complete your personal profile, then accept your commerce invitation.",
+      "empty": "No pending invitation was found. Contact your administrator to request one or have it resent.",
+      "commerce": "Commerce reference: {id}",
+      "accept": "Accept invitation",
+      "inactive": "Your commerce access is disabled. Contact your administrator to reactivate it.",
+      "subscriptionInactive": "Your commerce subscription is not active. Contact your administrator.",
+      "error": "Unable to load or accept the invitation. Refresh and try again."
+    }
+  },
+  "onboarding": {
+    "eyebrow": "Account setup",
+    "title": "Welcome to InstAlert",
+    "description": "Complete your business and personal details to get started.",
+    "stepsLabel": "Account setup progress",
+    "steps": {
+      "business": "Your business",
+      "personal-profile": "Personal profile",
+      "subscription": "Subscription"
+    },
+    "checking": "Checking your account…",
+    "detailsSaved": "Your details are saved",
+    "paymentRequired": "Your business and personal profile are complete. An active subscription is required before you can enter InstAlert.",
+    "checkStatus": "Check subscription status",
+    "savedNote": "Your progress is saved. You can sign out and continue later.",
+    "resume": "Continue setting up your account."
   }
 }

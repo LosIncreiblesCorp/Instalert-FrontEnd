@@ -18,7 +18,6 @@ export const useProfilesStore = defineStore('profiles', {
         isProfileLoading: false, isPreferencesLoading: false, isProfileSaving: false, isPreferencesSaving: false,
         profileError: null, preferencesError: null, profileSaved: false, preferencesSaved: false }),
     actions: {
-        /** UI role selection is a demo identity boundary, not authentication. */
         setContext(role) {
             const userId = currentApiContext().role === role ? apiContext.userId : null;
             if (this.userId === userId && this.revision === currentContextRevision()) return;
@@ -48,7 +47,7 @@ export const useProfilesStore = defineStore('profiles', {
                 if (this.userId === userId && this.revision === revision && currentContextRevision() === revision) this.isProfileLoading = false;
             }
         },
-        async loadPreferences() {
+        async loadPreferences({ applyLocale = true } = {}) {
             if (!this.userId || this.isPreferencesLoading || this.isPreferencesSaving) return false;
             const userId = this.userId;
             const revision = this.revision;
@@ -61,7 +60,7 @@ export const useProfilesStore = defineStore('profiles', {
                 if (this.userId !== userId || this.revision !== revision || currentContextRevision() !== revision) return false;
                 if (preferences.userId !== userId) throw new Error('Preferences identity mismatch.');
                 this.preferences = preferences;
-                i18n.global.locale.value = uiLocales[preferences.locale];
+                if (applyLocale) i18n.global.locale.value = uiLocales[preferences.locale];
                 return true;
             } catch (error) {
                 if (this.userId === userId && this.revision === revision && currentContextRevision() === revision) this.preferencesError = profileError(error, 'profiles.errors.preferencesLoad');

@@ -6,6 +6,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Business } from '../../domain/model/business.entity.js';
 import useBusinessStore from '../../application/business.store.js';
 
+const emit = defineEmits(['saved']);
 const store = useBusinessStore();
 const { t, locale } = useI18n();
 const form = reactive({ taxId: '', name: '', address: '', latitude: null, longitude: null });
@@ -130,7 +131,7 @@ async function saveProfile() {
     (field?.$el ?? field)?.focus();
     return;
   }
-  if (await store.saveProfile({ ...form })) resetForm();
+  if (await store.saveProfile({ ...form })) { resetForm(); emit('saved'); }
 }
 
 function discardChanges() {
@@ -199,6 +200,7 @@ onBeforeUnmount(() => { disposed = true; destroyMap(); });
         <p id="business-address-error" class="field-error" aria-live="polite">{{ touched && errors.address ? t(errors.address) : '' }}</p>
       </div>
 
+
       <section class="location-section" aria-labelledby="business-location-title">
         <div class="location-heading">
           <h2 id="business-location-title" ref="locationField" tabindex="-1" aria-describedby="business-location-help business-location-error">
@@ -237,6 +239,7 @@ onBeforeUnmount(() => { disposed = true; destroyMap(); });
 </template>
 
 <style scoped>
+
 .business-profile-page { max-width: 1120px; margin: auto; padding: clamp(20px, 3vw, 40px); color: var(--ink, #172033); }
 .page-heading { margin-bottom: 28px; }
 .eyebrow { margin: 0 0 10px; color: #2563eb; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }

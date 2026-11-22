@@ -7,6 +7,7 @@ import { planPrice, formatMoney } from "../payments-format.js";
 const props = defineProps({
   plan: { type: Object, required: true },
   selected: { type: Boolean, default: false },
+  initial: { type: Boolean, default: false },
   selecting: { type: Boolean, default: false },
   currency: { type: String, default: "PEN" },
   accent: { type: Boolean, default: false },
@@ -50,6 +51,7 @@ const ctaLabel = computed(() => {
   if (props.selected) return t("payments.inUse");
   if (props.unavailable) return t("payments.planUnavailable");
   if (props.blocked) return t("payments.planBlocked");
+  if (props.initial) return t("payments.choosePlan", { name: props.plan.name });
   if (props.accent) return t("payments.upgradePlan", { name: props.plan.name });
   return t("payments.changePlan");
 });

@@ -1,6 +1,7 @@
 import axios from "axios";
 import i18n from '../../i18n.js';
-import { currentApiContext, currentContextRevision } from './api-context.js';
+import { currentContextRevision, setAuthenticatedContext } from './api-context.js';
+import { accessToken, clearSession } from '../../iam/infrastructure/session.js';
 import { normalizeApiError } from './api-errors.js';
 
 const platformApi = import.meta.env.VITE_INSTALERT_PLATFORM_API_URL?.trim();
@@ -33,19 +34,25 @@ export class BaseApi {
             },
         });
         this.#http.interceptors.request.use(config => {
-            config.demoContextRevision = currentContextRevision();
-            const { userId } = currentApiContext();
+            config.contextRevision = currentContextRevision();
+            config.sessionToken = accessToken();
             config.headers.delete('User-Id');
-            if (userId) config.headers.set('User-Id', userId);
+            config.headers.delete('Authorization');
+            if (config.sessionToken) config.headers.set('Authorization', 'Bearer ' + config.sessionToken);
             config.headers.set('Accept-Language', i18n.global.locale.value === 'es' ? 'es-419' : 'en-US');
             return config;
         }, undefined, { synchronous: true });
-        const stale = config => config?.demoContextRevision !== undefined && config.demoContextRevision !== currentContextRevision();
+        const stale = config => config?.contextRevision !== undefined
+            && (config.contextRevision !== currentContextRevision() || config.sessionToken !== accessToken());
         this.#http.interceptors.response.use(response => {
-            if (stale(response.config)) throw new axios.CanceledError('The selected demo account changed.', response.config);
+            if (stale(response.config)) throw new axios.CanceledError('The account or commerce changed.', response.config);
             return response;
         }, error => {
-            if (stale(error.config)) return Promise.reject(new axios.CanceledError('The selected demo account changed.', error.config));
+            if (stale(error.config)) return Promise.reject(new axios.CanceledError('The account or commerce changed.', error.config));
+            if (error.response?.status === 401 && !error.config?.credentialRequest && error.config?.sessionToken) {
+                clearSession('expired');
+                setAuthenticatedContext();
+            }
             return Promise.reject(axios.isCancel(error) ? error : normalizeApiError(error));
         });
     }
