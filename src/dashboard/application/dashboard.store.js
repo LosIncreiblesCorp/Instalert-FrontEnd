@@ -1,3 +1,4 @@
+import { accessToken, currentSession } from '../../iam/infrastructure/session.js';
 import { ref, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { DashboardApi } from '../infrastructure/dashboard-api.js';
@@ -13,20 +14,26 @@ export const useDashboardStore = defineStore('dashboard', () => {
     let generation = 0, summaryRequest = 0, historyRequest = 0, detailRequest = 0;
     const capture = () => ({ generation, revision: currentContextRevision(), role: apiContext.role, userId: apiContext.userId, businessId: apiContext.businessId });
     const current = scope => scope.generation === generation && scope.revision === currentContextRevision()
-        && scope.businessId === apiContext.businessId && scope.userId === apiContext.userId;
+        && scope.businessId === apiContext.businessId && scope.userId === apiContext.userId && currentSession().hasApplicationAccess;
     function resetContext() {
         generation++; summaryRequest++; historyRequest++; detailRequest++;
         summary.value = null; monthlyReports.value = []; monthlyReport.value = null;
         isSummaryLoading.value = false; isHistoryLoading.value = false; isDetailLoading.value = false; isGenerating.value = false;
         historyLoaded.value = false; summaryError.value = null; historyError.value = null; detailError.value = null; generationError.value = null;
     }
-    watch(() => [apiContext.userId, apiContext.businessId, apiContext.status], resetContext, { flush: 'sync' });
+    watch(() => [apiContext.userId, apiContext.businessId, apiContext.status, currentSession().hasApplicationAccess], resetContext, { flush: 'sync' });
+    function canLoad() {
+        if (accessToken() && currentSession().hasApplicationAccess) return true;
+        resetContext();
+        return false;
+    }
     function ownedReport(dto, scope) {
         const report = DashboardAssembler.toMonthlyReport(dto);
         if (report.businessId !== scope.businessId) throw new Error('Invalid report scope.');
         return report;
     }
     async function loadSummary() {
+        if (!canLoad()) return false;
         const scope = capture(), request = ++summaryRequest;
         const valid = () => current(scope) && request === summaryRequest;
         isSummaryLoading.value = true; summaryError.value = null;
@@ -44,6 +51,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         } finally { if (valid()) isSummaryLoading.value = false; }
     }
     async function loadMonthlyReports() {
+        if (!canLoad()) return false;
         const scope = capture(), request = ++historyRequest;
         const valid = () => current(scope) && request === historyRequest;
         isHistoryLoading.value = true; historyError.value = null;
@@ -60,6 +68,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         } finally { if (valid()) isHistoryLoading.value = false; }
     }
     async function loadMonthlyReport(id) {
+        if (!canLoad()) return false;
         const scope = capture(), request = ++detailRequest;
         const valid = () => current(scope) && request === detailRequest;
         isDetailLoading.value = true; detailError.value = null; monthlyReport.value = null;
@@ -77,6 +86,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         } finally { if (valid()) isDetailLoading.value = false; }
     }
     async function generateReport(startDate, endDate) {
+        if (!canLoad()) return null;
         if (isGenerating.value) return null;
         const scope = capture(); isGenerating.value = true; generationError.value = null;
         try {

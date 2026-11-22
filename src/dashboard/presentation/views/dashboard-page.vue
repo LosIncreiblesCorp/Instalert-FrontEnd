@@ -16,7 +16,6 @@
     <pv-message v-if="store.summaryError" severity="error" :closable="false" role="alert">{{ t(store.summaryError) }} <button type="button" class="text-link" :disabled="store.isSummaryLoading" @click="reload">{{ t('dashboard.retry') }}</button></pv-message>
     <p v-if="store.isSummaryLoading" class="loading-note" role="status"><i class="pi pi-spin pi-spinner" aria-hidden="true"></i>{{ t('dashboard.loading') }}</p>
     <template v-if="summary">
-      <pv-message v-if="summary.warnings.length" severity="warn" :closable="false"><strong>{{ t('dashboard.partialData') }}</strong><ul class="warning-list"><li v-for="warning in summary.warnings" :key="warning">{{ t('dashboard.warnings.' + warning) }}</li></ul></pv-message>
       <div class="metric-grid">
         <article v-for="card in cards" :key="card.key" class="metric-card">
           <div class="metric-heading"><span>{{ card.label }}</span><i :class="card.icon" aria-hidden="true"></i></div>
@@ -64,6 +63,7 @@ import { computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { useDashboardStore } from '../../application/dashboard.store.js';
+import { currentSession } from '../../../iam/infrastructure/session.js';
 import { apiContext } from '../../../shared/infrastructure/api-context.js';
 import { dashboardTimeZone } from '../../domain/model/dashboard-summary.entity.js';
 import DashboardChart from '../components/dashboard-chart.vue';
@@ -116,7 +116,7 @@ const cards = computed(() => {
   ];
 });
 function reload() { return store.loadSummary(); }
-watch(() => [apiContext.userId, apiContext.businessId, apiContext.status], () => { void reload(); }, { immediate: true });
+watch(() => [apiContext.userId, apiContext.businessId, apiContext.status, currentSession().hasApplicationAccess], () => { void reload(); }, { immediate: true });
 </script>
 
 <style scoped>
@@ -128,7 +128,7 @@ h1 { margin: 0; font-size: clamp(25px, 3vw, 32px); letter-spacing: -.035em; } .p
 .month-context { display: inline-block; margin: 16px 0 0; padding: 7px 11px; border-radius: 7px; background: #eff6ff; color: #1d4ed8; font-size: 12px; font-weight: 600; }
 .page-actions { display: flex; flex-wrap: wrap; gap: 10px; flex-shrink: 0; } .page-actions :deep(button) { min-height: 42px; font-size: 13px; }
 .snapshot-note { color: #64748b; font-size: 11px; line-height: 1.7; margin: 12px 0 20px; } .loading-note { display: flex; gap: 10px; color: #475569; align-items: center; padding: 16px 0; font-size: 14px; }
-.warning-list { margin: 8px 0 0; padding-left: 18px; font-size: 12px; line-height: 1.7; } .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin: 22px 0; }
+.metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin: 22px 0; }
 .metric-card { min-width: 0; padding: 20px; border: 1px solid #e2e8f0; border-radius: 14px; background: white; }
 .metric-heading { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; color: #475569; font-size: 12px; line-height: 1.5; } .metric-heading i { color: #64748b; background: #f1f5f9; padding: 9px; border-radius: 9px; }
 .metric-value { font-size: clamp(23px, 2.6vw, 32px); font-weight: 750; letter-spacing: -.035em; line-height: 1.3; margin: 15px 0 6px; overflow-wrap: anywhere; }
