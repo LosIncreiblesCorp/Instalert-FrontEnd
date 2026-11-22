@@ -41,6 +41,7 @@ import { ref, computed, watch, nextTick } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useDashboardStore } from '../../application/dashboard.store.js';
+import { currentSession } from '../../../iam/infrastructure/session.js';
 import { apiContext } from '../../../shared/infrastructure/api-context.js';
 import { dashboardTimeZone, dashboardDateKey } from '../../domain/model/dashboard-summary.entity.js';
 import DashboardChart from '../components/dashboard-chart.vue';
@@ -80,10 +81,10 @@ const comparison = computed(() => {
   return t(current > previous ? 'dashboard.monthly.increased' : 'dashboard.monthly.decreased', { value, month: previousMonth.value });
 });
 function reload() { return reportId.value ? store.loadMonthlyReport(reportId.value) : store.loadMonthlyReports(); }
-watch([() => apiContext.role, () => apiContext.userId, () => apiContext.businessId, () => apiContext.status, reportId], async ([role], previous, onCleanup) => {
+watch([() => apiContext.role, () => apiContext.userId, () => apiContext.businessId, () => apiContext.status, () => currentSession().hasApplicationAccess, reportId], async ([role], previous, onCleanup) => {
   let current = true;
   onCleanup(() => { current = false; });
-  if (role !== 'administrator') return;
+  if (role !== 'administrator' || !currentSession().hasApplicationAccess) return;
   await reload(); await nextTick(); if (current) heading.value?.focus();
 }, { immediate: true });
 </script>

@@ -8,8 +8,10 @@ import ApiConnectionState from './api-connection-state.vue';
 import { useNotificationsStore } from '../../../notifications/application/notifications.store.js';
 import NotificationNotice from '../../../notifications/presentation/components/notification-notice.vue';
 
+import { useProfilesStore } from '../../../profiles/application/profiles.store.js';
 import { useIamStore } from '../../../iam/application/iam.store.js';
 const iam = useIamStore(), router = useRouter();
+const profiles = useProfilesStore();
 async function signOut() {
   try { await iam.signOut(); } catch { /* The local session is cleared even when the service is unavailable. */ }
   await router.replace({ name: 'sign-in' });
@@ -23,9 +25,14 @@ const mobileNavigationOpen = ref(false);
 const businessNavigationOpen = ref(false);
 
 const isAdministrator = computed(() => route.meta.role === "administrator");
-const currentRoleLabel = computed(() =>
-  isAdministrator.value ? t("roles.administrator") : t("roles.employee"),
-);
+const accountName = computed(() => {
+  const profile = profiles.profile?.userId === apiContext.userId ? profiles.profile : null;
+  return profile?.firstName?.trim() || iam.user.email || t('common.profile');
+});
+watch(() => [apiContext.userId, apiContext.role], () => {
+  profiles.setContext(apiContext.role);
+  if (apiContext.userId && !profiles.profile) void profiles.loadProfile();
+}, { immediate: true });
 const homeRouteName = computed(() =>
   isAdministrator.value ? "admin-dashboard" : "employee-dashboard",
 );
@@ -119,15 +126,14 @@ function closeMobileNavigation() {
           <i class="pi pi-bell" aria-hidden="true"></i>
           <span v-if="unreadNotifications > 0" class="notification-badge" aria-hidden="true">{{ unreadNotifications > 99 ? '99+' : unreadNotifications }}</span>
         </RouterLink>
-        <RouterLink class="profile-link" :to="{ name: profileRouteName }" :aria-label="t('common.profile')">
-          <span class="role-mark" aria-hidden="true"><i class="pi pi-user"></i></span>
-          <span class="role-copy">
-            <span class="role-name">{{ currentRoleLabel }}</span>
+        <RouterLink class="profile-link" :to="{ name: profileRouteName }" :aria-label="t('common.profile') + ': ' + accountName" :title="accountName">
+          <span class="account-mark" aria-hidden="true"><i class="pi pi-user"></i></span>
+          <span class="account-copy">
+            <span class="account-name">{{ accountName }}</span>
           </span>
           <span class="profile-label">{{ t("common.profile") }}</span>
         </RouterLink>
       </div>
-      <pv-button text icon="pi pi-sign-out" :label="t('common.signOut')" @click="signOut" />
     </header>
 
     <pv-button
@@ -189,10 +195,10 @@ function closeMobileNavigation() {
         </ul>
       </nav>
 
-      <div class="sidebar-role-note">
-        <i class="pi pi-shield" aria-hidden="true"></i>
-        <span>{{ currentRoleLabel }}</span>
-      </div>
+      <button type="button" class="sidebar-sign-out" @click="signOut">
+        <i class="pi pi-sign-out" aria-hidden="true"></i>
+        <span>{{ t('common.signOut') }}</span>
+      </button>
     </aside>
 
     <main id="main-content" class="workspace-main" tabindex="-1">
@@ -333,7 +339,7 @@ function closeMobileNavigation() {
   background: #e7edff;
 }
 
-.role-mark {
+.account-mark {
   display: grid;
   width: 34px;
   height: 34px;
@@ -344,11 +350,12 @@ function closeMobileNavigation() {
   background: #f2f6ff;
 }
 
-.role-copy {
+.account-copy {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  min-width: 104px;
+  min-width: 0;
+  max-width: min(30vw, 240px);
 }
 
 .profile-label {
@@ -356,7 +363,10 @@ function closeMobileNavigation() {
   font-weight: 650;
 }
 
-.role-name {
+.account-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 12px;
   font-weight: 700;
   line-height: 1.2;
@@ -506,7 +516,12 @@ function closeMobileNavigation() {
   line-height: 1.35;
 }
 
-.sidebar-role-note {
+.sidebar-sign-out {
+  width: 100%;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
   display: flex;
   min-height: 39px;
   align-items: center;
@@ -520,7 +535,9 @@ function closeMobileNavigation() {
   flex-shrink: 0;
 }
 
-.sidebar-role-note i {
+.sidebar-sign-out:hover { background: #e7edff; }
+
+.sidebar-sign-out i {
   color: var(--blue);
   font-size: 13px;
 }
@@ -587,7 +604,7 @@ select:focus-visible {
     font-size: 11px;
   }
 
-  .role-copy {
+  .account-copy {
     min-width: auto;
   }
 
@@ -634,15 +651,15 @@ select:focus-visible {
     height: 30px;
   }
 
-  .role-mark {
+  .account-mark {
     display: grid;
   }
 
-  .role-copy { display: none; }
+  .account-copy { display: flex; max-width: 95px; }
   .profile-label { display: none; }
-  .profile-link { min-width: 44px; justify-content: center; padding: 4px; }
+  .profile-link { min-width: 44px; justify-content: center; padding: 4px 8px 4px 4px; }
 
-  .role-name {
+  .account-name {
     max-width: 102px;
     font-size: 10px;
     text-align: right;
