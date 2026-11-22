@@ -269,6 +269,8 @@
       "noZones": "No risk zones are available.",
       "noLocation": "No valid coordinates are available for this record.",
       "unlocated": "Records without a valid location or zone boundary: {count}. Consult their available details in Explore map data.",
+      "notificationUnavailable": "This alert is no longer active or is unavailable on the map within the permitted area.",
+      "notificationResolved": "This alert has been resolved. Its available report is shown.",
       "selectionFiltered": "The selected incident is outside the current filters.",
       "unavailable": "This record is no longer available. Refresh the data and try again.",
       "noBusinessLocation": "Save the business location to explore nearby incidents."
@@ -1116,6 +1118,7 @@
     "emptyHelp": "Received updates will appear here.",
     "newNotification": "New notification",
     "dismiss": "Dismiss notice",
+    "viewOnMap": "View alert on map",
     "viewNotifications": "View notifications",
     "bellLabel": "Notifications, {count} unread",
     "unsavedChanges": "Discard your unsaved notification preferences?",

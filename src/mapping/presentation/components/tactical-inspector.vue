@@ -97,6 +97,7 @@
 /** Read-only inspector. All counts refer to the same filtered map projection. */
 import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { incidentTitle, zoneName } from '../mapping-format.js';
 const { t, te, locale } = useI18n();
 const props = defineProps({
   item: { type: Object, required: true }, type: { type: String, required: true },

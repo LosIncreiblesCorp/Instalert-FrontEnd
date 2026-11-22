@@ -1,8 +1,15 @@
 <script setup>
 import { RouterLink } from 'vue-router';
+import { computed } from 'vue';
+import { apiContext } from '../../../shared/infrastructure/api-context.js';
+import { useNotificationsStore } from '../../application/notifications.store.js';
+import { notificationMapLink } from '../notification-map-link.js';
 import { useI18n } from 'vue-i18n';
-defineProps({ notification: { type: Object, required: true }, routeName: { type: String, required: true } });
-defineEmits(['dismiss']);
+const props = defineProps({ notification: { type: Object, required: true }, routeName: { type: String, required: true } });
+const emit = defineEmits(['dismiss']);
+const store = useNotificationsStore();
+const mapLink = computed(() => notificationMapLink(props.notification, apiContext.role));
+function openNotice() { if (mapLink.value) void store.markAsRead(props.notification.id); emit('dismiss'); }
 const { t } = useI18n();
 </script>
 
@@ -16,7 +23,7 @@ const { t } = useI18n();
       </div>
     </div>
     <button class="notice-close" type="button" :aria-label="t('notifications.dismiss')" @click="$emit('dismiss')"><i class="pi pi-times" aria-hidden="true" /></button>
-    <RouterLink :to="{ name: routeName }" @click="$emit('dismiss')">{{ t('notifications.viewNotifications') }}</RouterLink>
+    <RouterLink :to="mapLink ?? { name: routeName }" @click="openNotice">{{ t(mapLink ? 'notifications.viewOnMap' : 'notifications.viewNotifications') }}</RouterLink>
   </aside>
 </template>
 
