@@ -269,6 +269,8 @@
       "noZones": "No hay zonas de riesgo disponibles.",
       "noLocation": "Este registro no tiene coordenadas válidas disponibles.",
       "unlocated": "Registros sin ubicación o límites de zona válidos: {count}. Consulta sus datos disponibles en Explorar datos del mapa.",
+      "notificationUnavailable": "Esta alerta ya no está activa o no está disponible en el mapa dentro del alcance permitido.",
+      "notificationResolved": "Esta alerta fue resuelta. Se muestra su reporte disponible.",
       "selectionFiltered": "El incidente seleccionado está fuera de los filtros actuales.",
       "unavailable": "Este registro ya no está disponible. Actualiza los datos e inténtalo nuevamente.",
       "noBusinessLocation": "Guarda la ubicación del comercio para explorar los incidentes cercanos."
@@ -1116,6 +1118,7 @@
     "emptyHelp": "Los avisos que recibas aparecerán aquí.",
     "newNotification": "Nueva notificación",
     "dismiss": "Cerrar aviso",
+    "viewOnMap": "Ver alerta en el mapa",
     "viewNotifications": "Ver notificaciones",
     "bellLabel": "Notificaciones, {count} sin leer",
     "unsavedChanges": "¿Descartar los cambios sin guardar en tus preferencias de notificación?",

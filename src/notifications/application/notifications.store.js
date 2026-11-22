@@ -1,3 +1,4 @@
+import { accessToken, currentSession } from '../../iam/infrastructure/session.js';
 import { computed, onScopeDispose, ref, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { NotificationPreferences } from '../domain/model/notification-preferences.entity.js';
@@ -33,9 +34,9 @@ export const useNotificationsStore = defineStore('notifications', () => {
     let visibilityListener;
     const scope = () => ({ generation, revision: currentContextRevision(), userId: apiContext.userId, businessId: apiContext.businessId });
     const current = captured => captured.generation === generation && captured.revision === currentContextRevision()
-        && captured.userId === apiContext.userId && captured.businessId === apiContext.businessId;
+        && currentSession().hasApplicationAccess && captured.userId === apiContext.userId && captured.businessId === apiContext.businessId;
     const errorKey = (error, fallback) => error.apiError?.messageKey
-        ?? (error.message?.startsWith('notifications.errors.') ? error.message : fallback);
+        ?? (/^(notifications\.errors\.|api\.)/.test(error.message) ? error.message : fallback);
     function owned(resource, captured) {
         const notification = NotificationAssembler.toDomain(resource);
         if (notification.recipientUserId !== captured.userId || notification.targetBusinessId !== captured.businessId)
@@ -61,13 +62,17 @@ export const useNotificationsStore = defineStore('notifications', () => {
         isPreferencesLoading.value = false; isPreferencesSaving.value = false;
         feedError.value = null; preferencesError.value = null; readError.value = null; preferencesSaved.value = false;
     }
-    watch(() => [apiContext.userId, apiContext.businessId, apiContext.status], resetContext, { flush: 'sync' });
+    watch(() => [apiContext.userId, apiContext.businessId, apiContext.status, currentSession().hasApplicationAccess], resetContext, { flush: 'sync' });
 
+    function requireAccess() {
+        if (!accessToken() || !currentSession().hasApplicationAccess) throw new Error('api.errors.forbidden');
+        return requireBusinessId();
+    }
     async function loadPreferences() {
         if (isPreferencesLoading.value || isPreferencesSaving.value) return false;
         const captured = scope(); isPreferencesLoading.value = true; preferencesError.value = null;
         try {
-            requireBusinessId();
+            requireAccess();
             const response = await api.getPreferences(captured.userId, captured.businessId);
             if (!current(captured)) return false;
             preferences.value = ownedPreferences(response.data, captured); return true;
@@ -83,7 +88,7 @@ export const useNotificationsStore = defineStore('notifications', () => {
         if (!draft.isValid) { preferencesError.value = 'notifications.errors.invalidPreferences'; return false; }
         isPreferencesSaving.value = true;
         try {
-            requireBusinessId();
+            requireAccess();
             const response = await api.updatePreferences(captured.userId, captured.businessId, NotificationPreferencesAssembler.toChanges(draft));
             if (!current(captured)) return false;
             const saved = ownedPreferences(response.data, captured);
@@ -99,7 +104,7 @@ export const useNotificationsStore = defineStore('notifications', () => {
         if (isRefreshing.value || readingIds.value.length) return false;
         const captured = scope(); isRefreshing.value = true; feedError.value = null;
         try {
-            requireBusinessId();
+            requireAccess();
             const received = new Map();
             for (let page = 1; ; page++) {
                 const response = await api.getNotifications(captured.businessId, page, pageSize);
@@ -132,7 +137,7 @@ export const useNotificationsStore = defineStore('notifications', () => {
         if (!notification?.isUnread || readingIds.value.includes(String(id)) || isRefreshing.value) return false;
         const captured = scope(); readingIds.value.push(String(id)); readError.value = null;
         try {
-            requireBusinessId();
+            requireAccess();
             const response = await api.markAsRead(id);
             if (!current(captured)) return false;
             const saved = owned(response.data, captured);
@@ -147,7 +152,7 @@ export const useNotificationsStore = defineStore('notifications', () => {
     function dismissNotice() { notices.value.shift(); }
     function startPolling() {
         stopPolling();
-        if (typeof document === 'undefined' || apiContext.status !== 'ready') return;
+        if (typeof document === 'undefined' || apiContext.status !== 'ready' || !accessToken() || !currentSession().hasApplicationAccess) return;
         const run = polling;
         let pending = false;
         async function poll() {

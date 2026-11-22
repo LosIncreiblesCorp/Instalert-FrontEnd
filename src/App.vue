@@ -27,9 +27,9 @@ watch(() => currentSession().hasApplicationAccess, (allowed, previous) => {
   if (!allowed && previous && route.meta.role && !route.meta.standalone) router.replace({ name: 'session-setup' });
 });
 const notifications = useNotificationsStore();
-watch(() => [apiContext.userId, apiContext.businessId, apiContext.status, route.meta.role, route.meta.standalone], () => {
+watch(() => [apiContext.userId, apiContext.businessId, apiContext.status, route.meta.role, route.meta.standalone, currentSession().hasApplicationAccess], () => {
   notifications.stopPolling();
-  if (route.meta.role && !route.meta.standalone && apiContext.status === 'ready') notifications.startPolling();
+  if (route.meta.role && !route.meta.standalone && apiContext.status === 'ready' && currentSession().hasApplicationAccess) notifications.startPolling();
 }, { immediate: true });
 onUnmounted(() => notifications.stopPolling());
 const isStandaloneRoute = computed(() => route.meta.standalone === true);
