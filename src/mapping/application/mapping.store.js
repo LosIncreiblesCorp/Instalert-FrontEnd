@@ -1,3 +1,4 @@
+import { accessToken, currentSession } from '../../iam/infrastructure/session.js';
 import { computed, ref, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { MappingApi } from '../infrastructure/mapping-api.js';
@@ -6,7 +7,7 @@ import { IncidentMarkerAssembler } from '../infrastructure/incident-marker.assem
 import { BusinessLocationAssembler } from '../infrastructure/business-location.assembler.js';
 import { apiContext, currentContextRevision, requireBusinessId } from '../../shared/infrastructure/api-context.js';
 
-/** A complete geographical snapshot for the selected account, commerce and filters. */
+/** A complete geographical snapshot for the authenticated account, commerce and filters. */
 export const useMappingStore = defineStore('mapping', () => {
     const riskZones = ref([]), incidents = ref([]), businesses = ref([]);
     const isLoading = ref(false), hasLoaded = ref(false), error = ref(null), selectedZone = ref(null);
@@ -17,10 +18,14 @@ export const useMappingStore = defineStore('mapping', () => {
         riskZones.value = []; incidents.value = []; businesses.value = []; selectedZone.value = null;
         isLoading.value = false; hasLoaded.value = false; error.value = null;
     }
-    watch(() => [apiContext.userId, apiContext.businessId, apiContext.status], resetContext, { flush: 'sync' });
+    watch(() => [apiContext.userId, apiContext.businessId, apiContext.status, currentSession().hasApplicationAccess], resetContext, { flush: 'sync' });
     async function fetchMapData({ radiusMeters = 1000, category = 'all', period = '24h' } = {}) {
+        if (!accessToken() || !currentSession().hasApplicationAccess) {
+            resetContext();
+            return false;
+        }
         const revision = currentContextRevision(), currentRequest = ++request;
-        const current = () => currentRequest === request && revision === currentContextRevision();
+        const current = () => currentRequest === request && revision === currentContextRevision() && currentSession().hasApplicationAccess;
         const key = JSON.stringify([apiContext.businessId, radiusMeters, category, period]);
         if (key !== queryKey) {
             riskZones.value = []; incidents.value = []; businesses.value = []; selectedZone.value = null; hasLoaded.value = false;
@@ -47,7 +52,7 @@ export const useMappingStore = defineStore('mapping', () => {
             hasLoaded.value = true; return true;
         } catch (failure) {
             if (current()) error.value = failure.apiError?.messageKey
-                ?? (failure.message?.startsWith('mapping.feedback.') ? failure.message : 'mapping.feedback.loadError');
+                ?? (/^(mapping\.feedback\.|api\.)/.test(failure.message) ? failure.message : 'mapping.feedback.loadError');
             return false;
         } finally { if (current()) isLoading.value = false; }
     }

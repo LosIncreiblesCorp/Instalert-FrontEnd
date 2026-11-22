@@ -251,7 +251,7 @@ export default defineStore('alert', () => {
             const response = await api.resolvePanic(id);
             if (!current(captured)) return false;
             replaceRecord(readRecord(response, captured.businessId)); selectedRecordId.value = id;
-            currentView.value = 'panic-report'; return true;
+            currentView.value = 'panic-report'; defaultPanicReportLocation(); return true;
         } catch (error) { if (current(captured)) errorMessage.value = message(error); return false; }
         finally { if (current(captured)) writes.value--; }
     }
@@ -304,10 +304,15 @@ export default defineStore('alert', () => {
         if ((draftRevisions.get(id) ?? 0) !== (savedDraftRevisions.get(id) ?? 0)) return persistPanicReportDraft(id);
         return pendingDraftSave;
     }
+    function defaultPanicReportLocation() {
+        const record = selectedRecord.value, location = apiContext.businessLocation;
+        if (record && location && (!Number.isFinite(record.latitude) || !Number.isFinite(record.longitude)))
+            updatePanicReportDraft(locationDetails(location));
+    }
     function resumePanicReport(id) {
         const record = alertRecords.value.find(item => item.id === id);
         if (!record?.hasPendingPanicReport || record.employeeId !== apiContext.userId) return false;
-        selectedRecordId.value = id; currentView.value = 'panic-report'; noticeMessage.value = null; return true;
+        selectedRecordId.value = id; currentView.value = 'panic-report'; defaultPanicReportLocation(); noticeMessage.value = null; return true;
     }
     async function deferPanicReport() {
         const captured = scope();

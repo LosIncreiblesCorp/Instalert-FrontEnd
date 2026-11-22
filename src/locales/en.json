@@ -662,7 +662,10 @@
         "requesting": "Getting your current location…",
         "ready": "Current location recorded; you can edit it.",
         "manualHelp": "Location could not be retrieved. You can enter a reference manually.",
-        "notAvailable": "Location unavailable"
+        "notAvailable": "Location unavailable",
+        "mapLabel": "Incident location map",
+        "markerLabel": "Selected incident location",
+        "mapHelp": "Starts at your business location. Click the map or drag the marker to choose another point. With the keyboard, move the map using the arrow keys, then select Use map center."
       },
       "form": {
         "category": "Incident type",

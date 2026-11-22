@@ -662,7 +662,10 @@
         "requesting": "Obteniendo la ubicación actual…",
         "ready": "Ubicación actual registrada; puedes editarla.",
         "manualHelp": "No se pudo obtener la ubicación. Puedes escribir una referencia manualmente.",
-        "notAvailable": "Ubicación no disponible"
+        "notAvailable": "Ubicación no disponible",
+        "mapLabel": "Mapa de ubicación del incidente",
+        "markerLabel": "Ubicación seleccionada del incidente",
+        "mapHelp": "La ubicación inicial es la de tu negocio. Haz clic en el mapa o arrastra el marcador para elegir otro punto. Con el teclado, mueve el mapa con las flechas y selecciona Usar el centro del mapa."
       },
       "form": {
         "category": "Tipo de incidente",

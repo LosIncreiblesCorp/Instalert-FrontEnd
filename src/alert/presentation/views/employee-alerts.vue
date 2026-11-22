@@ -6,6 +6,7 @@ import { storeToRefs } from 'pinia';
 import { useConfirm } from 'primevue';
 import { useI18n } from 'vue-i18n';
 import useAlertStore from '../../application/alert.store.js';
+import AlertLocationMap from '../components/alert-location-map.vue';
 import { currentApiContext, currentContextRevision } from '../../../shared/infrastructure/api-context.js';
 import { AlertRecordKind, AlertRecordStatus, PanicReportStatus } from '../../domain/model/alert-record.entity.js';
 import {
@@ -141,7 +142,7 @@ const panicDescription = computed({
 });
 const panicLocation = computed({
   get: () => selectedRecord.value?.location ?? '',
-  set: (value) => store.updatePanicReportDraft({ location: value, latitude: null, longitude: null }),
+  set: (value) => store.updatePanicReportDraft({ location: value }),
 });
 const reportCategory = computed({
   get: () => reportDraft.value.category,
@@ -153,7 +154,7 @@ const reportCategory = computed({
 const reportLocation = computed({
   get: () => reportDraft.value.location,
   set: (value) => {
-    store.updateReportDraft({ location: value, latitude: null, longitude: null });
+    store.updateReportDraft({ location: value });
     reportValidationError.value = false;
   },
 });
@@ -259,6 +260,14 @@ function reportStatusLabel(status) {
 }
 
 /** Requests geolocation and stores it in the given form target. @param {string} target - Form target key. @returns {void} */
+function selectMapLocation(target, point) {
+  const location = { ...point, location: `${point.latitude.toFixed(5)}, ${point.longitude.toFixed(5)}` };
+  if (target === 'panic-report') store.updatePanicReportDraft(location);
+  else store.updateReportDraft(location);
+  locationFeedback.value = 'ready';
+  reportValidationError.value = false; panicValidationError.value = false;
+}
+
 function requestCurrentLocation(target) {
   locationFeedback.value = 'requesting';
   if (!navigator.geolocation) {
@@ -279,7 +288,7 @@ function requestCurrentLocation(target) {
 
     if (target === 'panic') store.setCountdownLocation(location);
     else if (target === 'panic-report') store.updatePanicReportDraft(location);
-    else if (!reportDraft.value.location) store.updateReportDraft(location);
+    else if (currentView.value === 'report-form') store.updateReportDraft(location);
 
     locationFeedback.value = 'ready';
   }, () => {
@@ -332,7 +341,7 @@ async function saveGracePeriod() {
 
 /** Starts an incident report draft of the given kind. @param {string} kind - Report kind. @returns {void} */
 function startReport(kind) {
-  if (store.startReport(kind)) void preloadLocationIfAlreadyAllowed('report');
+  store.startReport(kind);
 }
 
 /** Asks the user to confirm discarding the report draft. @returns {Promise<boolean>} True when discarded. */
@@ -682,6 +691,8 @@ onBeforeRouteUpdate(canLeaveCurrentView);
               <pv-button icon="pi pi-map-marker" :label="t('alerts.workflow.location.useCurrent')" text @click="requestCurrentLocation('panic-report')" />
             </div>
             <pv-input-text id="panic-location" v-model="panicLocation" maxlength="250" :placeholder="t('alerts.workflow.location.manualPlaceholder')" />
+            <AlertLocationMap :latitude="selectedRecord?.latitude" :longitude="selectedRecord?.longitude" :disabled="isSaving"
+              @select="selectMapLocation('panic-report', $event)" />
             <small v-if="locationFeedback === 'requesting'">{{ t('alerts.workflow.location.requesting') }}</small>
             <small v-else-if="locationFeedback === 'ready'">{{ t('alerts.workflow.location.ready') }}</small>
             <small v-if="locationFeedback === 'unavailable'">{{ t('alerts.workflow.location.manualHelp') }}</small>
@@ -741,6 +752,8 @@ onBeforeRouteUpdate(canLeaveCurrentView);
               <pv-button icon="pi pi-map-marker" :label="t('alerts.workflow.location.useCurrent')" text @click="requestCurrentLocation('report')" />
             </div>
             <pv-input-text id="report-location" v-model="reportLocation" maxlength="250" :placeholder="t('alerts.workflow.location.manualPlaceholder')" />
+            <AlertLocationMap :latitude="reportDraft?.latitude" :longitude="reportDraft?.longitude" :disabled="isSaving"
+              @select="selectMapLocation('report', $event)" />
             <small v-if="locationFeedback === 'requesting'">{{ t('alerts.workflow.location.requesting') }}</small>
             <small v-else-if="locationFeedback === 'ready'">{{ t('alerts.workflow.location.ready') }}</small>
             <small v-if="locationFeedback === 'unavailable'">{{ t('alerts.workflow.location.manualHelp') }}</small>

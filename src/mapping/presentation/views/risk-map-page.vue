@@ -71,6 +71,7 @@
 import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
+import { currentSession } from '../../../iam/infrastructure/session.js';
 import { useMappingStore } from '../../application/mapping.store.js';
 import { apiContext } from '../../../shared/infrastructure/api-context.js';
 import { IncidentCategory } from '../../domain/model/incident-marker.entity.js';
@@ -166,8 +167,8 @@ async function reloadData() {
   if (loaded) await openRequestedAlert();
   return loaded;
 }
-function refreshVisible() { if (!document.hidden && !mappingStore.isLoading) void reloadData(); }
-watch([timeFilter, incidentTypeFilter, radiusMeters, () => apiContext.userId, () => apiContext.businessId, () => apiContext.status], () => {
+function refreshVisible() { if (!document.hidden && !mappingStore.isLoading && currentSession().hasApplicationAccess) void reloadData(); }
+watch([timeFilter, incidentTypeFilter, radiusMeters, () => apiContext.userId, () => apiContext.businessId, () => apiContext.status, () => currentSession().hasApplicationAccess], () => {
   void closeInspector();
   void reloadData();
 });
