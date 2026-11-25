@@ -1,298 +1,166 @@
-# InstAlert (`instalert`)
+# InstAlert Frontend
 
-## Overview
-InstAlert is a Vue 3 + Vite application organized with a domain-driven design (DDD) style. The project models operational safety for businesses by bounded context and keeps business concepts separated from UI and infrastructure concerns.
+InstAlert helps business administrators and operational employees manage incidents, nearby risks, emergency contacts and notifications. This repository contains the Vue application. It connects to the separate InstAlert ASP.NET Core API and does not run a database itself.
 
-The app has two roles (`administrator`, `employee`) with separate `/admin/*` and `/employee/*` route trees. The current implementation actively uses Alert, Business, Contacts, Mapping, Payments, Profiles, Notifications and Dashboard contexts on top of a Shared kernel.
+## Requirements
 
-## Goals
-- Show a practical front-end architecture with DDD-inspired layering.
-- Keep domain concepts explicit (`entity`, `assembler`, `api`, `store`).
-- Provide a clean base for CRUD use cases, localization (EN/ES), routing by role, and map-based visualization.
+- Node.js 22.12 or later in the 22.x line, or a newer supported LTS, with npm.
+- The InstAlert backend running with IAM and its database migrations applied.
+- A public Mapbox access token for the map screens.
+- A PayPal Sandbox application Client ID matching the backend, to complete subscription checkout.
+- Brevo configured on the backend to deliver employee invitations.
 
-## Tech Stack
-- Vue 3
-- Vite
-- Pinia
-- Vue Router
-- Vue I18n
-- PrimeVue + PrimeFlex + PrimeIcons + `@primeuix/themes`
-- Axios
-- Mapbox GL (`mapbox-gl`) for risk maps
-- Chart.js for dashboard charts
-- `json-server` for local mock API
+Run commands from this repository's root, where `package.json` is located.
 
-## Project Structure (DDD-Oriented)
+## 1. Install dependencies
+
+```powershell
+node --version
+npm --version
+npm ci
+```
+
+`npm ci` installs the versions recorded in `package-lock.json`. No JSON Server process is required for the authenticated application.
+
+## 2. Configure local development
+
+Create or edit `.env.development.local` in the repository root:
+
+```dotenv
+VITE_INSTALERT_PLATFORM_API_URL=http://localhost:5221/api/v1
+VITE_PAYPAL_ENVIRONMENT=sandbox
+VITE_PAYPAL_CLIENT_ID=<PUBLIC_SANDBOX_CLIENT_ID>
+VITE_MAPBOX_API_KEY=<PUBLIC_MAPBOX_TOKEN>
+```
+
+Replace the placeholders with your own values. The API URL must include `/api/v1`; it is not the Scalar documentation URL. Use the same public Sandbox Client ID as the backend's `PayPal:ClientId`. Restrict the public Mapbox token to the origins used by your application as appropriate.
+
+Vite loads the base environment files and then the selected mode's files. A mode-specific `.local` file overrides its corresponding committed file; terminal environment variables take precedence. Restart Vite after editing environment values. If `.env.development` already exists, review its values rather than assuming they point to your local API.
+
+Every `VITE_*` value can be exposed to the browser. Never put a database password, JWT signing key, PayPal Client Secret or Brevo API key here. Those belong in the backend. The application also reads `VITE_PRIME_UI_LICENSE_KEY` if your UI package setup requires a license; provide your own applicable value rather than borrowing a credential.
+
+## 3. Start the application
+
+Start the backend first, following its README. Its default HTTP profile uses port 5221. Then run:
+
+```powershell
+npm run dev -- --port 5173 --strictPort
+```
+
+Open `http://localhost:5173`. Strict port mode stops if 5173 is already occupied, avoiding an unexpected origin change. The backend must allow this exact origin in CORS. If you choose another hostname or port, update backend CORS accordingly.
+
+You can check backend readiness at `http://localhost:5221/health/ready` and inspect its endpoints at `http://localhost:5221/scalar/`. A successful health response confirms database readiness, not external email or payment credentials.
+
+## 4. Create accounts and try the flow
+
+### Administrator
+
+1. Open the application and register using an email and password. Passwords require at least ten characters, a letter and a digit, within the backend's 72 UTF-8 byte limit.
+2. Register your single business. Enter its details and select its position on the map.
+3. Complete your personal profile.
+4. Choose Essential, Professional or Business and approve the subscription with a PayPal Sandbox personal buyer account.
+5. Wait for server verification. Buyer approval alone does not grant access; the backend must confirm the subscription and paid period.
+6. Open the dashboard and business staff management to invite employees.
+
+Leaving during setup does not require starting again: after sign-in, the app resumes the step reported by the server. Public registration creates administrators only. There is no demonstration role selector or shared seeded account.
+
+### Employee
+
+1. Receive an invitation from the administrator. The backend must have workers and Brevo email delivery enabled.
+2. Sign in with the invited email and temporary password received by email. The temporary password lasts 24 hours.
+3. Replace it with a personal password, complete the profile and accept the invitation.
+4. Use the operational dashboard, alerts, map, notifications and your own emergency contacts.
+
+Each employee belongs to one business. A deactivated membership retains that association. Administrators can deactivate or reactivate access subject to subscription and available capacity; they cannot edit an incorporated employee's credentials. If the temporary password expires, the administrator can resend the pending invitation.
+
+## Main features
+
+| Area | What it does |
+| --- | --- |
+| Account and profile | Sign-in, administrator registration, onboarding, personal data and password changes. |
+| Business | Business profile, map location, staff, invitations and plan capacity. |
+| Alerts | Panic countdown, confirmation, resolution, report details and history. Cancelling the countdown creates no alert. |
+| Mapping | Nearby incidents, active alerts, registered businesses, risk zones and search filters. |
+| Emergency contacts | Employees create, edit and delete their own contacts. |
+| Notifications | Periodically refreshed inbox, unread state, nearby-alert preferences and navigation to the alert on the map. |
+| Payments | Sandbox checkout, verification, subscription status, plan changes, cancellation, renewal and billing history. |
+| Dashboard | Indicators and reports using data supplied by the API. |
+
+The backend validates identity, ownership, membership, subscription and transitions. The frontend's route guards guide navigation; they do not replace server authorization. Signing out clears account-scoped frontend state. English and Latin American Spanish are supported.
+
+## Production build
+
+Create or edit `.env.production.local` with the public configuration for the deployment:
+
+```dotenv
+VITE_INSTALERT_PLATFORM_API_URL=https://instalert-backend-yqe9.onrender.com/api/v1
+VITE_PAYPAL_ENVIRONMENT=sandbox
+VITE_PAYPAL_CLIENT_ID=<PUBLIC_SANDBOX_CLIENT_ID>
+VITE_MAPBOX_API_KEY=<PUBLIC_MAPBOX_TOKEN>
+```
+
+Use the backend address you actually intend to publish against. The API must already serve the IAM version and allow the frontend origin in CORS. This URL alone does not prove which backend release is currently deployed.
+
+```powershell
+npm run build
+npm run preview -- --port 4173 --strictPort
+```
+
+The build output is `dist/`. Production builds reject missing/invalid API URLs, URLs without HTTPS or the `/api/v1` suffix, and missing Sandbox configuration. Vite embeds these values at build time: changing them requires another build. `npm run preview` serves the built files locally; it does not publish them. To test API calls from port 4173, allow `http://localhost:4173` in backend CORS.
+
+## Firebase Hosting
+
+The repository is configured for the Firebase project `instalert-c3f7f`. Before publishing, verify this is the intended project or select your own project using Firebase CLI. You need access to the target Firebase project.
+
+```powershell
+npm install --global firebase-tools
+firebase login
+firebase use
+npm run build
+firebase deploy --only hosting
+```
+
+The final command publishes the contents of `dist/` to the selected project. Build and verify the API configuration first. The configured project uses `https://instalert-c3f7f.web.app/`.
+
+`firebase.json` serves `dist`, rewrites application routes to `index.html`, and configures caching. General responses are revalidated; versioned assets under `/assets/` may be cached for a year. Check direct navigation and refresh on sign-in, onboarding and protected routes after publication. Firebase Hosting serves the frontend only; the API and MySQL are hosted separately.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| API requests fail | Confirm the API is running, its URL ends in `/api/v1`, and restart Vite after changing variables. |
+| Browser reports CORS | Verify API connectivity, then allow the exact frontend scheme, hostname and port in backend CORS. |
+| Map does not load | Check the Mapbox token, its allowed origins and browser network errors. |
+| PayPal checkout is unavailable | Configure Sandbox in both applications and match the public Client ID and provider plan IDs. |
+| Account returns to setup | Check the incomplete step in the session; the profile and verified subscription are required. |
+| Invitation email is missing | Check backend workers, Email/Brevo configuration, delivery status and the recipient's spam folder. |
+| Notifications are missing | Check backend event workers, active membership, subscription, nearby radius and notification preferences. |
+| A protected request returns 401 | Sign in again; the token may be expired or revoked. |
+| A protected request returns 403 | Check role, onboarding, membership and paid access. |
+| Production build uses old configuration | Review `.env.production`, `.env.production.local` and terminal overrides, then rebuild and publish again. |
+
+## Project structure
+
 ```text
 src/
-  alert/                       # Alert bounded context
-    domain/model/              # Core entities (AlertRecord, AlertPreferences)
-    application/               # Use-case orchestration (alert.store.js)
-    infrastructure/            # API gateway and assemblers
-    presentation/              # Views and route declarations
-
-  business/                    # Business / personnel bounded context
-    domain/model/              # BusinessMember, StaffInvitation entities
-    application/               # business.store.js
-    infrastructure/            # business-api.js, assemblers
-    presentation/              # personnel-list, invitation-form + routes
-
-  contacts/                    # Emergency contacts bounded context
-    domain/model/              # EmergencyContact entity
-    application/               # contacts.store.js
-    infrastructure/            # contacts-api.js, assembler
-    presentation/              # contacts-list, contact-form + routes
-
-  mapping/                     # Mapping / risk-zone bounded context
-    domain/model/              # RiskZone, IncidentMarker, BusinessLocation
-    application/               # mapping.store.js
-    infrastructure/            # mapping-api.js, assemblers
-    presentation/              # risk-map-page, risk-map, tactical-inspector, zone-detail
-
-  payments/                    # Payments / subscription bounded context
-    domain/model/              # Plan, Subscription, Invoice, PaymentMethod
-    application/               # payments.store.js
-    infrastructure/            # payments-api.js, assemblers
-    presentation/              # subscription-page, plan-card, billing-history, etc.
-
-  profiles/                    # Personal data and general preferences
-    domain/model/              # UserProfile, UserPreferences
-    application/               # profiles.store.js
-    infrastructure/            # profiles-api.js, assemblers
-    presentation/              # user-profile + routes
-
-  notifications/               # Received notices and delivery preferences
-    domain/model/              # Notification, NotificationPreferences
-    application/               # notifications.store.js
-    infrastructure/            # notifications-api.js, assemblers
-    presentation/              # notifications, notification-notice + routes
-
-  dashboard/                   # Current-month read projections and saved monthly reports
-    domain/model/              # DashboardSummary, MonthlyReport
-    application/               # dashboard.store.js
-    infrastructure/            # dashboard-api.js, dashboard.assembler.js
-    presentation/              # dashboard-page, monthly-reports, dashboard-chart + routes
-
-  shared/                      # Shared cross-context concerns
-    infrastructure/            # BaseApi, BaseEndpoint
-    presentation/              # Layout and shared views/components
+  iam/
+  business/
+  profiles/
+  alert/
+  contacts/
+  notifications/
+  payments/
+  mapping/
+  dashboard/
+  shared/
+  router.js
+  main.js
 ```
 
-## Bounded Contexts
+Feature folders separate domain models, application state/use cases, API adapters and presentation. Shared contains reusable components and HTTP/session infrastructure. Vue Router composes role-specific navigation; Pinia manages state; Axios communicates with the backend; PrimeVue provides UI components; Mapbox GL renders maps; Chart.js renders dashboard charts.
 
-### Alert Context
-- Manages safety alerts and employee alert preferences.
-- Uses `AlertRecord` and `AlertPreferences` entities in the domain layer.
-- Uses `useAlertStore` to orchestrate panic activation, grace-period countdown, report drafts and history queries.
-- Routes: base `alert-routes.js` (`alerts`) remapped to `/employee/*` in `src/router.js`, plus `/admin/alerts/history`.
-
-Alert uses the server's `POST alerts/panic-preparations` response to start the countdown. Cancelling removes the local preparation and sends no confirmation; no alert or incident report is created. Confirmation uses `POST alerts/panic` with the same preparation token on retries. A saved commerce location is used initially; device location requires browser permission. Manually changing a report address clears its old coordinates.
-
-Resolution (`POST alerts/{id}/resolution`), draft saving (`PUT alerts/{id}/report-draft`) and completion (`POST alerts/{id}/report-completion`) are separate commands. Draft saves are serialized and preserve later edits while a previous save is in flight. A completed panic remains resolved. Alert responses contain lifecycle data without event revisions; the store orders draft saves and rejects responses from an old account or commerce context. Non-panic reports use `POST alerts/reports`; submitted records are read-only.
-
-History follows the API pagination for the resolved commerce ID. Administrators can read the commerce's history; employees can resume only their own pending reports. The grace period is read/saved through `alert-preferences/{userId}`. Changing it can be saved explicitly or when starting the panic countdown. Preparations are retained in session storage for a reload under the same account and commerce; changing either clears timers, preparations and drafts, and old responses are discarded.
-
-### Business Context
-- Owns the business profile, operational memberships and staff invitations.
-- Uses `Business`, `BusinessMember` and `StaffInvitation` entities.
-- Uses `useBusinessStore` for commerce updates, invitations, employee details and membership activation/deactivation.
-- Routes in `business-routes.js`: `/admin/business`, `/admin/personnel`, `/admin/personnel/invitations/new`.
-
-### Contacts Context
-- Manages employee emergency contacts.
-- Uses `EmergencyContact` entity and `useContactsStore` for fetch/create/update/delete.
-- Routes in `contacts-routes.js`: `/employee/contacts`, `/employee/contacts/new`, `/employee/contacts/:id/edit`.
-- Uses `GET/POST emergency-contacts` and `GET/PUT/DELETE emergency-contacts/{id}`. Ownership comes from the caller's `User-Id`; bodies contain only `fullName`, `relationship`, `phone`, `email` and `notes`.
-- Reads the shared demonstration account rather than a separate contact owner ID. Contact state is cleared when account or commerce changes; late requests cannot overwrite the new context or a more recently selected contact.
-- Names and relationships are required, phones are normalized to 7–15 digits with an optional leading `+`, email is optional and notes allow up to 140 characters. Empty email is sent as `null`.
-- Forms preserve entered values on errors and ask before leaving with unsaved changes. Server field errors are localized; an unavailable list is not presented as an empty successful result. Deletion requires the confirmation dialog; cancelling keeps the record.
-- The backend enforces active operational membership and contact ownership. This feature stores contact details; it does not create accounts or send email. Notification delivery is a separate integration.
-
-### Mapping Context
-- Queries `mapping/incidents`, `mapping/businesses` and `mapping/risk-zones` from the ASP.NET API.
-- The server resolves the commerce center and applies radius (100, 500 or 1000 meters), category and date filters.
-- Keeps alert kind separate from incident category. Risk-zone counts and classification windows are supplied by Mapping.
-- Refreshes every 15 seconds while the map page is visible. Account or commerce changes clear the snapshot and discard late responses; a failed refresh preserves the current snapshot.
-- Mapbox renders the geography. The explorer also makes incidents, businesses and zones available through keyboard navigation.
-
-### Payments Context
-- Loads the three monthly USD plans, current subscription, seat usage and billing history from the ASP.NET API.
-- Uses `plans`, `businesses/{id}/seats`, `businesses/{id}/subscription` and `businesses/{id}/billing-history`.
-- Opens checkout or a plan change through the backend. The returned provider plan and checkout correlation are passed to the PayPal Sandbox SDK.
-- Browser approval remains pending until server verification succeeds. Pending approval is retained per account and commerce in session storage; verification can be retried without paying again.
-- Uses the dedicated cancellation command. A development subscription is identified as demonstration data and cannot be canceled through PayPal.
-- No local catalog or payment-history fallback is used. Provider secrets stay on the server; only the Sandbox client ID belongs in Vite configuration.
-- Routes in `payments-routes.js`: `/admin/subscription`.
-
-### Profiles Context
-- Owns personal data and general application preferences. Credentials belong to IAM; notification delivery and reception-radius preferences belong to Notifications.
-- Uses `UserProfile`, `UserPreferences`, `ProfilesApi`, assemblers and `useProfilesStore`.
-- Personal data includes names, DNI stored as text and optional phone. DNI validation requires eight digits and preserves initial zeros.
-- Application language is edited in profile preferences: `en_US` by default and `es_419` as the alternative.
-- Routes in `profiles-routes.js`: `/admin/profile` and `/employee/profile`.
-
-### Notifications Context
-- Owns received notifications, recipient/read state and notification-delivery preferences. The original alert belongs to Alert.
-- Uses `Notification`, `NotificationPreferences`, `NotificationsApi`, assemblers and `useNotificationsStore`.
-- The header bell opens the inbox with an unread count, all/unread filters and read-state actions. A gear opens preferences in a modal dialog.
-- Nearby-alert preferences use radii of 100, 500 or 1000 meters (initially 500), measured from the business's saved location.
-- Uses `GET notifications?businessId=...&page=...&pageSize=100`, `POST notifications/{id}/reading` and `GET/PUT notification-preferences/{userId}?businessId=...`. Preferences send only `nearbyAlertsEnabled` and `nearbyRadiusMeters`; read timestamps are assigned by the server.
-- Loads the entire paginated inbox for the resolved commerce. The server selects recipients and measures distances; the browser does not create notifications or derive recipients from Alert resources.
-- Refreshes every 15 seconds while the application is visible and resumes immediately when the tab becomes visible. The header badge works across module pages. New unread arrivals after the initial load display a dismissible notice; dismissing it does not mark it as read.
-- Changing the demonstration account or commerce clears the inbox, preferences, notices and pending request state. Late responses cannot populate another account. A failed refresh preserves received data and shows an error; it is not treated as an empty inbox.
-- Preferences apply to future delivery and do not remove previously received notifications. Notices are delivery history and can remain after the source panic has been resolved.
-- Backend in-app generation requires `Workers__Enabled=true` to process committed alert events. External email remains a separate server transport; no provider key is exposed to the frontend.
-- Routes in `notifications-routes.js`: `/admin/notifications` and `/employee/notifications`.
-
-### Dashboard Context
-- Reads the current-month projection from `GET businesses/{id}/dashboard`; metrics and series are calculated by the backend for the caller's role.
-- Administrators create immutable report snapshots using `POST businesses/{id}/reports` with inclusive `startDate` and `endDate` values (`YYYY-MM-DD`).
-- Reads saved reports from `GET businesses/{id}/reports` and `GET businesses/{id}/reports/{reportId}`. Multiple snapshots may use the same date range.
-- Report schema version 2 includes its requested dates, effective cutoff and a comparison with the preceding interval of equal duration. There is no automatic monthly closing job.
-- Clears data when the account or commerce changes, rejects late responses and retains the current summary if a refresh fails.
-- Existing route names are retained: `/admin/dashboard`, `/employee/dashboard`, `/admin/monthly-reports` and `/admin/monthly-reports/:reportId`.
-
-### Shared Context
-Provides reusable infrastructure and presentation utilities.
-
-- `BaseApi` centralizes Axios configuration.
-- `BaseEndpoint` centralizes CRUD endpoint behavior.
-- Shared UI structure (`layout.vue`) and `page-not-found.vue` live under `shared/presentation`. Language settings are presented by Profiles.
-
-## Layer Responsibilities
-
-### Domain Layer
-- Defines business concepts and invariants as plain JavaScript classes.
-- Should stay framework-agnostic (no Vue/HTTP code).
-
-### Application Layer
-- Coordinates behavior and state transitions through Pinia stores.
-- Uses domain objects plus infrastructure services to execute workflows.
-
-### Infrastructure Layer
-- Talks to external services/APIs.
-- Maps external payloads to internal models via assemblers.
-
-### Presentation Layer
-- Renders UI and handles user interactions.
-- Calls store actions and reacts to state.
-
-## Running the Project
-
-### Prerequisites
-
-Node.js/npm and the ASP.NET backend running with its HTTP launch profile on port 5221. The two demonstration actors and their commerce must be available in the backend database.
-
-```powershell
-npm install
-npm run dev
-```
-
-Vite defaults to port 5173. The API connection is configured in `.env.development` as `http://localhost:5221/api/v1`.
-
-For a production build, supply the future ASP.NET API URL through `VITE_INSTALERT_PLATFORM_API_URL`, including `/api/v1`, then run `npm run build`. See the deployment configuration below. `npm run preview` serves the resulting build.
-
-The `server/` directory and JSON Server dependency remain for the module adapters that have not yet been integrated. They are not used by Shared, Alert, Business, Contacts, Notifications or Profiles. Those adapters will be adapted in separate features.
-
-## Environment Variables
-Environment files included:
-- `.env.development`
-- `.env.production`
-
-Main variables:
-- `VITE_INSTALERT_PLATFORM_API_URL`
-- `VITE_MAPBOX_API_KEY`
-- `VITE_PRIME_UI_LICENSE_KEY`
-- `VITE_PAYPAL_ENVIRONMENT` and `VITE_PAYPAL_CLIENT_ID` configure Sandbox checkout. Provider plan IDs are returned by the backend checkout command.
-API resource paths are configured in both environment files:
-
-| Variable | Configured resource path |
-|---|---|
-| `VITE_ALERTS_ENDPOINT_PATH` | `alerts` |
-| `VITE_BUSINESS_MEMBERS_ENDPOINT_PATH` | `business-members` |
-| `VITE_STAFF_INVITATIONS_ENDPOINT_PATH` | `staff-invitations` |
-| `VITE_BUSINESSES_ENDPOINT_PATH` | `businesses` |
-| `VITE_RISK_ZONES_ENDPOINT_PATH` | `risk_zones` |
-| `VITE_INCIDENTS_ENDPOINT_PATH` | `incidents` |
-| `VITE_PLANS_ENDPOINT_PATH` | `plans` |
-| `VITE_SUBSCRIPTIONS_ENDPOINT_PATH` | `subscriptions` |
-| `VITE_PAYMENT_METHODS_ENDPOINT_PATH` | `payment-methods` |
-| `VITE_INVOICES_ENDPOINT_PATH` | `invoices` |
-| `VITE_NOTIFICATIONS_ENDPOINT_PATH` | `notifications` |
-| `VITE_DASHBOARD_ENDPOINT_PATH` | `dashboard` |
-| `VITE_MONTHLY_REPORTS_ENDPOINT_PATH` | `monthly-reports` |
-
-The API base URL includes `/api/v1`; resource paths are relative to it. Development uses the ASP.NET backend on port 5221. Production requires an explicit build-time API URL; the former hosted mock is not the deployment default.
-
-Missing API configuration raises an error rather than falling back to hard-coded resource names. Restart Vite after changing environment variables, or rebuild for production. All `VITE_*` values are exposed to the browser.
-
-Tip: if your API is running on a different port, update `VITE_INSTALERT_PLATFORM_API_URL` in `.env.development`.
-
-Dashboard always consumes the ASP.NET API; it does not aggregate JSON Server collections in the browser.
-
-## Routing Notes
-- Router exposes role-scoped trees: `/admin/*` (`administrator`) and `/employee/*` (`employee`). `/` shows the demonstration profile selector; `/admin` and `/employee` redirect to their respective dashboards.
-- Feature modules export their own routes (`alert-routes.js`, `business-routes.js`, `contacts-routes.js`, `payments-routes.js`, `profiles-routes.js`, `notifications-routes.js`) and `src/router.js` composes them; employee alert routes are derived by prefixing `alertRoutes` with `/employee/`.
-- Global `beforeEach` sets the document title from route metadata (`InstAlert | <translated title>`).
-
-## API and Data Notes
-- JSON Server provides mock resources for local frontend development.
-- Mock role and resource identifiers do not implement authentication or authorization.
-
-### Frontend integration boundaries
-
-The current frontend consumes the following adapter projections. HTTP access and mock resource composition stay in infrastructure adapters; contexts collaborate through DTOs and IDs.
-
-| Consumer | Source owner | Adapter result consumed by the frontend |
-|---|---|---|
-| Business | Business API | `GET businesses/{id}/seats` returns the server-calculated limit, active employees, reservations, available seats and subscription status. |
-| Payments | Business | `PaymentsApi.getSeatUsage(businessId)` returns `{ activeEmployees, reservedSeats }`; administrators are excluded and pending invitations reserve seats. |
-| Mapping | Business | Business location assemblers map `{ id, name, address, isVerified, latitude, longitude }` into Mapping's own location model. |
-
-JSON Server supplies raw collections; infrastructure adapters compose the snapshots consumed by their contexts. These frontend data shapes describe the current mock integration.
-
-Business and Profiles use the ASP.NET contracts directly. The commerce ID is resolved from the caller's context; registration sends no synthetic ID or audit metadata. Business updates use `PUT businesses/{id}`, and personal data uses `GET/PUT profiles/{userId}`. Preferences use `GET/PUT profiles/{userId}/preferences`.
-
-Staff and invitations are queried under `businesses/{id}/members` and `businesses/{id}/invitations`. Invitation creation uses `POST businesses/{id}/invitations`; edits use `PUT staff-invitations/{id}`, while cancellation and resend use their dedicated POST commands. Membership edits use `PUT business-members/{id}`; activation/deactivation use dedicated POST commands. Memberships and invitation history are retained, with no deletion actions.
-
-Only the fixed demonstration accounts are available in this delivery. Staff invitations reserve seats and request delivery, but they do not create access credentials or IAM accounts. Address entry does not perform geocoding: the user selects the map point, and Business stores its coordinates.
-
-## Documentation
-- Domain and architecture references:
-  - `docs/class_diagram.puml`
-  - `docs/user-stories.md`
-- Project history and release notes:
-  - `CHANGELOG.md`
-
-## Recommended Development Practices
-- Keep each feature inside its bounded context first; move to `shared` only when truly cross-context.
-- Preserve layer boundaries (presentation does not call raw HTTP clients directly).
-- Prefer explicit domain language in naming and docs.
-- Add or update docs when introducing new entities or use cases.
-
-
-## ASP.NET shared connection
-
-The shared HTTP client now uses the ASP.NET API. Development defaults to `http://localhost:5221/api/v1`, matching its HTTP launch profile; Vite uses port 5173. Starting JSON Server is not required for this connection. Alert, Business, Contacts, Notifications and Profiles use this connection; the other module adapters remain pending their respective integration features.
-
-The profile selector retains two fixed demonstration actors: administrator → `synthetic-admin`, employee → `synthetic-employee`. Every request reads the current actor and sends `User-Id` plus `Accept-Language` (`en-US` or `es-419`). This is a demonstration selector, without registration, passwords or IAM. Switching profiles clears the shared commerce context and rejects responses belonging to the previous actor.
-
-Before opening a role view, the router resolves its commerce through `GET businesses`. The context stores the returned ID and location; it does not assume `bus-1`. An empty employee result is checked against `GET business-members/me` to distinguish an inactive membership. Connection failures, missing/ambiguous assignments and inactive membership have localized messages and a retry action. `currentApiContext()` and `requireBusinessId()` are available to module adapters as they are integrated.
-
-Shared error normalization preserves the original HTTP response and adds `apiError` with status, domain code, field validation and a translation key; `getApiErrorMessage()` produces the localized message.
-
-### Deployment configuration
-
-No public ASP.NET URL is configured yet. Supply `VITE_INSTALERT_PLATFORM_API_URL` when building, including `/api/v1`. A production build without this value fails with a configuration message instead of silently targeting the hosted JSON mock. For a same-origin reverse proxy, set `/api/v1` only if that proxy has been configured.
-
-```powershell
-$env:VITE_INSTALERT_PLATFORM_API_URL = 'https://YOUR-BACKEND-HOST/api/v1'
-npm run build
-```
-
-On the demonstration backend, configure `Demo__Enabled=true` and `Cors__AllowedOrigins__0` with the exact frontend origin. Keep provider credentials on the server. These settings do not deploy either application.
-
-
-Administrator registration and sign-in use IAM bearer sessions. Account setup continues through the commerce, personal profile and subscription. The three plans and checkout are supplied by the API. PayPal approval alone does not unlock the application: the server must verify the payment and the refreshed IAM session must grant access.
-
-Configure `VITE_PAYPAL_ENVIRONMENT=sandbox` and `VITE_PAYPAL_CLIENT_ID` using the same Sandbox application as the backend. These are public frontend settings; the client secret stays on the server. The server creates the pending subscription and returns its ID to the PayPal SDK. Pending payments can be retried from the page and reconciled by the backend without a webhook. Cancellation retains the paid period, and renewal can be resumed before expiry. Employee account provisioning and identity integration in the remaining modules are separate features.
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Development server. |
+| `npm run build` | Production build in `dist/`. |
+| `npm run preview` | Local preview of the production build. |
