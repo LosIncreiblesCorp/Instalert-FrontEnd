@@ -21,13 +21,14 @@ export const IncidentCategory = Object.freeze({
 export class IncidentMarker {
 /** Creates an incident marker entity.
 * @param {Object} params - Incident marker fields. */
-    constructor({ id, title, description, type, category, businessId, status, latitude, longitude, reportedAt }) {
+    constructor({ id, title, description, type, category, businessId, businessName = '', status, latitude, longitude, reportedAt }) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.type = type;
         this.category = category;
         this.businessId = businessId;
+        this.businessName = businessName;
         this.status = status;
         this.latitude = latitude;
         this.longitude = longitude;
