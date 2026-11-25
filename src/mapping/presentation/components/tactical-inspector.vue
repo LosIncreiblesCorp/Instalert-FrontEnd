@@ -21,6 +21,7 @@
           <p class="text-sm text-gray-600 m-0 mb-3"><i class="pi pi-clock mr-1" aria-hidden="true"></i>{{ formatDate(item.reportedAt) }}</p>
           <span class="status-badge" :class="statusClass(item.status)">{{ statusLabel(item.status) }}</span>
         </div>
+        <p class="text-sm text-gray-700 mb-3"><strong>{{ t('mapping.inspector.sourceBusiness') }}:</strong> {{ incidentBusinessName }}</p>
         <h3 class="text-sm font-bold text-gray-700 border-bottom-1 surface-border pb-2 mb-3 mt-4">{{ t('mapping.inspector.reportDetails') }}</h3>
         <p class="text-sm text-gray-700 bg-gray-50 p-3 border-round line-height-3 m-0 border-1 surface-border">{{ item.description || t('mapping.notRecorded') }}</p>
         <p v-if="!item.hasLocation" class="text-sm text-gray-600">{{ t('mapping.feedback.noLocation') }}</p>
@@ -37,7 +38,7 @@
           </div>
           <p v-if="!item.hasLocation" class="text-sm text-gray-600">{{ t('mapping.feedback.noLocation') }}</p>
           <p v-else-if="!applicableZones.length" class="text-sm text-gray-600">{{ t('mapping.inspector.noAssociatedZone') }}</p>
-          <template v-if="applicableZones.length">
+          <div class="business-reports">
             <div class="bg-gray-50 border-round p-3 mb-4">
               <p class="text-xs font-bold text-gray-600 m-0 mb-1">{{ t('mapping.inspector.filteredReports') }}</p>
               <h3 class="text-xl font-bold m-0 mb-1">{{ localIncidents.length }}</h3>
@@ -50,6 +51,7 @@
               <p class="text-xs text-gray-600 line-height-3">{{ recentIncident.description || t('mapping.notRecorded') }}</p>
               <span class="status-badge" :class="statusClass(recentIncident.status)">{{ statusLabel(recentIncident.status) }}</span>
             </div>
+            <p v-else class="text-sm text-gray-600 mb-4">{{ t('mapping.inspector.noBusinessReports') }}</p>
             <div class="mb-4">
               <h3 class="text-xs font-bold text-gray-600 mb-2">{{ t('mapping.inspector.hourlyDistribution') }}</h3>
               <p class="text-xs text-gray-600">{{ t('mapping.inspector.localTime') }}</p>
@@ -57,8 +59,8 @@
               <ul class="hourly-labels"><li v-for="bucket in hourlyCounts" :key="bucket.label"><span>{{ bucket.label }}</span><span class="sr-only">: {{ bucket.count }}</span></li></ul>
               <p v-if="undatedCount" class="text-xs text-gray-600">{{ t('mapping.inspector.undatedReports', { count: undatedCount }) }}</p>
             </div>
-            <button type="button" class="zone-action" @click="activeTab = 'zone'"><i class="pi pi-map mr-2" aria-hidden="true"></i>{{ t('mapping.inspector.viewZoneReports') }}</button>
-          </template>
+            <button v-if="applicableZones.length" type="button" class="zone-action" @click="activeTab = 'zone'"><i class="pi pi-map mr-2" aria-hidden="true"></i>{{ t('mapping.inspector.viewZoneReports') }}</button>
+          </div>
         </template>
         <template v-else>
           <h2 class="text-lg mt-0">{{ t('mapping.inspector.businessesInZone') }}</h2>
@@ -112,7 +114,10 @@ watch(() => [props.type, props.item.id], () => { activeTab.value = props.type ==
 const applicableZones = computed(() => props.type === 'zone' ? [props.item]
   : props.type === 'business' ? props.zones.filter(zone => zone.containsLocation(props.item)) : []);
 const reportsForZone = zone => props.incidents.filter(incident => zone.containsLocation(incident));
-const localIncidents = computed(() => props.incidents.filter(incident => applicableZones.value.some(zone => zone.containsLocation(incident))));
+const localIncidents = computed(() => props.incidents.filter(incident => incident.businessId === props.item.id));
+const incidentBusinessName = computed(() => props.item.businessName
+  || props.businesses.find(business => business.id === props.item.businessId)?.name
+  || t('mapping.inspector.businessUnavailable'));
 const zoneBusinesses = computed(() => props.type === 'zone' ? props.businesses.filter(business => props.item.containsLocation(business)) : []);
 const validTime = incident => incident.reportedAt instanceof Date && Number.isFinite(incident.reportedAt.getTime());
 const recentIncident = computed(() => [...localIncidents.value].filter(validTime).sort((a, b) => b.reportedAt - a.reportedAt)[0] ?? null);
